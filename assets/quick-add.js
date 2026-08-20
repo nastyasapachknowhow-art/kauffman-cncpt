@@ -12,6 +12,8 @@ export class QuickAddComponent extends Component {
   #cachedContent = new Map();
   /** @type {AbortController} */
   #cartUpdateAbortController = new AbortController();
+  /** @type {MutationObserver | null} */
+  #galleryObserver = null;
 
   get productPageUrl() {
     const productCard = /** @type {import('./product-card').ProductCard | null} */ (this.closest('product-card'));
@@ -61,6 +63,7 @@ export class QuickAddComponent extends Component {
     mediaQueryLarge.removeEventListener('change', this.#closeQuickAddModal);
     this.#abortController?.abort();
     this.#cartUpdateAbortController.abort();
+    this.#galleryObserver?.disconnect();
     document.removeEventListener(ThemeEvents.variantSelected, this.#updateQuickAddButtonState.bind(this));
   }
 
@@ -207,6 +210,81 @@ export class QuickAddComponent extends Component {
     morph(modalContent, productGrid);
 
     this.#syncVariantSelection(modalContent);
+    this.#setupGalleryControls(modalContent);
+  }
+
+  /**
+   * Restores gallery controls after product-page markup is placed in the modal.
+   * The gallery's inline preview script is not run when the fetched HTML is
+   * morphed into the existing dialog, so the thumbnails need one delegated
+   * modal-level handler instead.
+   *
+   * @param {Element} modalContent - The quick-add modal content container.
+   */
+  #setupGalleryControls(modalContent) {
+    if (modalContent.dataset.quickAddGalleryControlsReady !== 'true') {
+      modalContent.dataset.quickAddGalleryControlsReady = 'true';
+
+      modalContent.addEventListener('click', (event) => {
+        const target = event.target;
+        if (!(target instanceof Element)) return;
+
+        const previewButton = target.closest('[data-media-gallery-preview-index]');
+        if (!(previewButton instanceof HTMLButtonElement) || !modalContent.contains(previewButton)) return;
+
+        const gallery = previewButton.closest('media-gallery');
+        const slideshow = gallery?.querySelector('slideshow-component');
+        const index = Number(previewButton.dataset.mediaGalleryPreviewIndex);
+        if (!gallery || !slideshow || Number.isNaN(index)) return;
+
+        event.preventDefault();
+
+        if (typeof slideshow.select === 'function') {
+          slideshow.select(index, event);
+        } else {
+          gallery.querySelectorAll('button[ref="dots[]"]')[index]?.click();
+        }
+
+        this.#syncGalleryPreviewState(gallery, index);
+      });
+    }
+
+    this.#galleryObserver?.disconnect();
+    this.#galleryObserver = new MutationObserver(() => this.#syncGalleryPreviewState(modalContent));
+    this.#galleryObserver.observe(modalContent, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['aria-hidden'],
+    });
+
+    this.#syncGalleryPreviewState(modalContent);
+  }
+
+  /**
+   * Keeps the desktop and mobile thumbnail rails in sync with the active slide.
+   *
+   * @param {Element} root - A media gallery or the modal content container.
+   * @param {number} [selectedIndex] - The selected slide, when known directly from a thumbnail click.
+   */
+  #syncGalleryPreviewState(root, selectedIndex) {
+    const galleries = root.matches('media-gallery') ? [root] : Array.from(root.querySelectorAll('media-gallery'));
+
+    for (const gallery of galleries) {
+      const slideshow = gallery.querySelector('slideshow-component');
+      if (!slideshow) continue;
+
+      const slides = Array.from(slideshow.querySelectorAll('slideshow-slide'));
+      const activeIndex =
+        selectedIndex ?? slides.findIndex((slide) => slide.getAttribute('aria-hidden') === 'false');
+      if (activeIndex < 0) continue;
+
+      gallery.querySelectorAll('[data-media-gallery-preview-index]').forEach((button) => {
+        const isActive = Number(button.dataset.mediaGalleryPreviewIndex) === activeIndex;
+        button.classList.toggle('is-active', isActive);
+        button.setAttribute('aria-selected', String(isActive));
+      });
+    }
   }
 
   /**
