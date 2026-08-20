@@ -1,6 +1,6 @@
 import { morph } from '@theme/morph';
 import { Component } from '@theme/component';
-import { CartUpdateEvent, ThemeEvents, VariantSelectedEvent } from '@theme/events';
+import { CartUpdateEvent, SlideshowSelectEvent, ThemeEvents, VariantSelectedEvent } from '@theme/events';
 import { DialogComponent, DialogCloseEvent } from '@theme/dialog';
 import { mediaQueryLarge, getIOSVersion } from '@theme/utilities';
 import VariantPicker from '@theme/variant-picker';
@@ -207,6 +207,57 @@ export class QuickAddComponent extends Component {
     morph(modalContent, productGrid);
 
     this.#syncVariantSelection(modalContent);
+    this.#setupGalleryControls(modalContent);
+  }
+
+  /**
+   * Enables preview thumbnails after fetched product markup is morphed into the
+   * dialog. Inline scripts in that markup are not re-executed by the browser.
+   *
+   * @param {Element} modalContent - The quick-add modal content container.
+   */
+  #setupGalleryControls(modalContent) {
+    if (modalContent.dataset.quickAddGalleryControlsReady === 'true') return;
+
+    modalContent.dataset.quickAddGalleryControlsReady = 'true';
+
+    const syncPreviewState = (gallery, activeIndex) => {
+      gallery.querySelectorAll('[data-media-gallery-preview-index]').forEach((button) => {
+        const isActive = Number(button.dataset.mediaGalleryPreviewIndex) === activeIndex;
+        button.classList.toggle('is-active', isActive);
+        button.setAttribute('aria-selected', String(isActive));
+      });
+    };
+
+    modalContent.addEventListener('click', (event) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+
+      const previewButton = target.closest('[data-media-gallery-preview-index]');
+      if (!(previewButton instanceof HTMLButtonElement) || !modalContent.contains(previewButton)) return;
+
+      const gallery = previewButton.closest('media-gallery');
+      const slideshow = gallery?.querySelector('slideshow-component');
+      const index = Number(previewButton.dataset.mediaGalleryPreviewIndex);
+      if (!gallery || !slideshow || Number.isNaN(index)) return;
+
+      event.preventDefault();
+
+      if (typeof slideshow.select === 'function') {
+        slideshow.select(index, event);
+      } else {
+        gallery.querySelectorAll('button[ref="dots[]"]')[index]?.click();
+      }
+
+      syncPreviewState(gallery, index);
+    });
+
+    modalContent.addEventListener(SlideshowSelectEvent.eventName, (event) => {
+      if (!(event instanceof SlideshowSelectEvent) || !(event.target instanceof Element)) return;
+
+      const gallery = event.target.closest('media-gallery');
+      if (gallery) syncPreviewState(gallery, event.detail.index);
+    });
   }
 
   /**
