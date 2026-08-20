@@ -1,0 +1,540 @@
+{% comment %}
+  Custom Product Benefits
+  File: sections/custom-product-benefits.liquid
+{% endcomment %}
+
+<section
+  id="ProductBenefits-{{ section.id }}"
+  class="product-benefits product-benefits--{{ section.id }}"
+>
+  <div class="product-benefits__inner">
+    <div class="product-benefits__grid">
+      {% for block in section.blocks %}
+        <div class="product-benefits__item" {{ block.shopify_attributes }}>
+          <div class="product-benefits__icon-wrap">
+            {% if block.settings.icon != blank %}
+              {{
+                block.settings.icon
+                | image_url: width: 160
+                | image_tag:
+                  class: 'product-benefits__icon product-benefits__icon--image',
+                  loading: 'lazy',
+                  alt: block.settings.label
+              }}
+            {% else %}
+              <div class="product-benefits__icon product-benefits__icon--placeholder">
+                {{ block.settings.fallback_icon }}
+              </div>
+            {% endif %}
+          </div>
+
+          {% if block.settings.label != blank %}
+            <div class="product-benefits__label">
+              {{ block.settings.label }}
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<style>
+  .product-benefits--{{ section.id }} {
+    width: 100%;
+    background: {{ section.settings.background_color }};
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+
+  .product-benefits--{{ section.id }} .product-benefits__inner {
+    width: 100%;
+    max-width: {{ section.settings.max_width }}px;
+    margin: 0 auto;
+    padding-left: {{ section.settings.side_padding }}px;
+    padding-right: {{ section.settings.side_padding }}px;
+  }
+
+  .product-benefits--{{ section.id }} .product-benefits__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    border-top: 1px solid {{ section.settings.border_color }};
+    border-bottom: 1px solid {{ section.settings.border_color }};
+    min-height: {{ section.settings.block_height }}px;
+  }
+
+  .product-benefits--{{ section.id }} .product-benefits__item {
+    min-height: calc({{ section.settings.block_height }}px / 2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: {{ section.settings.icon_label_gap }}px;
+    text-align: center;
+  }
+
+  .product-benefits--{{ section.id }} .product-benefits__icon-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: {{ section.settings.icon_box_size }}px;
+    height: {{ section.settings.icon_box_size }}px;
+  }
+
+  .product-benefits--{{ section.id }} .product-benefits__icon--image {
+    display: block;
+    width: {{ section.settings.icon_size }}px;
+    height: {{ section.settings.icon_size }}px;
+    object-fit: contain;
+  }
+
+  .product-benefits--{{ section.id }} .product-benefits__icon--placeholder {
+    font-family: Inter, sans-serif;
+    font-size: {{ section.settings.fallback_icon_size }}px;
+    line-height: 1;
+    color: {{ section.settings.icon_color }};
+  }
+
+  .product-benefits--{{ section.id }} .product-benefits__label {
+    max-width: {{ section.settings.label_max_width }}px;
+    font-family: {{ section.settings.label_font_family }}, sans-serif;
+    font-style: normal;
+    font-weight: {{ section.settings.label_font_weight }};
+    font-size: {{ section.settings.label_font_size }}px;
+    line-height: {{ section.settings.label_line_height }}px;
+    color: {{ section.settings.label_color }};
+    text-align: center;
+  }
+
+  @media screen and (min-width: 821px) {
+    .product-benefits--{{ section.id }} .product-benefits__grid {
+      grid-template-columns: repeat({{ section.settings.desktop_columns }}, 1fr);
+      min-height: auto;
+    }
+
+    .product-benefits--{{ section.id }} .product-benefits__item {
+      min-height: {{ section.settings.desktop_item_height }}px;
+    }
+  }
+
+  @media screen and (max-width: 820px) {
+    .product-benefits--{{ section.id }} {
+      padding-top: {{ section.settings.mobile_padding_top }}px;
+      padding-bottom: {{ section.settings.mobile_padding_bottom }}px;
+    }
+
+    .product-benefits--{{ section.id }} .product-benefits__inner {
+      max-width: {{ section.settings.mobile_max_width }}px;
+      padding-left: {{ section.settings.mobile_side_padding }}px;
+      padding-right: {{ section.settings.mobile_side_padding }}px;
+    }
+
+    .product-benefits--{{ section.id }} .product-benefits__grid {
+      min-height: {{ section.settings.mobile_block_height }}px;
+    }
+
+    .product-benefits--{{ section.id }} .product-benefits__item {
+      min-height: calc({{ section.settings.mobile_block_height }}px / 2);
+    }
+
+    .product-benefits--{{ section.id }} .product-benefits__icon-wrap {
+      width: {{ section.settings.mobile_icon_box_size }}px;
+      height: {{ section.settings.mobile_icon_box_size }}px;
+    }
+
+    .product-benefits--{{ section.id }} .product-benefits__icon--image {
+      width: {{ section.settings.mobile_icon_size }}px;
+      height: {{ section.settings.mobile_icon_size }}px;
+    }
+
+    .product-benefits--{{ section.id }} .product-benefits__label {
+      max-width: {{ section.settings.mobile_label_max_width }}px;
+      font-size: {{ section.settings.mobile_label_font_size }}px;
+      line-height: {{ section.settings.mobile_label_line_height }}px;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Product benefits",
+  "tag": "section",
+  "class": "section-product-benefits",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "Desktop max width",
+      "min": 320,
+      "max": 1200,
+      "step": 10,
+      "unit": "px",
+      "default": 390
+    },
+    {
+      "type": "range",
+      "id": "mobile_max_width",
+      "label": "Mobile max width",
+      "min": 320,
+      "max": 430,
+      "step": 2,
+      "unit": "px",
+      "default": 392
+    },
+    {
+      "type": "range",
+      "id": "side_padding",
+      "label": "Desktop side padding",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "mobile_side_padding",
+      "label": "Mobile side padding",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "block_height",
+      "label": "Desktop block height",
+      "min": 120,
+      "max": 420,
+      "step": 4,
+      "unit": "px",
+      "default": 312
+    },
+    {
+      "type": "range",
+      "id": "mobile_block_height",
+      "label": "Mobile block height",
+      "min": 120,
+      "max": 420,
+      "step": 4,
+      "unit": "px",
+      "default": 312
+    },
+    {
+      "type": "range",
+      "id": "desktop_columns",
+      "label": "Desktop columns",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "desktop_item_height",
+      "label": "Desktop item height",
+      "min": 80,
+      "max": 240,
+      "step": 4,
+      "unit": "px",
+      "default": 140
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Desktop padding top",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Desktop padding bottom",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "mobile_padding_top",
+      "label": "Mobile padding top",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "mobile_padding_bottom",
+      "label": "Mobile padding bottom",
+      "min": 0,
+      "max": 160,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "icon_label_gap",
+      "label": "Icon and label gap",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Icons"
+    },
+    {
+      "type": "range",
+      "id": "icon_box_size",
+      "label": "Desktop icon box size",
+      "min": 24,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "mobile_icon_box_size",
+      "label": "Mobile icon box size",
+      "min": 24,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "icon_size",
+      "label": "Desktop icon size",
+      "min": 16,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "default": 42
+    },
+    {
+      "type": "range",
+      "id": "mobile_icon_size",
+      "label": "Mobile icon size",
+      "min": 16,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "default": 42
+    },
+    {
+      "type": "range",
+      "id": "fallback_icon_size",
+      "label": "Fallback icon size",
+      "min": 12,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "default": 28
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "text",
+      "id": "label_font_family",
+      "label": "Label font family",
+      "default": "Inter"
+    },
+    {
+      "type": "select",
+      "id": "label_font_weight",
+      "label": "Label font weight",
+      "options": [
+        {
+          "value": "300",
+          "label": "Light"
+        },
+        {
+          "value": "400",
+          "label": "Regular"
+        },
+        {
+          "value": "500",
+          "label": "Medium"
+        },
+        {
+          "value": "600",
+          "label": "Semi-bold"
+        }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "range",
+      "id": "label_font_size",
+      "label": "Desktop label font size",
+      "min": 8,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "label_line_height",
+      "label": "Desktop label line height",
+      "min": 10,
+      "max": 36,
+      "step": 1,
+      "unit": "px",
+      "default": 17
+    },
+    {
+      "type": "range",
+      "id": "mobile_label_font_size",
+      "label": "Mobile label font size",
+      "min": 8,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "mobile_label_line_height",
+      "label": "Mobile label line height",
+      "min": 10,
+      "max": 36,
+      "step": 1,
+      "unit": "px",
+      "default": 17
+    },
+    {
+      "type": "range",
+      "id": "label_max_width",
+      "label": "Desktop label max width",
+      "min": 40,
+      "max": 180,
+      "step": 2,
+      "unit": "px",
+      "default": 124
+    },
+    {
+      "type": "range",
+      "id": "mobile_label_max_width",
+      "label": "Mobile label max width",
+      "min": 40,
+      "max": 180,
+      "step": 2,
+      "unit": "px",
+      "default": 124
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background",
+      "default": "#F7F5F1"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border",
+      "default": "#E5E0D8"
+    },
+    {
+      "type": "color",
+      "id": "icon_color",
+      "label": "Fallback icon color",
+      "default": "#292828"
+    },
+    {
+      "type": "color",
+      "id": "label_color",
+      "label": "Label color",
+      "default": "#8A8680"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "benefit",
+      "name": "Benefit",
+      "limit": 4,
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "icon",
+          "label": "Icon image"
+        },
+        {
+          "type": "text",
+          "id": "fallback_icon",
+          "label": "Fallback icon",
+          "default": "＋"
+        },
+        {
+          "type": "textarea",
+          "id": "label",
+          "label": "Label",
+          "default": "Premium quality"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product benefits",
+      "blocks": [
+        {
+          "type": "benefit",
+          "settings": {
+            "fallback_icon": "✦",
+            "label": "Premium materials"
+          }
+        },
+        {
+          "type": "benefit",
+          "settings": {
+            "fallback_icon": "↺",
+            "label": "14-day easy returns"
+          }
+        },
+        {
+          "type": "benefit",
+          "settings": {
+            "fallback_icon": "□",
+            "label": "Gift-ready packaging"
+          }
+        },
+        {
+          "type": "benefit",
+          "settings": {
+            "fallback_icon": "✓",
+            "label": "Designed in Europe"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

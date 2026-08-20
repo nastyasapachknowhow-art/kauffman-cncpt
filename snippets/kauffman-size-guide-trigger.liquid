@@ -1,0 +1,63 @@
+{%- doc -%}
+  Renders the button that opens a product size-guide dialog.
+
+  @param {string} component_id - Id of the dialog component to open.
+  @param {string} dialog_id - Id of the controlled dialog.
+  @param {string} [label] - Optional trigger label.
+{%- enddoc -%}
+
+<button
+  type="button"
+  class="kauffman-size-guide-trigger"
+  on:click="#{{ component_id }}/showDialog"
+  aria-haspopup="dialog"
+  aria-controls="{{ dialog_id }}"
+>
+  <svg class="kauffman-size-guide-trigger__icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+    <path d="M8 2.25a2 2 0 1 1 2 2c0 .92-.53 1.27-1.17 1.69-.38.25-.78.52-.83.93L3.2 10.35A1.5 1.5 0 0 0 4.08 13h7.84a1.5 1.5 0 0 0 .88-2.65L8 6.87" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  <span>{{ label | default: 'Size guide' | escape }}</span>
+</button>
+
+{% stylesheet %}
+  .kauffman-size-guide-trigger {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 7px;
+    padding: 2px 0;
+    border: 0;
+    background: transparent;
+    color: rgb(var(--color-foreground-rgb) / 0.72);
+    font: inherit;
+    font-size: 11px;
+    line-height: 1.2;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+
+  .kauffman-size-guide-trigger:hover {
+    color: rgb(var(--color-foreground-rgb));
+  }
+
+  .kauffman-size-guide-trigger:focus-visible {
+    outline: var(--focus-outline-width) solid currentcolor;
+    outline-offset: var(--focus-outline-offset);
+  }
+
+  .kauffman-size-guide-trigger__icon {
+    width: 13px;
+    height: 13px;
+    flex: 0 0 13px;
+    stroke-width: 1.25;
+  }
+
+  @media screen and (max-width: 820px) {
+    .kauffman-size-guide-trigger {
+      font-size: 10px;
+    }
+  }
+{% endstylesheet %}

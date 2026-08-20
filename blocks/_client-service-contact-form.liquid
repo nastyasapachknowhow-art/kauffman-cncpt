@@ -1,0 +1,287 @@
+{% liquid
+  assign contact_title = block.settings.title | default: 'Customer Support'
+  assign form_id = block.id | default: section.id | prepend: 'ClientServiceContactForm-'
+  assign page_url = canonical_url
+
+  if page_url == blank and request.path != blank
+    assign page_url = shop.url | append: request.path
+  endif
+
+  assign product_title = ''
+  assign product_sku = ''
+
+  if closest.product != blank
+    assign product_title = closest.product.title
+    assign product_sku = closest.product.selected_or_first_available_variant.sku
+  endif
+
+  assign whatsapp_number = block.settings.whatsapp_number | strip | remove: ' ' | remove: '+' | remove: '-' | remove: '(' | remove: ')' | remove: '.'
+  assign whatsapp_url = ''
+
+  if block.settings.show_whatsapp and whatsapp_number != blank
+    capture whatsapp_message
+      echo block.settings.whatsapp_message | default: 'Hi, I have a question about this page:'
+      if page_url != blank
+        echo ' '
+        echo page_url
+      endif
+    endcapture
+
+    assign encoded_whatsapp_message = whatsapp_message | strip | url_encode
+    assign whatsapp_url = 'https://wa.me/' | append: whatsapp_number | append: '?text=' | append: encoded_whatsapp_message
+  endif
+%}
+
+{% if contact_title != blank %}
+  <details
+    class="product-info-client-accordion__item product-info-client-accordion__item--contact"
+    {% if block.settings.open_by_default %}
+      open
+    {% endif %}
+    {{ block.shopify_attributes }}
+  >
+    <summary class="product-info-client-accordion__summary">
+      <span class="product-info-client-accordion__title-wrap">
+        <span class="product-info-client-accordion__title">
+          {{ contact_title }}
+        </span>
+      </span>
+
+      <span class="product-info-client-accordion__icon" aria-hidden="true">
+        <span class="product-info-client-accordion__icon-line product-info-client-accordion__icon-line--horizontal"></span>
+        <span class="product-info-client-accordion__icon-line product-info-client-accordion__icon-line--vertical"></span>
+      </span>
+    </summary>
+
+    <div class="product-info-client-accordion__content product-info-client-accordion__content--contact">
+      {%- form 'contact', id: form_id, class: 'product-info-client-accordion__form' -%}
+        <input name="contact[id]" type="hidden" value="{{ form_id }}">
+        <input name="contact[tags]" type="hidden" value="{{ block.settings.contact_tags | escape }}">
+
+        {% if page_url != blank %}
+          <input name="contact[Page URL]" type="hidden" value="{{ page_url | escape }}">
+        {% endif %}
+
+        {% if product_title != blank %}
+          <input name="contact[Product]" type="hidden" value="{{ product_title | escape }}">
+        {% endif %}
+
+        {% if product_sku != blank %}
+          <input name="contact[Product SKU]" type="hidden" value="{{ product_sku | escape }}">
+        {% endif %}
+
+        {% if block.settings.email_subject != blank %}
+          <input name="contact[Subject]" type="hidden" value="{{ block.settings.email_subject | escape }}">
+        {% endif %}
+
+        {%- if form.errors and form.id == form_id -%}
+          <div class="product-info-client-accordion__form-message product-info-client-accordion__form-message--error" tabindex="-1" autofocus>
+            {{- 'icon-error.svg' | inline_asset_content -}}
+            <span>{{ form.errors | default_errors }}</span>
+          </div>
+        {%- endif -%}
+
+        {%- if form.posted_successfully? and form.id == form_id -%}
+          <div class="product-info-client-accordion__form-message product-info-client-accordion__form-message--success" tabindex="-1" autofocus>
+            {{- 'icon-checkmark.svg' | inline_asset_content -}}
+            <span>{{ block.settings.success_message }}</span>
+          </div>
+        {%- endif -%}
+
+        <div class="product-info-client-accordion__form-row">
+          <div class="product-info-client-accordion__field">
+            <label class="product-info-client-accordion__label" for="{{ form_id }}-name">
+              {{ block.settings.name_label }}
+            </label>
+            <input
+              id="{{ form_id }}-name"
+              class="product-info-client-accordion__input"
+              type="text"
+              name="contact[name]"
+              autocomplete="name"
+              value="{% if form.name %}{{ form.name | escape }}{% elsif customer %}{{ customer.name | escape }}{% endif %}"
+            >
+          </div>
+
+          <div class="product-info-client-accordion__field">
+            <label class="product-info-client-accordion__label" for="{{ form_id }}-email">
+              {{ block.settings.email_label }}
+            </label>
+            <input
+              id="{{ form_id }}-email"
+              class="product-info-client-accordion__input"
+              type="email"
+              name="contact[email]"
+              autocomplete="email"
+              spellcheck="false"
+              autocapitalize="off"
+              value="{% if form.email %}{{ form.email | escape }}{% elsif customer %}{{ customer.email | escape }}{% endif %}"
+              aria-required="true"
+              required
+              {% if form.errors contains 'email' and form.id == form_id %}
+                aria-invalid="true"
+              {% endif %}
+            >
+          </div>
+        </div>
+
+        <div class="product-info-client-accordion__field">
+          <label class="product-info-client-accordion__label" for="{{ form_id }}-phone">
+            {{ block.settings.phone_label }}
+          </label>
+          <input
+            id="{{ form_id }}-phone"
+            class="product-info-client-accordion__input"
+            type="tel"
+            name="contact[phone]"
+            autocomplete="tel"
+            value="{% if form.phone %}{{ form.phone | escape }}{% elsif customer %}{{ customer.phone | escape }}{% endif %}"
+          >
+        </div>
+
+        <div class="product-info-client-accordion__field">
+          <label class="product-info-client-accordion__label" for="{{ form_id }}-body">
+            {{ block.settings.message_label }}
+          </label>
+          <textarea
+            id="{{ form_id }}-body"
+            class="product-info-client-accordion__input product-info-client-accordion__textarea"
+            name="contact[body]"
+            rows="7"
+            required
+          >{{- form.body -}}</textarea>
+        </div>
+
+        <div class="product-info-client-accordion__actions">
+          <button class="product-info-client-accordion__submit" type="submit">
+            {{ block.settings.submit_label }}
+          </button>
+
+          {% if whatsapp_url != blank %}
+            <a class="product-info-client-accordion__whatsapp" href="{{ whatsapp_url }}" target="_blank" rel="noopener">
+              {{ block.settings.whatsapp_label }}
+            </a>
+          {% endif %}
+        </div>
+
+        {% if block.settings.footer_note != blank %}
+          <div class="product-info-client-accordion__form-note rte">
+            {{ block.settings.footer_note }}
+          </div>
+        {% endif %}
+      {%- endform -%}
+    </div>
+  </details>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Support contact form",
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Customer Support"
+    },
+    {
+      "type": "checkbox",
+      "id": "open_by_default",
+      "label": "Open by default",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Email form"
+    },
+    {
+      "type": "text",
+      "id": "email_subject",
+      "label": "Email subject",
+      "default": "Customer support request"
+    },
+    {
+      "type": "text",
+      "id": "contact_tags",
+      "label": "Contact tags",
+      "default": "client-service, product-page"
+    },
+    {
+      "type": "text",
+      "id": "name_label",
+      "label": "Name label",
+      "default": "Name"
+    },
+    {
+      "type": "text",
+      "id": "email_label",
+      "label": "Email label",
+      "default": "Email"
+    },
+    {
+      "type": "text",
+      "id": "phone_label",
+      "label": "Phone label",
+      "default": "Phone number"
+    },
+    {
+      "type": "text",
+      "id": "message_label",
+      "label": "Message label",
+      "default": "Message"
+    },
+    {
+      "type": "text",
+      "id": "submit_label",
+      "label": "Submit label",
+      "default": "Send"
+    },
+    {
+      "type": "text",
+      "id": "success_message",
+      "label": "Success message",
+      "default": "Thanks. We will get back to you soon."
+    },
+    {
+      "type": "richtext",
+      "id": "footer_note",
+      "label": "Footer note",
+      "default": "<p>Privacy Policy and Terms of Service apply.</p>"
+    },
+    {
+      "type": "header",
+      "content": "WhatsApp"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_whatsapp",
+      "label": "Show WhatsApp link",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "whatsapp_number",
+      "label": "WhatsApp phone number",
+      "info": "Use international format, for example 40700111222."
+    },
+    {
+      "type": "text",
+      "id": "whatsapp_label",
+      "label": "WhatsApp label",
+      "default": "Message us on WhatsApp"
+    },
+    {
+      "type": "text",
+      "id": "whatsapp_message",
+      "label": "WhatsApp message",
+      "default": "Hi, I have a question about this product:"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Support contact form"
+    }
+  ]
+}
+{% endschema %}

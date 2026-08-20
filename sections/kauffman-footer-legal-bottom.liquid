@@ -1,0 +1,59 @@
+<div class="section-background color-{{ section.settings.color_scheme }}"></div>
+<section id="kauffman-footer-legal-bottom-{{ section.id }}" class="kflb section section--{{ section.settings.section_width }} color-{{ section.settings.color_scheme }}" style="--kflb-pad-y-d: {{ section.settings.padding_y_desktop }}px; --kflb-pad-y-m: {{ section.settings.padding_y_mobile }}px;">
+  <style>
+    #kauffman-footer-legal-bottom-{{ section.id }} { color: var(--color-foreground); background: var(--color-background); }
+    #kauffman-footer-legal-bottom-{{ section.id }} * { box-sizing: border-box; }
+    #kauffman-footer-legal-bottom-{{ section.id }} p,
+    #kauffman-footer-legal-bottom-{{ section.id }} ul { margin: 0; padding: 0; }
+    #kauffman-footer-legal-bottom-{{ section.id }} a { color: inherit; text-decoration: none; }
+    #kauffman-footer-legal-bottom-{{ section.id }} .kflb__legal,
+    #kauffman-footer-legal-bottom-{{ section.id }} .kflb__copy {
+      padding: var(--kflb-pad-y-d) 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      flex-wrap: wrap;
+      border-top: {% if section.settings.show_top_border %}1px solid var(--color-border){% else %}0{% endif %};
+    }
+    #kauffman-footer-legal-bottom-{{ section.id }} .kflb__copy { border-top: 1px solid var(--color-border); }
+    #kauffman-footer-legal-bottom-{{ section.id }} .kflb__company,
+    #kauffman-footer-legal-bottom-{{ section.id }} .kflb__copy-text,
+    #kauffman-footer-legal-bottom-{{ section.id }} .kflb__slogan { color: var(--color-foreground); opacity: .45; font-size: 12px; line-height: 1.6; letter-spacing: .08em; }
+    #kauffman-footer-legal-bottom-{{ section.id }} .kflb__slogan { color: var(--color-primary); opacity: 1; text-transform: uppercase; }
+    #kauffman-footer-legal-bottom-{{ section.id }} .kflb__links { display: flex; gap: 18px; flex-wrap: wrap; justify-content: center; }
+    #kauffman-footer-legal-bottom-{{ section.id }} .kflb__links a { color: var(--color-foreground); opacity: .42; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; transition: opacity .2s ease, color .2s ease; }
+    #kauffman-footer-legal-bottom-{{ section.id }} .kflb__links a:hover { opacity: 1; color: var(--color-primary); }
+    @media (max-width: 820px) {
+      #kauffman-footer-legal-bottom-{{ section.id }} .kflb__legal,
+      #kauffman-footer-legal-bottom-{{ section.id }} .kflb__copy { padding: var(--kflb-pad-y-m) 24px; justify-content: {{ section.settings.alignment_mobile }}; text-align: center; }
+      #kauffman-footer-legal-bottom-{{ section.id }} .kflb__links { justify-content: center; width: 100%; }
+    }
+  </style>
+  <div class="kflb__legal">
+    {% if section.settings.company_text != blank %}<div class="kflb__company">{{ section.settings.company_text }}</div>{% endif %}
+    {% if section.settings.bottom_menu != blank %}<nav class="kflb__links" aria-label="Footer legal links">{% for link in section.settings.bottom_menu.links %}<a href="{{ link.url }}">{{ link.title }}</a>{% endfor %}</nav>{% endif %}
+  </div>
+  <div class="kflb__copy">
+    {% if section.settings.copyright_text != blank %}<p class="kflb__copy-text">{{ section.settings.copyright_text }}</p>{% endif %}
+    {% if section.settings.slogan_text != blank %}<p class="kflb__slogan">{{ section.settings.slogan_text }}</p>{% endif %}
+  </div>
+</section>
+{% schema %}
+{
+  "name": "Kauffman footer legal",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Color scheme", "default": "scheme-1" },
+    { "type": "select", "id": "section_width", "label": "Width", "options": [{"value":"page-width","label":"Page"},{"value":"full-width","label":"Full"}], "default": "full-width" },
+    { "type": "checkbox", "id": "show_top_border", "label": "Show top border", "default": true },
+    { "type": "text", "id": "company_text", "label": "Company text", "default": "CUI: RO12345678 · Nr. ORC: J40/1234/2024 · Bucharest, Romania" },
+    { "type": "link_list", "id": "bottom_menu", "label": "Bottom legal menu" },
+    { "type": "text", "id": "copyright_text", "label": "Copyright text", "default": "© 2024–2026 Kauffman Concept. All rights reserved." },
+    { "type": "text", "id": "slogan_text", "label": "Right slogan", "default": "Born digital. Built for Europe." },
+    { "type": "select", "id": "alignment_mobile", "label": "Mobile alignment", "options": [{"value":"flex-start","label":"Left"},{"value":"center","label":"Center"},{"value":"flex-end","label":"Right"}], "default": "center" },
+    { "type": "range", "id": "padding_y_desktop", "label": "Padding vertical desktop", "min": 12, "max": 80, "step": 4, "unit": "px", "default": 28 },
+    { "type": "range", "id": "padding_y_mobile", "label": "Padding vertical mobile", "min": 12, "max": 64, "step": 4, "unit": "px", "default": 20 }
+  ],
+  "presets": [{ "name": "Kauffman footer legal bottom" }]
+}
+{% endschema %}

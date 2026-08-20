@@ -1,0 +1,314 @@
+{%- doc -%}
+  Intended for use in a block similar to the button block.
+
+  @param {string} link - link to render
+  @param {object} [block] - The block
+
+  @example
+  {% render 'button', link: '/collections/all' %}
+{%- enddoc -%}
+
+{% assign block_settings = block.settings %}
+
+<a
+  {% if link == blank %}
+    role="link"
+    aria-disabled="true"
+  {% else %}
+    href="{{ link }}"
+  {% endif %}
+  class="
+    size-style
+    {{ block_settings.style_class }}
+    {{ block_settings.style_class }}--{{ block.id }}
+    {% if block_settings.use_custom_style %}
+      kauffman-custom-button
+      {% if block_settings.style_class == 'link' %}
+        kauffman-custom-link
+        kauffman-custom-link--{{ block_settings.custom_link_underline_style }}
+        kauffman-custom-link-animation--{{ block_settings.custom_link_underline_animation }}
+      {% endif %}
+    {% endif %}
+  "
+  style="
+    {% render 'size-style', settings: block_settings %}
+    {% if block_settings.use_custom_style %}
+      --k-button-padding-x: {{ block_settings.custom_padding_x }}px;
+      --k-button-padding-y: {{ block_settings.custom_padding_y }}px;
+      --k-button-min-height: {{ block_settings.custom_min_height }}px;
+      --k-button-padding-x-mobile: {{ block_settings.custom_padding_x_mobile }}px;
+      --k-button-padding-y-mobile: {{ block_settings.custom_padding_y_mobile }}px;
+      --k-button-min-height-mobile: {{ block_settings.custom_min_height_mobile }}px;
+      --k-button-border-radius: {{ block_settings.custom_border_radius }}px;
+      --k-button-border-width: {{ block_settings.custom_border_width }}px;
+      --k-button-font-size: {{ block_settings.custom_font_size }}px;
+      --k-button-font-size-mobile: {{ block_settings.custom_font_size_mobile }}px;
+      --k-button-font-weight: {{ block_settings.custom_font_weight }};
+      --k-button-text-transform: {{ block_settings.custom_text_transform }};
+      --k-button-letter-spacing: {{ block_settings.custom_letter_spacing }}px;
+      --k-button-line-height: {{ block_settings.custom_line_height }};
+      --k-button-text-color: {{ block_settings.custom_text_color }};
+      --k-button-background-color: {{ block_settings.custom_background_color }};
+      --k-button-border-color: {{ block_settings.custom_border_color }};
+      --k-button-hover-text-color: {{ block_settings.custom_hover_text_color }};
+      --k-button-hover-background-color: {{ block_settings.custom_hover_background_color }};
+      --k-button-hover-border-color: {{ block_settings.custom_hover_border_color }};
+      --k-link-text-color: {{ block_settings.custom_link_text_color }};
+      --k-link-hover-text-color: {{ block_settings.custom_link_hover_text_color }};
+      --k-link-underline-color: {{ block_settings.custom_link_underline_color }};
+      --k-link-hover-underline-color: {{ block_settings.custom_link_hover_underline_color }};
+      --k-link-underline-thickness: {{ block_settings.custom_link_underline_thickness }}px;
+      --k-link-underline-offset: {{ block_settings.custom_link_underline_offset }}px;
+      --k-link-underline-style: {{ block_settings.custom_link_underline_style }};
+      --k-link-underline-animation: {{ block_settings.custom_link_underline_animation }};
+    {% endif %}
+  "
+  {%- if block_settings.open_in_new_tab -%}
+    target="_blank"
+    rel="noopener noreferrer"
+  {%- endif -%}
+  {{ block.shopify_attributes }}
+>
+  {{ block_settings.label }}
+</a>
+
+{% stylesheet %}
+  .link {
+    text-decoration: none;
+    text-decoration-color: currentcolor;
+
+    &:hover {
+      color: var(--color-primary-hover);
+      text-decoration-color: transparent;
+    }
+  }
+
+
+  .kauffman-button-block-align {
+    display: flex;
+    width: 100%;
+    min-height: var(--k-button-align-area-min-height, 0px);
+  }
+
+  .kauffman-button-block-align--top_left {
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+
+  .kauffman-button-block-align--top_center {
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  .kauffman-button-block-align--top_right {
+    align-items: flex-start;
+    justify-content: flex-end;
+  }
+
+  .kauffman-button-block-align--middle_left {
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .kauffman-button-block-align--middle_center {
+    align-items: center;
+    justify-content: center;
+  }
+
+  .kauffman-button-block-align--middle_right {
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  .kauffman-button-block-align--bottom_left {
+    align-items: flex-end;
+    justify-content: flex-start;
+  }
+
+  .kauffman-button-block-align--bottom_center {
+    align-items: flex-end;
+    justify-content: center;
+  }
+
+  .kauffman-button-block-align--bottom_right {
+    align-items: flex-end;
+    justify-content: flex-end;
+  }
+
+  .kauffman-custom-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--k-button-min-height);
+    padding-block: var(--k-button-padding-y) !important;
+    padding-inline: var(--k-button-padding-x) !important;
+    border: var(--k-button-border-width) solid var(--k-button-border-color) !important;
+    border-radius: var(--k-button-border-radius) !important;
+    background: var(--k-button-background-color) !important;
+    color: var(--k-button-text-color) !important;
+    font-size: var(--k-button-font-size) !important;
+    font-weight: var(--k-button-font-weight) !important;
+    line-height: var(--k-button-line-height) !important;
+    letter-spacing: var(--k-button-letter-spacing) !important;
+    text-align: center;
+    text-transform: var(--k-button-text-transform) !important;
+    text-decoration: none;
+    transition:
+      background-color 300ms ease,
+      border-color 300ms ease,
+      color 300ms ease,
+      opacity 300ms ease;
+  }
+
+  .kauffman-custom-button:hover {
+    border-color: var(--k-button-hover-border-color) !important;
+    background: var(--k-button-hover-background-color) !important;
+    color: var(--k-button-hover-text-color) !important;
+  }
+
+
+
+  .kauffman-custom-button.link {
+    position: relative;
+    min-height: auto;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    color: var(--k-link-text-color) !important;
+    padding-block: 0 !important;
+    padding-inline: 0 !important;
+    text-decoration: none !important;
+    overflow: visible;
+  }
+
+  .kauffman-custom-button.link:hover {
+    background: transparent !important;
+    border-color: transparent !important;
+    color: var(--k-link-hover-text-color) !important;
+  }
+
+  .kauffman-custom-button.link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: calc(var(--k-link-underline-offset) * -1);
+    height: var(--k-link-underline-thickness);
+    background: var(--k-link-underline-color);
+    pointer-events: none;
+    opacity: 1;
+    transform: scaleX(1);
+    transform-origin: center;
+    transition:
+      transform 300ms ease,
+      opacity 300ms ease,
+      background-color 300ms ease;
+  }
+
+  .kauffman-custom-button.link:hover::after {
+    background: var(--k-link-hover-underline-color);
+  }
+
+  .kauffman-custom-button.link.kauffman-custom-link--none::after {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+
+  .kauffman-custom-button.link.kauffman-custom-link--hover::after {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+
+  .kauffman-custom-button.link.kauffman-custom-link--hover:hover::after {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+
+  .kauffman-custom-button.link.kauffman-custom-link--hide_on_hover:hover::after {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+
+  .kauffman-custom-button.link.kauffman-custom-link-animation--none::after,
+  .kauffman-custom-button.link.kauffman-custom-link-animation--none:hover::after {
+    transition: none;
+  }
+
+  .kauffman-custom-button.link.kauffman-custom-link-animation--fade::after,
+  .kauffman-custom-button.link.kauffman-custom-link-animation--fade:hover::after {
+    transform: scaleX(1);
+  }
+
+  .kauffman-custom-button.link.kauffman-custom-link-animation--slide_left::after {
+    transform-origin: left;
+  }
+
+  .kauffman-custom-button.link.kauffman-custom-link-animation--slide_center::after {
+    transform-origin: center;
+  }
+
+  @media screen and (max-width: 820px) {
+
+    .kauffman-button-block-align {
+      min-height: var(--k-button-align-area-min-height-mobile, var(--k-button-align-area-min-height, 0px));
+    }
+
+    .kauffman-button-block-align-mobile--top_left {
+      align-items: flex-start;
+      justify-content: flex-start;
+    }
+
+    .kauffman-button-block-align-mobile--top_center {
+      align-items: flex-start;
+      justify-content: center;
+    }
+
+    .kauffman-button-block-align-mobile--top_right {
+      align-items: flex-start;
+      justify-content: flex-end;
+    }
+
+    .kauffman-button-block-align-mobile--middle_left {
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    .kauffman-button-block-align-mobile--middle_center {
+      align-items: center;
+      justify-content: center;
+    }
+
+    .kauffman-button-block-align-mobile--middle_right {
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .kauffman-button-block-align-mobile--bottom_left {
+      align-items: flex-end;
+      justify-content: flex-start;
+    }
+
+    .kauffman-button-block-align-mobile--bottom_center {
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .kauffman-button-block-align-mobile--bottom_right {
+      align-items: flex-end;
+      justify-content: flex-end;
+    }
+
+    .kauffman-custom-button {
+      min-height: var(--k-button-min-height-mobile);
+      padding-block: var(--k-button-padding-y-mobile) !important;
+      padding-inline: var(--k-button-padding-x-mobile) !important;
+      font-size: var(--k-button-font-size-mobile) !important;
+    }
+
+    .kauffman-custom-button.link {
+      min-height: auto;
+      padding-block: 0 !important;
+      padding-inline: 0 !important;
+    }
+  }
+{% endstylesheet %}

@@ -1,0 +1,34 @@
+{%- doc -%}
+  Wraps complete details markup with the accordion-custom behavior component.
+
+  @param {string} children - Complete details element rendered by the caller.
+  @param {string} [class] - Optional wrapper class.
+  @param {boolean} [disable_on_mobile] - Prevent toggling on mobile.
+  @param {boolean} [disable_on_desktop] - Prevent toggling on desktop.
+  @param {boolean} [open_by_default_on_mobile] - Open the supplied details on mobile.
+  @param {boolean} [open_by_default_on_desktop] - Open the supplied details on desktop.
+  @param {boolean} [close_with_escape] - Close the supplied details with Escape.
+{%- enddoc -%}
+
+<accordion-custom
+  {% if class != blank %}
+    class="{{ class }}"
+  {% endif %}
+  data-disable-on-mobile="{{ disable_on_mobile | default: false }}"
+  data-disable-on-desktop="{{ disable_on_desktop | default: false }}"
+  data-close-with-escape="{{ close_with_escape | default: false }}"
+  {% if open_by_default_on_mobile %}
+    open-by-default-on-mobile
+  {% endif %}
+  {% if open_by_default_on_desktop %}
+    open-by-default-on-desktop
+  {% endif %}
+>
+  {{ children }}
+</accordion-custom>
+
+{% stylesheet %}
+  accordion-custom {
+    display: block;
+  }
+{% endstylesheet %}

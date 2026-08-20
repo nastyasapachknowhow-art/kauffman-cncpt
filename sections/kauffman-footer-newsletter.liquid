@@ -1,0 +1,122 @@
+<div class="section-background color-{{ section.settings.color_scheme }}"></div>
+<section
+  id="kauffman-footer-newsletter-{{ section.id }}"
+  class="kfn section section--{{ section.settings.section_width }} color-{{ section.settings.color_scheme }}"
+  style="--kfn-pad-top-d: {{ section.settings.padding_top_desktop }}px; --kfn-pad-bottom-d: {{ section.settings.padding_bottom_desktop }}px; --kfn-pad-top-m: {{ section.settings.padding_top_mobile }}px; --kfn-pad-bottom-m: {{ section.settings.padding_bottom_mobile }}px;"
+>
+  <style>
+    #kauffman-footer-newsletter-{{ section.id }} { color: var(--color-foreground); background: var(--color-background); }
+    #kauffman-footer-newsletter-{{ section.id }} * { box-sizing: border-box; }
+    #kauffman-footer-newsletter-{{ section.id }} .kfn__wrap {
+      padding: var(--kfn-pad-top-d) 48px var(--kfn-pad-bottom-d);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 32px;
+      border-bottom: {% if section.settings.show_bottom_border %}1px solid var(--color-border){% else %}0{% endif %};
+    }
+    #kauffman-footer-newsletter-{{ section.id }} .kfn__title {
+      margin: 0 0 8px;
+      color: var(--color-foreground-heading);
+      font-family: var(--font-heading-family, inherit);
+      font-size: clamp(28px, 2.4vw, 44px);
+      line-height: 1.05;
+      font-weight: 400;
+    }
+    #kauffman-footer-newsletter-{{ section.id }} .kfn__text {
+      margin: 0;
+      color: var(--color-foreground);
+      opacity: .55;
+      font-size: 14px;
+      line-height: 1.5;
+      letter-spacing: .08em;
+    }
+    #kauffman-footer-newsletter-{{ section.id }} .kfn__form {
+      display: flex;
+      flex: 1 1 420px;
+      max-width: {{ section.settings.form_max_width }}px;
+      min-width: 280px;
+    }
+    #kauffman-footer-newsletter-{{ section.id }} .kfn__input {
+      width: 100%;
+      min-width: 0;
+      min-height: 48px;
+      border: 1px solid var(--color-input-border, var(--color-border));
+      border-right: 0;
+      background: var(--color-input-background, transparent);
+      color: var(--color-input-text, var(--color-foreground));
+      padding: 0 18px;
+      font-size: 12px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      outline: 0;
+    }
+    #kauffman-footer-newsletter-{{ section.id }} .kfn__input::placeholder { color: currentColor; opacity: .42; }
+    #kauffman-footer-newsletter-{{ section.id }} .kfn__button {
+      min-height: 48px;
+      padding: 0 28px;
+      border: 1px solid var(--color-primary-button-background, var(--color-primary));
+      letter-spacing: .28em;
+      text-transform: uppercase;
+      font-size: 11px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    #kauffman-footer-newsletter-{{ section.id }} .kfn__button--primary {
+      background: var(--color-primary-button-background, var(--color-primary));
+      color: var(--color-primary-button-text, #fff);
+    }
+    #kauffman-footer-newsletter-{{ section.id }} .kfn__button--secondary {
+      background: var(--color-secondary-button-background, transparent);
+      color: var(--color-secondary-button-text, var(--color-foreground));
+      border-color: var(--color-secondary-button-border, var(--color-border));
+    }
+    @media (max-width: 820px) {
+      #kauffman-footer-newsletter-{{ section.id }} .kfn__wrap {
+        padding: var(--kfn-pad-top-m) 24px var(--kfn-pad-bottom-m);
+        display: block;
+      }
+      #kauffman-footer-newsletter-{{ section.id }} .kfn__text-wrap { margin-bottom: 22px; }
+      #kauffman-footer-newsletter-{{ section.id }} .kfn__form { max-width: none; min-width: 0; }
+      #kauffman-footer-newsletter-{{ section.id }} .kfn__button { padding: 0 18px; }
+    }
+  </style>
+  <div class="kfn__wrap">
+    <div class="kfn__text-wrap">
+      {% if section.settings.heading != blank %}<h2 class="kfn__title">{{ section.settings.heading }}</h2>{% endif %}
+      {% if section.settings.text != blank %}<p class="kfn__text">{{ section.settings.text }}</p>{% endif %}
+    </div>
+    {% if section.settings.show_newsletter %}
+      {% form 'customer', class: 'kfn__form' %}
+        <input type="hidden" name="contact[tags]" value="newsletter">
+        <input class="kfn__input" type="email" name="contact[email]" autocomplete="email" placeholder="{{ section.settings.input_placeholder | escape }}" required>
+        <button class="kfn__button kfn__button--{{ section.settings.button_style }}" type="submit">{{ section.settings.button_label }}</button>
+      {% endform %}
+    {% endif %}
+  </div>
+</section>
+{% schema %}
+{
+  "name": "Kauffman footer news",
+  "enabled_on": {
+    "groups": ["footer"]
+  },
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Color scheme", "default": "scheme-1" },
+    { "type": "select", "id": "section_width", "label": "Width", "options": [{"value":"page-width","label":"Page"},{"value":"full-width","label":"Full"}], "default": "full-width" },
+    { "type": "checkbox", "id": "show_bottom_border", "label": "Show bottom border", "default": true },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Stay in the loop" },
+    { "type": "text", "id": "text", "label": "Text", "default": "Private drops, new arrivals & selected offers — straight to your inbox." },
+    { "type": "checkbox", "id": "show_newsletter", "label": "Show newsletter form", "default": true },
+    { "type": "text", "id": "input_placeholder", "label": "Input placeholder", "default": "Your email address" },
+    { "type": "text", "id": "button_label", "label": "Button label", "default": "Subscribe" },
+    { "type": "select", "id": "button_style", "label": "Button style", "options": [{"value":"primary","label":"Primary"},{"value":"secondary","label":"Secondary"}], "default": "primary" },
+    { "type": "range", "id": "form_max_width", "label": "Form max width", "min": 320, "max": 900, "step": 20, "unit": "px", "default": 620 },
+    { "type": "range", "id": "padding_top_desktop", "label": "Padding top desktop", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 52 },
+    { "type": "range", "id": "padding_bottom_desktop", "label": "Padding bottom desktop", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 52 },
+    { "type": "range", "id": "padding_top_mobile", "label": "Padding top mobile", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 36 },
+    { "type": "range", "id": "padding_bottom_mobile", "label": "Padding bottom mobile", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 36 }
+  ],
+  "presets": [{ "name": "Kauffman footer newsletter" }]
+}
+{% endschema %}

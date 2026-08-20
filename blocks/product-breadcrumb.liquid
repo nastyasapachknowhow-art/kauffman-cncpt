@@ -1,0 +1,436 @@
+{% doc %}
+  @prompt
+    breadcrumb
+{% enddoc %}
+{% liquid
+  assign breadcrumb_id = block.id | replace: '_', '' | downcase
+  assign breadcrumb_estimated_height = block.settings.padding_vertical | times: 2 | plus: block.settings.font_size | plus: 12
+  assign breadcrumb_collection = collection
+  assign breadcrumb_collection_label = ''
+  assign breadcrumb_collection_url = ''
+  assign breadcrumb_product_title = ''
+
+  if product != blank
+    assign breadcrumb_product_title = product.title | escape
+    assign breadcrumb_product_title = breadcrumb_product_title | replace: '&amp;nbsp;', '&nbsp;'
+    assign breadcrumb_product_title = breadcrumb_product_title | replace: '&amp;#160;', '&#160;'
+    assign metafield_collection_label = product.metafields.custom.collection.value | default: '' | strip
+
+    if metafield_collection_label != blank
+      assign metafield_collection_key = metafield_collection_label | downcase
+      assign metafield_collection_handle = metafield_collection_label | handleize
+      assign breadcrumb_collection = blank
+
+      for product_collection in product.collections
+        assign product_collection_title_key = product_collection.title | strip | downcase
+
+        if product_collection_title_key == metafield_collection_key or product_collection.handle == metafield_collection_handle
+          assign breadcrumb_collection = product_collection
+          break
+        endif
+      endfor
+
+      if breadcrumb_collection == blank and metafield_collection_handle != blank
+        assign breadcrumb_collection = collections[metafield_collection_handle]
+      endif
+
+      assign breadcrumb_collection_label = metafield_collection_label
+    endif
+  endif
+
+  if breadcrumb_collection != blank
+    if breadcrumb_collection_label == blank
+      assign breadcrumb_collection_label = breadcrumb_collection.title
+    endif
+
+    assign breadcrumb_collection_url = breadcrumb_collection.url
+  endif
+%}
+
+{% style %}
+  :root {
+    --product-breadcrumb-height: {{ breadcrumb_estimated_height }}px;
+  }
+
+  .product-breadcrumb-{{ breadcrumb_id }} {
+    display: block;
+    position: relative;
+    width: {{ block.settings.desktop_width_percent }}%;
+    max-width: 100%;
+    height: auto;
+    min-height: 0;
+    padding: {{ block.settings.padding_vertical }}px {{ block.settings.padding_horizontal }}px;
+    overflow: visible;
+    box-sizing: border-box;
+  }
+
+  .product-breadcrumb-nav-{{ breadcrumb_id }} {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: {{ block.settings.spacing }}px;
+    font-size: {{ block.settings.font_size }}px;
+    line-height: 1.35;
+    color: {{ block.settings.text_color }};
+  }
+
+  .product-breadcrumb-item-{{ breadcrumb_id }} {
+    display: flex;
+    align-items: center;
+    gap: {{ block.settings.spacing }}px;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .product-breadcrumb-link-{{ breadcrumb_id }} {
+    color: {{ block.settings.link_color }};
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .product-breadcrumb-link-{{ breadcrumb_id }}:hover {
+    color: {{ block.settings.link_hover_color }};
+  }
+
+  .product-breadcrumb-current-{{ breadcrumb_id }} {
+    color: {{ block.settings.current_color }};
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  .product-breadcrumb-separator-{{ breadcrumb_id }} {
+    color: {{ block.settings.separator_color }};
+    user-select: none;
+  }
+
+  @media screen and (max-width: 820px) {
+    .product-breadcrumb-{{ breadcrumb_id }} {
+      width: 100%;
+    }
+
+    .product-breadcrumb-nav-{{ breadcrumb_id }} {
+      font-size: {{ block.settings.font_size | times: 0.9 }}px;
+      align-items: flex-start;
+      row-gap: max(4px, {{ block.settings.spacing | divided_by: 2 }}px);
+    }
+
+    .product-breadcrumb-item-{{ breadcrumb_id }} {
+      align-items: flex-start;
+    }
+  }
+{% endstyle %}
+
+<breadcrumb-navigation-{{ breadcrumb_id }}
+  class="product-breadcrumb-{{ breadcrumb_id }}"
+  {{ block.shopify_attributes }}
+>
+  <nav
+    class="product-breadcrumb-nav-{{ breadcrumb_id }}"
+    aria-label="Breadcrumb"
+  >
+    <div class="product-breadcrumb-item-{{ breadcrumb_id }}">
+      <a
+        href="{{ block.settings.home_link | default: routes.root_url }}"
+        class="product-breadcrumb-link-{{ breadcrumb_id }}"
+      >
+        {% if block.settings.show_home_icon %}
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <path
+              d="M2 6L8 2L14 6V13C14 13.5304 13.7893 14.0391 13.4142 14.4142C13.0391 14.7893 12.5304 15 12 15H4C3.46957 15 2.96086 14.7893 2.58579 14.4142C2.21071 14.0391 2 13.5304 2 13V6Z"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M6 15V8H10V15"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        {% else %}
+          {{ block.settings.home_text | escape }}
+        {% endif %}
+      </a>
+      <span
+        class="product-breadcrumb-separator-{{ breadcrumb_id }}"
+        aria-hidden="true"
+      >
+        {{ block.settings.separator | escape }}
+      </span>
+    </div>
+
+    {% if product and breadcrumb_collection_label != blank %}
+      <div class="product-breadcrumb-item-{{ breadcrumb_id }}">
+        {% if breadcrumb_collection_url != blank %}
+          <a
+            href="{{ breadcrumb_collection_url | escape }}"
+            class="product-breadcrumb-link-{{ breadcrumb_id }}"
+          >
+            {{ breadcrumb_collection_label | escape }}
+          </a>
+        {% else %}
+          <span
+            class="product-breadcrumb-link-{{ breadcrumb_id }}"
+          >
+            {{ breadcrumb_collection_label | escape }}
+          </span>
+        {% endif %}
+        <span
+          class="product-breadcrumb-separator-{{ breadcrumb_id }}"
+          aria-hidden="true"
+        >
+          {{ block.settings.separator | escape }}
+        </span>
+      </div>
+    {% elsif collection and collection.handle != 'all' %}
+      <div class="product-breadcrumb-item-{{ breadcrumb_id }}">
+        <span
+          class="product-breadcrumb-current-{{ breadcrumb_id }}"
+          aria-current="page"
+        >
+          {{ collection.title | escape }}
+        </span>
+      </div>
+    {% endif %}
+
+    {% if product %}
+      <div class="product-breadcrumb-item-{{ breadcrumb_id }}">
+        <span
+          class="product-breadcrumb-current-{{ breadcrumb_id }}"
+          aria-current="page"
+        >
+          {{ breadcrumb_product_title }}
+        </span>
+      </div>
+    {% elsif page %}
+      <div class="product-breadcrumb-item-{{ breadcrumb_id }}">
+        <span
+          class="product-breadcrumb-current-{{ breadcrumb_id }}"
+          aria-current="page"
+        >
+          {{ page.title | escape }}
+        </span>
+      </div>
+    {% elsif article %}
+      {% if blog %}
+        <div class="product-breadcrumb-item-{{ breadcrumb_id }}">
+          <a
+            href="{{ blog.url | escape }}"
+            class="product-breadcrumb-link-{{ breadcrumb_id }}"
+          >
+            {{ blog.title | escape }}
+          </a>
+          <span
+            class="product-breadcrumb-separator-{{ breadcrumb_id }}"
+            aria-hidden="true"
+          >
+            {{ block.settings.separator | escape }}
+          </span>
+        </div>
+      {% endif %}
+      <div class="product-breadcrumb-item-{{ breadcrumb_id }}">
+        <span
+          class="product-breadcrumb-current-{{ breadcrumb_id }}"
+          aria-current="page"
+        >
+          {{ article.title | escape }}
+        </span>
+      </div>
+    {% elsif blog %}
+      <div class="product-breadcrumb-item-{{ breadcrumb_id }}">
+        <span
+          class="product-breadcrumb-current-{{ breadcrumb_id }}"
+          aria-current="page"
+        >
+          {{ blog.title | escape }}
+        </span>
+      </div>
+    {% endif %}
+  </nav>
+</breadcrumb-navigation-{{ breadcrumb_id }}>
+
+<script>
+  (function() {
+    if (customElements.get('breadcrumb-navigation-{{ breadcrumb_id }}')) return;
+
+    class BreadcrumbNavigation extends HTMLElement {
+      constructor() {
+        super();
+      }
+
+      connectedCallback() {
+        this.scheduleBreadcrumbHeightUpdate();
+
+        if ('ResizeObserver' in window) {
+          this.resizeObserver = new ResizeObserver(() => this.scheduleBreadcrumbHeightUpdate());
+          this.resizeObserver.observe(this);
+        }
+
+        if (document.fonts?.ready) {
+          document.fonts.ready.then(() => this.scheduleBreadcrumbHeightUpdate());
+        }
+      }
+
+      disconnectedCallback() {
+        this.resizeObserver?.disconnect();
+        cancelAnimationFrame(this.measurementFrame);
+      }
+
+      scheduleBreadcrumbHeightUpdate() {
+        if (!this.isConnected) return;
+        cancelAnimationFrame(this.measurementFrame);
+        this.measurementFrame = requestAnimationFrame(() => this.updateBreadcrumbHeight());
+      }
+
+      updateBreadcrumbHeight() {
+        const height = Math.ceil(this.getBoundingClientRect().height);
+
+        if (height > 0) {
+          document.documentElement.style.setProperty('--product-breadcrumb-height', `${height}px`);
+        }
+      }
+    }
+
+    customElements.define('breadcrumb-navigation-{{ breadcrumb_id }}', BreadcrumbNavigation);
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Product breadcrumb",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_home_icon",
+      "label": "Show home icon",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "home_text",
+      "label": "Home text",
+      "default": "Home"
+    },
+    {
+      "type": "url",
+      "id": "home_link",
+      "label": "Home link"
+    },
+    {
+      "type": "text",
+      "id": "separator",
+      "label": "Separator",
+      "default": "/"
+    },
+    {
+      "type": "header",
+      "content": "Style"
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "label": "Font size",
+      "min": 10,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "spacing",
+      "label": "Spacing",
+      "min": 4,
+      "max": 16,
+      "step": 2,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "padding_vertical",
+      "label": "Vertical padding",
+      "min": 0,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "padding_horizontal",
+      "label": "Horizontal padding",
+      "min": 0,
+      "max": 40,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "Desktop width",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "link_color",
+      "label": "Link",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "link_hover_color",
+      "label": "Link hover",
+      "default": "#666666"
+    },
+    {
+      "type": "color",
+      "id": "current_color",
+      "label": "Current page",
+      "default": "#666666"
+    },
+    {
+      "type": "color",
+      "id": "separator_color",
+      "label": "Separator",
+      "default": "#999999"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product breadcrumb"
+    }
+  ]
+}
+{% endschema %}

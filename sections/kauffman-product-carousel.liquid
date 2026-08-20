@@ -1,0 +1,481 @@
+{% liquid
+  assign section_id = 'kauffman-product-carousel-' | append: section.id
+  assign max_products = section.settings.max_products | default: 6
+  assign product_slide_count = 0
+
+  capture product_slides
+    if section.settings.collection != blank
+      for card_product in section.settings.collection.products limit: max_products
+        assign product_slide_count = product_slide_count | plus: 1
+        render 'kauffman-editorial-selection-product-card', card_product: card_product, card_settings: section.settings
+        unless forloop.last
+          echo '<!--@list/split-->'
+        endunless
+      endfor
+    else
+      for i in (1..max_products)
+        assign product_slide_count = product_slide_count | plus: 1
+        render 'kauffman-editorial-selection-product-card', card_product: blank, card_settings: section.settings
+        unless forloop.last
+          echo '<!--@list/split-->'
+        endunless
+      endfor
+    endif
+  endcapture
+
+  assign product_slides_array = product_slides | strip | split: '<!--@list/split-->'
+%}
+
+<section
+  id="{{ section_id }}"
+  class="
+    kauffman-product-carousel
+    kauffman-product-carousel--products-desktop-{{ section.settings.products_layout_desktop | default: 'carousel' }}
+    color-{{ section.settings.color_scheme }}
+  "
+  style="
+    --kpc-page-width: {{ section.settings.page_width }}px;
+    --kpc-section-padding-top: {{ section.settings.padding_top }}px;
+    --kpc-section-padding-bottom: {{ section.settings.padding_bottom }}px;
+    --kpc-section-padding-top-mobile: {{ section.settings.padding_top_mobile }}px;
+    --kpc-section-padding-bottom-mobile: {{ section.settings.padding_bottom_mobile }}px;
+    --kpc-gap: {{ section.settings.gap }}px;
+    --kpc-gap-mobile: {{ section.settings.gap_mobile }}px;
+    --kpc-product-image-fit: {{ section.settings.product_image_fit | default: 'cover' }};
+    --kpc-product-bg: {{ section.settings.product_background }};
+    --kpc-products-columns-desktop: {{ section.settings.carousel_columns_desktop | default: 2 }};
+  "
+>
+  <div class="kauffman-product-carousel__inner">
+    <div class="kauffman-product-carousel__products">
+      {% if section.settings.products_layout_desktop == 'grid' %}
+        <div class="kauffman-product-carousel__products-grid">
+          {% for product_slide in product_slides_array %}
+            <div class="kauffman-product-carousel__products-grid-item">
+              {{ product_slide }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {% render 'resource-list-carousel',
+        ref: section_id,
+        slides: product_slides_array,
+        slide_count: product_slide_count,
+        settings: section.settings,
+        slide_width_max: '520px'
+      %}
+    </div>
+  </div>
+</section>
+
+<style>
+  #{{ section_id }} {
+    padding-top: var(--kpc-section-padding-top);
+    padding-bottom: var(--kpc-section-padding-bottom);
+  }
+
+  #{{ section_id }} .kauffman-product-carousel__inner {
+    width: min(100% - 32px, var(--kpc-page-width));
+    margin-inline: auto;
+  }
+
+  #{{ section_id }} .kauffman-product-carousel__products {
+    --resource-list-column-gap-desktop: var(--kpc-gap);
+    --resource-list-column-gap: var(--kpc-gap);
+    --column-count: {{ section.settings.carousel_columns_desktop | default: 2 }};
+    --column-count-mobile: 1;
+    --mobile-card-size: {{ section.settings.mobile_card_size | default: '78cqw' }};
+
+    display: block;
+    min-width: 0;
+  }
+
+  #{{ section_id }} .kauffman-product-carousel__products-grid {
+    display: none;
+  }
+
+  #{{ section_id }} .kauffman-editorial-selection-v2-product-card {
+    min-width: 0;
+  }
+
+  #{{ section_id }} .kauffman-editorial-selection-v2-product-card__media-link,
+  #{{ section_id }} .kauffman-editorial-selection-v2-product-card__title-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  #{{ section_id }} .kauffman-editorial-selection-v2-product-card__media {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    height: auto;
+    padding-bottom: 0;
+    overflow: hidden;
+    background: var(--kpc-product-bg);
+  }
+
+  #{{ section_id }} .kauffman-editorial-selection-v2-product-card__image,
+  #{{ section_id }} .kauffman-editorial-selection-v2-product-card__placeholder {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: var(--kpc-product-image-fit);
+  }
+
+  #{{ section_id }} .kauffman-editorial-selection-v2-product-card__content {
+    padding-top: 16px;
+  }
+
+  #{{ section_id }} .kauffman-editorial-selection-v2-product-card__title,
+  #{{ section_id }} .kauffman-editorial-selection-v2-product-card__family,
+  #{{ section_id }} .kauffman-editorial-selection-v2-product-card__collection {
+    margin: 0;
+    font-family: var(--font-body--family, Inter, sans-serif);
+    font-weight: 400;
+    color: #1a1a1a;
+    font-size: 16px;
+    line-height: 1.25;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  #{{ section_id }} .kauffman-editorial-selection-v2-product-card__family,
+  #{{ section_id }} .kauffman-editorial-selection-v2-product-card__collection {
+    display: block;
+    overflow: hidden;
+    margin-top: 2px;
+    text-decoration: none;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  #{{ section_id }} .kauffman-editorial-selection-v2-product-card__vendor {
+    margin: 2px 0 0;
+    font-family: var(--font-body--family, Inter, sans-serif);
+    font-weight: 400;
+    opacity: 0.65;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 11px;
+    line-height: 1.4;
+  }
+
+  #{{ section_id }} .kauffman-editorial-selection-v2-product-card__title {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  #{{ section_id }} .kauffman-editorial-selection-v2-product-card__price {
+    margin-top: 14px;
+    margin-bottom: 0;
+    color: #1a1a1a;
+    font-family: var(--font-body--family, Inter, sans-serif);
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.25;
+  }
+
+  @media screen and (min-width: 821px) {
+    #{{ section_id }}.kauffman-product-carousel--products-desktop-grid .kauffman-product-carousel__products > div:not(.kauffman-product-carousel__products-grid) {
+      display: none;
+    }
+
+    #{{ section_id }}.kauffman-product-carousel--products-desktop-grid .kauffman-product-carousel__products-grid {
+      display: grid;
+      grid-template-columns: repeat(var(--kpc-products-columns-desktop), minmax(0, 1fr));
+      gap: var(--kpc-gap);
+    }
+
+    #{{ section_id }} .resource-list__carousel .resource-list__slide {
+      --section-slide-width: calc(
+        (100% - (var(--resource-list-column-gap) * (var(--column-count) - 1)) - var(--peek-next-slide-size)) /
+          var(--column-count)
+      );
+      --slide-width: var(--section-slide-width);
+    }
+  }
+
+  @media screen and (max-width: 820px) {
+    #{{ section_id }} {
+      padding-top: var(--kpc-section-padding-top-mobile);
+      padding-bottom: var(--kpc-section-padding-bottom-mobile);
+    }
+
+    #{{ section_id }} .kauffman-product-carousel__inner {
+      width: min(100% - 24px, var(--kpc-page-width));
+    }
+
+    #{{ section_id }} .kauffman-product-carousel__products {
+      --resource-list-column-gap-desktop: var(--kpc-gap-mobile);
+      --resource-list-column-gap: var(--kpc-gap-mobile);
+    }
+
+    #{{ section_id }} .kauffman-product-carousel__products-grid {
+      display: none;
+    }
+
+    #{{ section_id }} .kauffman-editorial-selection-v2-product-card__content {
+      padding-top: 11px;
+    }
+
+    #{{ section_id }} .kauffman-editorial-selection-v2-product-card__title,
+    #{{ section_id }} .kauffman-editorial-selection-v2-product-card__family,
+    #{{ section_id }} .kauffman-editorial-selection-v2-product-card__collection {
+      font-size: 10px;
+      line-height: 1.2;
+      letter-spacing: 0.03em;
+    }
+
+    #{{ section_id }} .kauffman-editorial-selection-v2-product-card__price {
+      margin-top: 8px;
+      font-size: 14px;
+    }
+
+    #{{ section_id }} .resource-list__carousel .resource-list__slide {
+      --slide-width: clamp(150px, var(--mobile-card-size, 60cqw), var(--slide-width-max));
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "KAUFFMAN Product carousel",
+  "settings": [
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "max_products",
+      "label": "Products to show",
+      "min": 1,
+      "max": 16,
+      "step": 1,
+      "default": 6
+    },
+    {
+      "type": "select",
+      "id": "products_layout_desktop",
+      "label": "Desktop products layout",
+      "options": [
+        {
+          "value": "carousel",
+          "label": "Carousel"
+        },
+        {
+          "value": "grid",
+          "label": "Grid"
+        }
+      ],
+      "default": "carousel"
+    },
+    {
+      "type": "range",
+      "id": "carousel_columns_desktop",
+      "label": "Desktop product columns",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "select",
+      "id": "mobile_card_size",
+      "label": "Mobile card width",
+      "options": [
+        {
+          "value": "32cqw",
+          "label": "3 visible"
+        },
+        {
+          "value": "40cqw",
+          "label": "2.5 visible"
+        },
+        {
+          "value": "44cqw",
+          "label": "2 visible"
+        },
+        {
+          "value": "68cqw",
+          "label": "Medium with peek"
+        },
+        {
+          "value": "78cqw",
+          "label": "Large with peek"
+        },
+        {
+          "value": "90cqw",
+          "label": "Nearly full width"
+        }
+      ],
+      "default": "32cqw"
+    },
+    {
+      "type": "select",
+      "id": "icons_style",
+      "label": "Carousel arrow style",
+      "options": [
+        {
+          "value": "arrow",
+          "label": "Arrow"
+        },
+        {
+          "value": "chevron",
+          "label": "Chevron"
+        },
+        {
+          "value": "none",
+          "label": "None"
+        }
+      ],
+      "default": "arrow"
+    },
+    {
+      "type": "select",
+      "id": "icons_shape",
+      "label": "Carousel arrow shape",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "circle",
+          "label": "Circle"
+        },
+        {
+          "value": "square",
+          "label": "Square"
+        }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_price",
+      "label": "Show price",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show vendor",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "product_background",
+      "label": "Product image background",
+      "default": "#F3F3F3"
+    },
+    {
+      "type": "select",
+      "id": "product_image_fit",
+      "label": "Product image fit",
+      "options": [
+        {
+          "value": "cover",
+          "label": "Cover"
+        },
+        {
+          "value": "contain",
+          "label": "Contain"
+        }
+      ],
+      "default": "cover"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "range",
+      "id": "page_width",
+      "label": "Page width",
+      "min": 960,
+      "max": 1800,
+      "step": 20,
+      "unit": "px",
+      "default": 1440
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "Desktop gap",
+      "min": 0,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "gap_mobile",
+      "label": "Mobile gap",
+      "min": 0,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top desktop",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom desktop",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "label": "Padding top mobile",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "label": "Padding bottom mobile",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 24
+    }
+  ],
+  "presets": [
+    {
+      "name": "KAUFFMAN Product carousel"
+    }
+  ]
+}
+{% endschema %}

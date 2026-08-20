@@ -1,0 +1,181 @@
+{% liquid
+  assign payment_types = section.settings.payment_icons | split: ','
+  assign trust_count = 0
+  for block in section.blocks
+    if block.type == 'trust_badge' and block.settings.image != blank
+      assign trust_count = trust_count | plus: 1
+    endif
+  endfor
+%}
+<div class="section-background color-{{ section.settings.color_scheme }}"></div>
+<section id="kauffman-footer-trust-payments-{{ section.id }}" class="kftp section section--{{ section.settings.section_width }} color-{{ section.settings.color_scheme }} kftp--desktop-{{ section.settings.alignment_desktop }} kftp--mobile-{{ section.settings.alignment_mobile }} kftp--icon-mode-{{ section.settings.icon_color_mode }} {% if section.settings.restore_original_on_hover %}kftp--restore-hover{% endif %}" style="--kftp-pad-y-d: {{ section.settings.padding_y_desktop }}px; --kftp-pad-y-m: {{ section.settings.padding_y_mobile }}px; --kftp-gap: {{ section.settings.icon_gap }}px; --kftp-pay-h-d: {{ section.settings.payment_icon_height_desktop }}px; --kftp-pay-h-m: {{ section.settings.payment_icon_height_mobile }}px; --kftp-overlay-color: {{ section.settings.icon_overlay_color }}; --kftp-scheme-icon-color: var(--color-background); --kftp-overlay-opacity: {{ section.settings.icon_overlay_opacity | divided_by: 100.0 }}; --kftp-sal-w-d: {{ section.settings.sal_width_desktop }}px; --kftp-sal-w-m: {{ section.settings.sal_width_mobile }}px; --kftp-odr-w-d: {{ section.settings.odr_width_desktop }}px; --kftp-odr-w-m: {{ section.settings.odr_width_mobile }}px;">
+  <style>
+    #kauffman-footer-trust-payments-{{ section.id }} { color: var(--color-foreground); background: var(--color-background); }
+    #kauffman-footer-trust-payments-{{ section.id }} * { box-sizing: border-box; }
+    #kauffman-footer-trust-payments-{{ section.id }} a { color: inherit; text-decoration: none; }
+    #kauffman-footer-trust-payments-{{ section.id }} .kftp__wrap {
+      padding: var(--kftp-pad-y-d) 48px;
+      border-top: {% if section.settings.show_top_border %}1px solid var(--color-border){% else %}0{% endif %};
+      border-bottom: {% if section.settings.show_bottom_border %}1px solid var(--color-border){% else %}0{% endif %};
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--kftp-row-gap, var(--kftp-gap));
+    }
+    #kauffman-footer-trust-payments-{{ section.id }} .kftp__group { display: flex; align-items: center; flex-wrap: wrap; gap: var(--kftp-gap); width: 100%; }
+    #kauffman-footer-trust-payments-{{ section.id }}.kftp--desktop-left .kftp__group { justify-content: flex-start; }
+    #kauffman-footer-trust-payments-{{ section.id }}.kftp--desktop-center .kftp__group { justify-content: center; }
+    #kauffman-footer-trust-payments-{{ section.id }}.kftp--desktop-right .kftp__group { justify-content: flex-end; }
+    #kauffman-footer-trust-payments-{{ section.id }} .kftp__trust-group { margin-bottom: {{ section.settings.trust_payments_gap_desktop | default: 18 }}px; }
+    #kauffman-footer-trust-payments-{{ section.id }} .kftp__payment-group:empty { display: none; }
+    #kauffman-footer-trust-payments-{{ section.id }} .kftp__badge,
+    #kauffman-footer-trust-payments-{{ section.id }} .kftp__pay { display: inline-flex; align-items: center; justify-content: center; line-height: 0; position: relative; }
+    #kauffman-footer-trust-payments-{{ section.id }} .kftp__badge img,
+    #kauffman-footer-trust-payments-{{ section.id }} .kftp__pay svg,
+    #kauffman-footer-trust-payments-{{ section.id }} .kftp__pay img { display: block; width: auto; transition: filter .2s ease, opacity .2s ease; }
+    #kauffman-footer-trust-payments-{{ section.id }} .kftp__sal img { max-width: var(--kftp-sal-w-d); }
+    #kauffman-footer-trust-payments-{{ section.id }} .kftp__odr img { max-width: var(--kftp-odr-w-d); }
+    #kauffman-footer-trust-payments-{{ section.id }} .kftp__custom img { max-height: {{ section.settings.trust_badge_height }}px; max-width: {{ section.settings.trust_badge_max_width }}px; object-fit: contain; }
+    #kauffman-footer-trust-payments-{{ section.id }} .kftp__pay svg,
+    #kauffman-footer-trust-payments-{{ section.id }} .kftp__pay img { height: var(--kftp-pay-h-d); }
+    #kauffman-footer-trust-payments-{{ section.id }} .kftp__fallback { color: var(--color-foreground); opacity: .65; letter-spacing: .18em; text-transform: uppercase; font-size: 11px; }
+    /* Icon color modes:
+       - off: original icons
+       - scheme: soft monochrome based on current color scheme background
+       - custom: soft monochrome with selected overlay color
+       This version does not overwrite SVG fills, so hover can reliably restore the original artwork. */
+    #kauffman-footer-trust-payments-{{ section.id }} .kftp__pay {
+      overflow: hidden;
+      border-radius: 4px;
+    }
+    #kauffman-footer-trust-payments-{{ section.id }}.kftp--icon-mode-scheme .kftp__pay svg,
+    #kauffman-footer-trust-payments-{{ section.id }}.kftp--icon-mode-scheme .kftp__pay img,
+    #kauffman-footer-trust-payments-{{ section.id }}.kftp--icon-mode-custom .kftp__pay svg,
+    #kauffman-footer-trust-payments-{{ section.id }}.kftp--icon-mode-custom .kftp__pay img {
+      filter: grayscale(1);
+      opacity: var(--kftp-overlay-opacity);
+    }
+    #kauffman-footer-trust-payments-{{ section.id }}.kftp--icon-mode-scheme .kftp__pay::after,
+    #kauffman-footer-trust-payments-{{ section.id }}.kftp--icon-mode-custom .kftp__pay::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      opacity: var(--kftp-overlay-opacity);
+      mix-blend-mode: color;
+      border-radius: inherit;
+      transition: opacity .2s ease;
+    }
+    #kauffman-footer-trust-payments-{{ section.id }}.kftp--icon-mode-scheme .kftp__pay::after {
+      background: var(--kftp-scheme-icon-color);
+    }
+    #kauffman-footer-trust-payments-{{ section.id }}.kftp--icon-mode-custom .kftp__pay::after {
+      background: var(--kftp-overlay-color);
+    }
+    #kauffman-footer-trust-payments-{{ section.id }}.kftp--icon-mode-scheme .kftp__badge img,
+    #kauffman-footer-trust-payments-{{ section.id }}.kftp--icon-mode-custom .kftp__badge img {
+      filter: grayscale(1);
+      opacity: var(--kftp-overlay-opacity);
+    }
+    #kauffman-footer-trust-payments-{{ section.id }}.kftp--restore-hover .kftp__badge:hover img,
+    #kauffman-footer-trust-payments-{{ section.id }}.kftp--restore-hover .kftp__pay:hover img,
+    #kauffman-footer-trust-payments-{{ section.id }}.kftp--restore-hover .kftp__pay:hover svg {
+      filter: none;
+      opacity: 1;
+    }
+    #kauffman-footer-trust-payments-{{ section.id }}.kftp--restore-hover .kftp__pay:hover::after {
+      opacity: 0;
+    }
+    @media (max-width: 820px) {
+      #kauffman-footer-trust-payments-{{ section.id }} .kftp__wrap { padding: var(--kftp-pad-y-m) 24px; }
+      #kauffman-footer-trust-payments-{{ section.id }}.kftp--mobile-left .kftp__group { justify-content: flex-start; }
+      #kauffman-footer-trust-payments-{{ section.id }}.kftp--mobile-center .kftp__group { justify-content: center; }
+      #kauffman-footer-trust-payments-{{ section.id }}.kftp--mobile-right .kftp__group { justify-content: flex-end; }
+      #kauffman-footer-trust-payments-{{ section.id }} .kftp__trust-group { margin-bottom: {{ section.settings.trust_payments_gap_mobile | default: 16 }}px; }
+      #kauffman-footer-trust-payments-{{ section.id }} .kftp__sal img { max-width: var(--kftp-sal-w-m); }
+      #kauffman-footer-trust-payments-{{ section.id }} .kftp__odr img { max-width: var(--kftp-odr-w-m); }
+      #kauffman-footer-trust-payments-{{ section.id }} .kftp__pay svg,
+      #kauffman-footer-trust-payments-{{ section.id }} .kftp__pay img { height: var(--kftp-pay-h-m); }
+    }
+  </style>
+  <div class="kftp__wrap">
+    <div class="kftp__group kftp__trust-group">
+      {% if section.settings.show_sal %}
+        <a class="kftp__badge kftp__sal" href="{{ section.settings.sal_url | default: '#' }}" target="_blank" rel="noopener noreferrer" aria-label="{{ section.settings.sal_label | escape }}">
+          {% if section.settings.sal_logo != blank %}{{ section.settings.sal_logo | image_url: width: 600 | image_tag: loading: 'lazy' }}{% else %}<span class="kftp__fallback">ANPC SAL</span>{% endif %}
+        </a>
+      {% endif %}
+      {% if section.settings.show_odr %}
+        <a class="kftp__badge kftp__odr" href="{{ section.settings.odr_url | default: '#' }}" target="_blank" rel="noopener noreferrer" aria-label="{{ section.settings.odr_label | escape }}">
+          {% if section.settings.odr_logo != blank %}{{ section.settings.odr_logo | image_url: width: 600 | image_tag: loading: 'lazy' }}{% else %}<span class="kftp__fallback">ODR</span>{% endif %}
+        </a>
+      {% endif %}
+      {% for block in section.blocks %}
+        {% if block.type == 'trust_badge' and block.settings.image != blank %}
+          <a class="kftp__badge kftp__custom" href="{{ block.settings.url | default: '#' }}" {% if block.settings.url != blank %}target="_blank" rel="noopener noreferrer"{% endif %} aria-label="{{ block.settings.label | escape }}" {{ block.shopify_attributes }}>
+            {{ block.settings.image | image_url: width: 500 | image_tag: loading: 'lazy' }}
+          </a>
+        {% endif %}
+      {% endfor %}
+    </div>
+    {% if section.settings.show_payment_icons %}
+      <div class="kftp__group kftp__payment-group">
+        {% for raw_type in payment_types %}
+          {% assign type = raw_type | strip %}
+          {% if type != blank %}<span class="kftp__pay" title="{{ type | replace: '_', ' ' | capitalize }}">{{ type | payment_type_svg_tag }}</span>{% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% schema %}
+{
+  "name": "Kauffman trust payments",
+  "enabled_on": {
+    "groups": ["footer"]
+  },
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Color scheme", "default": "scheme-1" },
+    { "type": "select", "id": "section_width", "label": "Width", "options": [{"value":"page-width","label":"Page"},{"value":"full-width","label":"Full"}], "default": "full-width" },
+    { "type": "select", "id": "alignment_desktop", "label": "Alignment desktop", "options": [{"value":"left","label":"Left"},{"value":"center","label":"Center"},{"value":"right","label":"Right"}], "default": "center" },
+    { "type": "select", "id": "alignment_mobile", "label": "Alignment mobile", "options": [{"value":"left","label":"Left"},{"value":"center","label":"Center"},{"value":"right","label":"Right"}], "default": "center" },
+    { "type": "checkbox", "id": "show_top_border", "label": "Show top border", "default": true },
+    { "type": "checkbox", "id": "show_bottom_border", "label": "Show bottom border", "default": true },
+    { "type": "header", "content": "ANPC / ODR" },
+    { "type": "checkbox", "id": "show_sal", "label": "Show ANPC SAL", "default": true },
+    { "type": "image_picker", "id": "sal_logo", "label": "ANPC SAL logo" },
+    { "type": "url", "id": "sal_url", "label": "ANPC SAL URL" },
+    { "type": "text", "id": "sal_label", "label": "ANPC SAL label", "default": "ANPC SAL" },
+    { "type": "range", "id": "sal_width_desktop", "label": "ANPC SAL width desktop", "min": 60, "max": 320, "step": 4, "unit": "px", "default": 220 },
+    { "type": "range", "id": "sal_width_mobile", "label": "ANPC SAL width mobile", "min": 60, "max": 260, "step": 4, "unit": "px", "default": 180 },
+    { "type": "checkbox", "id": "show_odr", "label": "Show ODR", "default": true },
+    { "type": "image_picker", "id": "odr_logo", "label": "ODR logo" },
+    { "type": "url", "id": "odr_url", "label": "ODR URL" },
+    { "type": "text", "id": "odr_label", "label": "ODR label", "default": "ODR" },
+    { "type": "range", "id": "odr_width_desktop", "label": "ODR width desktop", "min": 60, "max": 320, "step": 4, "unit": "px", "default": 220 },
+    { "type": "range", "id": "odr_width_mobile", "label": "ODR width mobile", "min": 60, "max": 260, "step": 4, "unit": "px", "default": 180 },
+    { "type": "header", "content": "Payments / overlay" },
+    { "type": "checkbox", "id": "show_payment_icons", "label": "Show payment icons", "default": true },
+    { "type": "text", "id": "payment_icons", "label": "Payment icons", "default": "visa,master,maestro,apple_pay,google_pay,paypal" },
+    { "type": "select", "id": "icon_color_mode", "label": "Icon color mode", "options": [{"value":"off","label":"Original colors"},{"value":"scheme","label":"Monochrome from color scheme background"},{"value":"custom","label":"Custom overlay color"}], "default": "scheme" },
+    { "type": "color", "id": "icon_overlay_color", "label": "Custom overlay color", "default": "#DE5219" },
+    { "type": "range", "id": "icon_overlay_opacity", "label": "Icon overlay opacity", "min": 0, "max": 100, "step": 5, "unit": "%", "default": 45 },
+    { "type": "checkbox", "id": "restore_original_on_hover", "label": "Show original colors on hover", "default": true },
+    { "type": "range", "id": "payment_icon_height_desktop", "label": "Payment icon height desktop", "min": 14, "max": 44, "step": 2, "unit": "px", "default": 26 },
+    { "type": "range", "id": "payment_icon_height_mobile", "label": "Payment icon height mobile", "min": 14, "max": 40, "step": 2, "unit": "px", "default": 24 },
+    { "type": "range", "id": "icon_gap", "label": "Icon gap", "min": 4, "max": 32, "step": 2, "unit": "px", "default": 16 },
+    { "type": "range", "id": "trust_payments_gap_desktop", "label": "Gap between trust and payment rows desktop", "min": 0, "max": 48, "step": 2, "unit": "px", "default": 18 },
+    { "type": "range", "id": "trust_payments_gap_mobile", "label": "Gap between trust and payment rows mobile", "min": 0, "max": 48, "step": 2, "unit": "px", "default": 16 },
+    { "type": "range", "id": "trust_badge_height", "label": "Custom trust badge height", "min": 14, "max": 60, "step": 2, "unit": "px", "default": 28 },
+    { "type": "range", "id": "trust_badge_max_width", "label": "Custom trust badge max width", "min": 60, "max": 260, "step": 4, "unit": "px", "default": 160 },
+    { "type": "range", "id": "padding_y_desktop", "label": "Padding vertical desktop", "min": 12, "max": 100, "step": 4, "unit": "px", "default": 36 },
+    { "type": "range", "id": "padding_y_mobile", "label": "Padding vertical mobile", "min": 12, "max": 80, "step": 4, "unit": "px", "default": 28 }
+  ],
+  "blocks": [{ "type": "trust_badge", "name": "Trust / service badge", "settings": [
+    { "type": "image_picker", "id": "image", "label": "Logo" },
+    { "type": "text", "id": "label", "label": "Label", "default": "Trust badge" },
+    { "type": "url", "id": "url", "label": "URL" }
+  ]}],
+  "presets": [{ "name": "Kauffman trust payments" }]
+}
+{% endschema %}

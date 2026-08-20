@@ -1,0 +1,857 @@
+{% liquid
+  assign product_resource = closest.product
+
+  if request.visual_preview_mode and product_resource == blank
+    assign product_resource = collections.all.products.first
+  endif
+
+  assign selected_variant = product_resource.selected_or_first_available_variant
+
+  assign selected_variant_stock_state = 'out_of_stock'
+  if selected_variant.available
+    assign selected_variant_stock_state = 'in_stock'
+
+    if selected_variant.inventory_quantity > 0 and selected_variant.inventory_quantity <= 5
+      assign selected_variant_stock_state = 'few_left'
+    endif
+  endif
+-%}
+
+{% unless product_resource == blank %}
+  <style>
+    .kauffman-stock-status-wrapper {
+      margin-block-end: 16px;
+      text-align: {{ block.settings.alignment | default: 'left' }};
+    }
+
+    .kauffman-stock-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #8f8a84;
+      font-size: {{ block.settings.kauffman_stock_status_font_size_desktop | default: 14 }}px;
+      line-height: 1.25;
+      font-weight: {{ block.settings.kauffman_stock_status_font_weight | default: 300 }};
+    }
+
+    .kauffman-stock-status__dot {
+      width: {{ block.settings.kauffman_stock_status_dot_size | default: 8 }}px;
+      height: {{ block.settings.kauffman_stock_status_dot_size | default: 8 }}px;
+      flex: 0 0 {{ block.settings.kauffman_stock_status_dot_size | default: 8 }}px;
+      border-radius: 999px;
+      display: inline-block;
+    }
+
+    .kauffman-stock-status--in-stock .kauffman-stock-status__dot {
+      background-color: #27843a;
+    }
+
+    .kauffman-stock-status--few-left .kauffman-stock-status__dot {
+      background-color: #d6a500;
+    }
+
+    .kauffman-stock-status--out-of-stock .kauffman-stock-status__dot {
+      background-color: #b7352d;
+    }
+
+    .kauffman-stock-status__subtext,
+    .kauffman-stock-status__notify {
+      display: block;
+      margin-block-start: 2px;
+      color: #8f8a84;
+      font-size: {{ block.settings.kauffman_stock_status_font_size_desktop | default: 14 }}px;
+      line-height: 1.25;
+      font-weight: {{ block.settings.kauffman_stock_status_font_weight | default: 300 }};
+      text-align: left;
+    }
+
+    .kauffman-stock-status__notify {
+      width: fit-content;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    @media screen and (max-width: 820px) {
+      .kauffman-stock-status,
+      .kauffman-stock-status__subtext,
+      .kauffman-stock-status__notify {
+        font-size: {{ block.settings.kauffman_stock_status_font_size_mobile | default: 14 }}px;
+      }
+    }
+
+    /* Kauffman swatch selector refinement */
+    .variant-picker .variant-option--swatches,
+    .variant-picker .variant-option:has(.swatch),
+    variant-picker .variant-option--swatches,
+    variant-picker .variant-option:has(.swatch) {
+      --kauffman-swatch-gap: {{ block.settings.kauffman_font_swatches_gap | default: 8 }}px;
+    }
+
+    .variant-picker .variant-option--swatches .variant-option__swatches,
+    .variant-picker .variant-option:has(.swatch) .variant-option__swatches,
+    .variant-picker .variant-option--swatches .variant-option__values,
+    .variant-picker .variant-option:has(.swatch) .variant-option__values,
+    variant-picker .variant-option--swatches .variant-option__swatches,
+    variant-picker .variant-option:has(.swatch) .variant-option__swatches,
+    variant-picker .variant-option--swatches .variant-option__values,
+    variant-picker .variant-option:has(.swatch) .variant-option__values {
+      gap: var(--kauffman-swatch-gap);
+      column-gap: var(--kauffman-swatch-gap);
+      row-gap: var(--kauffman-swatch-gap);
+    }
+
+    .variant-picker .swatch-input__label,
+    .variant-picker label:has(.swatch),
+    variant-picker .swatch-input__label,
+    variant-picker label:has(.swatch) {
+      padding: 2px;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      box-shadow: none;
+      outline: none;
+    }
+
+    .variant-picker .swatch-input__input:checked + .swatch-input__label,
+    .variant-picker input[type='radio']:checked + .swatch-input__label,
+    .variant-picker label:has(input[type='radio']:checked),
+    variant-picker .swatch-input__input:checked + .swatch-input__label,
+    variant-picker input[type='radio']:checked + .swatch-input__label,
+    variant-picker label:has(input[type='radio']:checked) {
+      border-color: currentColor;
+      box-shadow: none;
+      outline: none;
+    }
+
+    .variant-picker .swatch-input__input:checked + .swatch-input__label::before,
+    .variant-picker .swatch-input__input:checked + .swatch-input__label::after,
+    .variant-picker input[type='radio']:checked + .swatch-input__label::before,
+    .variant-picker input[type='radio']:checked + .swatch-input__label::after,
+    variant-picker .swatch-input__input:checked + .swatch-input__label::before,
+    variant-picker .swatch-input__input:checked + .swatch-input__label::after,
+    variant-picker input[type='radio']:checked + .swatch-input__label::before,
+    variant-picker input[type='radio']:checked + .swatch-input__label::after {
+      box-shadow: none;
+      outline: none;
+    }
+
+    .variant-picker .swatch,
+    variant-picker .swatch {
+      box-shadow: none;
+      outline: none;
+    }
+
+  </style>
+
+  <div
+    class="kauffman-stock-status-wrapper"
+    data-kauffman-stock-status
+    data-product-id="{{ product_resource.id }}"
+  >
+    <div
+      class="kauffman-stock-status
+        {% if selected_variant_stock_state == 'in_stock' %}
+          kauffman-stock-status--in-stock
+        {% elsif selected_variant_stock_state == 'few_left' %}
+          kauffman-stock-status--few-left
+        {% else %}
+          kauffman-stock-status--out-of-stock
+        {% endif %}"
+      data-kauffman-stock-status-line
+    >
+      <span class="kauffman-stock-status__dot" aria-hidden="true"></span>
+      <span data-kauffman-stock-status-text>
+        {% if selected_variant_stock_state == 'in_stock' %}
+          In Stock
+        {% elsif selected_variant_stock_state == 'few_left' %}
+          A few items left
+        {% else %}
+          Out of stock
+        {% endif %}
+      </span>
+    </div>
+
+    <div
+      class="kauffman-stock-status__subtext"
+      data-kauffman-stock-status-subtext
+      {% unless selected_variant.available %}hidden style="display: none;"{% endunless %}
+    >
+      Gift-ready premium packaging
+    </div>
+
+    <a
+      class="kauffman-stock-status__notify"
+      href="#StickyNotifyPanel-{{ section.id }}"
+      aria-controls="StickyNotifyPanel-{{ section.id }}"
+      data-kauffman-stock-status-notify
+      {% if selected_variant.available %}hidden style="display: none;"{% endif %}
+    >
+      {{ section.settings.sticky_notify_button_label | default: 'Notify me' }}
+    </a>
+
+    <script type="application/json" data-kauffman-stock-status-variants>
+      [
+        {%- for variant in product_resource.variants -%}
+          {%- liquid
+            assign variant_stock_state = 'out_of_stock'
+            if variant.available
+              assign variant_stock_state = 'in_stock'
+
+              if variant.inventory_quantity > 0 and variant.inventory_quantity <= 5
+                assign variant_stock_state = 'few_left'
+              endif
+            endif
+          -%}
+          {
+            "id": {{ variant.id | json }},
+            "available": {{ variant.available | json }},
+            "options": {{ variant.options | json }},
+            "stock_state": {{ variant_stock_state | json }}
+          }{% unless forloop.last %},{% endunless %}
+        {%- endfor -%}
+      ]
+    </script>
+  </div>
+
+  {% render 'variant-main-picker', product_resource: product_resource, block: block, section: section, product: product %}
+
+
+  <script>
+    (() => {
+      if (window.KauffmanStockStatusLoaded) return;
+      window.KauffmanStockStatusLoaded = true;
+
+      const getVariantFromUrl = (variants) => {
+        const variantId = new URLSearchParams(window.location.search).get('variant');
+        if (!variantId) return null;
+
+        return variants.find((variant) => String(variant.id) === String(variantId)) || null;
+      };
+
+      const getSelectedOptions = (container) => {
+        const optionInputs = Array.from(
+          container.querySelectorAll(
+            'input[type="radio"]:checked, select[name^="options"], select[name^="option"], select[data-kauffman-native-select]'
+          )
+        );
+
+        const groupedOptions = [];
+
+        optionInputs.forEach((input) => {
+          if (input.tagName === 'SELECT') {
+            groupedOptions.push(input.value);
+            return;
+          }
+
+          const name = input.getAttribute('name') || '';
+          const existingIndex = groupedOptions.findIndex((item) => item && item.name === name);
+
+          if (existingIndex === -1) {
+            groupedOptions.push({ name, value: input.value });
+          } else {
+            groupedOptions[existingIndex] = { name, value: input.value };
+          }
+        });
+
+        return groupedOptions.map((option) => (typeof option === 'string' ? option : option.value)).filter(Boolean);
+      };
+
+      const getVariantFromSelectedOptions = (variants, selectedOptions) => {
+        if (!selectedOptions.length) return null;
+
+        return variants.find((variant) => {
+          if (!variant.options || variant.options.length !== selectedOptions.length) return false;
+
+          return variant.options.every((option, index) => String(option) === String(selectedOptions[index]));
+        }) || null;
+      };
+
+      const getStockState = (variant) => {
+        if (variant?.stock_state) return variant.stock_state;
+        if (!variant?.available) return 'out_of_stock';
+
+        const quantity = Number(variant.inventory_quantity);
+        const hasLowStock = Number.isFinite(quantity) && quantity > 0 && quantity <= 5;
+
+        return hasLowStock ? 'few_left' : 'in_stock';
+      };
+
+      const updateStockStatus = (wrapper, variant) => {
+        if (!variant) return;
+
+        const statusLine = wrapper.querySelector('[data-kauffman-stock-status-line]');
+        const statusText = wrapper.querySelector('[data-kauffman-stock-status-text]');
+        const subtext = wrapper.querySelector('[data-kauffman-stock-status-subtext]');
+        const notify = wrapper.querySelector('[data-kauffman-stock-status-notify]');
+
+        if (!statusLine || !statusText) return;
+
+        statusLine.classList.remove(
+          'kauffman-stock-status--in-stock',
+          'kauffman-stock-status--few-left',
+          'kauffman-stock-status--out-of-stock'
+        );
+
+        const stockState = getStockState(variant);
+
+        if (stockState === 'in_stock') {
+          statusLine.classList.add('kauffman-stock-status--in-stock');
+          statusText.textContent = 'In Stock';
+
+          if (subtext) {
+            subtext.hidden = false;
+            subtext.style.display = '';
+          }
+          if (notify) {
+            notify.hidden = true;
+            notify.style.display = 'none';
+          }
+        } else if (stockState === 'few_left') {
+          statusLine.classList.add('kauffman-stock-status--few-left');
+          statusText.textContent = 'A few items left';
+
+          if (subtext) {
+            subtext.hidden = false;
+            subtext.style.display = '';
+          }
+          if (notify) {
+            notify.hidden = true;
+            notify.style.display = 'none';
+          }
+        } else {
+          statusLine.classList.add('kauffman-stock-status--out-of-stock');
+          statusText.textContent = 'Out of stock';
+
+          if (subtext) {
+            subtext.hidden = true;
+            subtext.style.display = 'none';
+          }
+          if (notify) {
+            notify.hidden = false;
+            notify.style.display = '';
+          }
+        }
+      };
+
+      const getPickerForWrapper = (wrapper) => {
+        const productSection = wrapper.closest('.shopify-section') || document;
+        const productId = wrapper.dataset.productId;
+
+        if (productId) {
+          return productSection.querySelector(`variant-picker[data-product-id="${CSS.escape(productId)}"]`);
+        }
+
+        return productSection.querySelector('variant-picker');
+      };
+
+      const refreshWrapper = (wrapper, preferredVariant = null) => {
+        const variantsScript = wrapper.querySelector('[data-kauffman-stock-status-variants]');
+        if (!variantsScript) return;
+
+        let variants = [];
+
+        try {
+          variants = JSON.parse(variantsScript.textContent);
+        } catch (error) {
+          return;
+        }
+
+        const picker = getPickerForWrapper(wrapper);
+        const preferredVariantFromMetadata = preferredVariant?.id
+          ? variants.find((item) => String(item.id) === String(preferredVariant.id))
+          : null;
+        const variant =
+          preferredVariantFromMetadata ||
+          getVariantFromSelectedOptions(variants, picker ? getSelectedOptions(picker) : []) ||
+          getVariantFromUrl(variants) ||
+          variants.find((item) => item.available) ||
+          variants[0];
+
+        updateStockStatus(wrapper, variant);
+      };
+
+      const refreshAll = () => {
+        document.querySelectorAll('[data-kauffman-stock-status]').forEach(refreshWrapper);
+      };
+
+      const refreshFromVariantEvent = (event) => {
+        const variant = event.detail?.resource;
+        const productId = event.detail?.data?.productId;
+
+        if (!variant || !productId) {
+          refreshAll();
+          return;
+        }
+
+        document.querySelectorAll('[data-kauffman-stock-status]').forEach((wrapper) => {
+          if (String(wrapper.dataset.productId) === String(productId)) {
+            refreshWrapper(wrapper, variant);
+          }
+        });
+      };
+
+      const handleNotifyClick = (event) => {
+        if (!(event.target instanceof Element)) return;
+
+        const trigger = event.target.closest('[data-kauffman-stock-status-notify]');
+        if (!trigger) return;
+
+        const wrapper = trigger.closest('[data-kauffman-stock-status]');
+        const productId = wrapper?.dataset.productId;
+        const stickyTarget = productId
+          ? document.querySelector(`sticky-add-to-cart[data-product-id="${CSS.escape(productId)}"]`)
+          : document.querySelector('sticky-add-to-cart');
+
+        if (!stickyTarget) return;
+
+        event.preventDefault();
+        trigger.dispatchEvent(
+          new CustomEvent('kauffman:open-notify-me', {
+            bubbles: true,
+            detail: { productId },
+          })
+        );
+      };
+
+      document.addEventListener('change', refreshAll);
+      document.addEventListener('input', refreshAll);
+      document.addEventListener('click', handleNotifyClick);
+      document.addEventListener('variant:selected', refreshAll);
+      document.addEventListener('variant:update', refreshFromVariantEvent);
+
+      const originalPushState = history.pushState;
+      const originalReplaceState = history.replaceState;
+
+      history.pushState = function () {
+        originalPushState.apply(this, arguments);
+        window.dispatchEvent(new Event('kauffman:url-change'));
+      };
+
+      history.replaceState = function () {
+        originalReplaceState.apply(this, arguments);
+        window.dispatchEvent(new Event('kauffman:url-change'));
+      };
+
+      window.addEventListener('popstate', refreshAll);
+      window.addEventListener('kauffman:url-change', refreshAll);
+
+      refreshAll();
+    })();
+  </script>
+{% endunless %}
+
+{% schema %}
+{
+  "name": "t:names.product_variant_picker",
+  "tag": null,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "t:content.resource_reference_product_variant_picker"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:content.edit_variants_in_theme_settings"
+    },
+    {
+      "type": "select",
+      "id": "variant_style",
+      "label": "t:settings.style",
+      "options": [
+        {
+          "value": "dropdowns",
+          "label": "t:options.dropdowns"
+        },
+        {
+          "value": "buttons",
+          "label": "t:options.buttons"
+        }
+      ],
+      "default": "buttons"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_swatches",
+      "label": "t:settings.swatches",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Kauffman custom variant UI"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_kauffman_variant_picker",
+      "label": "Enable custom model dropdown and font color swatches",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "kauffman_model_option_name",
+      "label": "Model option name",
+      "default": "Model"
+    },
+    {
+      "type": "text",
+      "id": "kauffman_font_color_option_name",
+      "label": "Font color option name",
+      "default": "Font color"
+    },
+    {
+      "type": "header",
+      "content": "Kauffman size guide popup"
+    },
+    {
+      "type": "checkbox",
+      "id": "kauffman_enable_size_guide",
+      "label": "Enable size guide popup",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "kauffman_size_guide_option_name",
+      "label": "Size option name",
+      "default": "Size"
+    },
+    {
+      "type": "text",
+      "id": "kauffman_size_guide_trigger_label",
+      "label": "Size guide link label",
+      "default": "Size guide"
+    },
+    {
+      "type": "text",
+      "id": "kauffman_size_guide_title",
+      "label": "Size guide popup title",
+      "default": "Size guide"
+    },
+    {
+      "type": "page",
+      "id": "kauffman_size_guide_page",
+      "label": "Default size guide page",
+      "info": "Used for products other than T-shirts and hoodies, or as their fallback. If no page is selected, the page with handle size-guide is used."
+    },
+    {
+      "type": "page",
+      "id": "kauffman_t_shirt_size_guide_page",
+      "label": "T-shirt size guide page",
+      "info": "Shown for product types T-shirt, T-shirts, Tshirt, and Tshirts."
+    },
+    {
+      "type": "page",
+      "id": "kauffman_hoodie_size_guide_page",
+      "label": "Hoodie size guide page",
+      "info": "Shown for product types Hoodie and Hoodies."
+    },
+    {
+      "type": "range",
+      "id": "kauffman_custom_label_font_size_desktop",
+      "label": "Custom picker label font size desktop",
+      "min": 10,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 22
+    },
+    {
+      "type": "range",
+      "id": "kauffman_custom_label_font_size_mobile",
+      "label": "Custom picker label font size mobile",
+      "min": 10,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "kauffman_model_font_size_desktop",
+      "label": "Model dropdown font size desktop",
+      "min": 12,
+      "max": 64,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "kauffman_model_font_size_mobile",
+      "label": "Model dropdown font size mobile",
+      "min": 12,
+      "max": 42,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "kauffman_model_width_desktop",
+      "label": "Model dropdown width desktop",
+      "min": 280,
+      "max": 382,
+      "step": 2,
+      "unit": "px",
+      "default": 382
+    },
+    {
+      "type": "range",
+      "id": "kauffman_model_width_mobile",
+      "label": "Model dropdown width mobile",
+      "min": 260,
+      "max": 430,
+      "step": 2,
+      "unit": "px",
+      "default": 382
+    },
+    {
+      "type": "range",
+      "id": "kauffman_model_height_desktop",
+      "label": "Model dropdown height desktop",
+      "min": 44,
+      "max": 120,
+      "step": 1,
+      "unit": "px",
+      "default": 54
+    },
+    {
+      "type": "range",
+      "id": "kauffman_model_height_mobile",
+      "label": "Model dropdown height mobile",
+      "min": 44,
+      "max": 90,
+      "step": 1,
+      "unit": "px",
+      "default": 52
+    },
+    {
+      "type": "range",
+      "id": "kauffman_model_option_height_desktop",
+      "label": "Model dropdown option height desktop",
+      "min": 40,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "kauffman_model_option_height_mobile",
+      "label": "Model dropdown option height mobile",
+      "min": 40,
+      "max": 90,
+      "step": 1,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "kauffman_model_padding_desktop",
+      "label": "Model dropdown horizontal padding desktop",
+      "min": 8,
+      "max": 48,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "kauffman_model_padding_mobile",
+      "label": "Model dropdown horizontal padding mobile",
+      "min": 8,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "kauffman_model_dropdown_gap",
+      "label": "Model dropdown list gap",
+      "min": 0,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "kauffman_model_list_max_height",
+      "label": "Model dropdown list max height",
+      "min": 160,
+      "max": 520,
+      "step": 10,
+      "unit": "px",
+      "default": 320
+    },
+    {
+      "type": "range",
+      "id": "kauffman_model_caret_size",
+      "label": "Model dropdown chevron size",
+      "min": 6,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "kauffman_model_caret_stroke",
+      "label": "Model dropdown chevron stroke",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "unit": "px",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "kauffman_color_label_font_size_desktop",
+      "label": "Color text value font size desktop",
+      "min": 10,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 22
+    },
+    {
+      "type": "range",
+      "id": "kauffman_color_label_font_size_mobile",
+      "label": "Color text value font size mobile",
+      "min": 10,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "kauffman_font_swatches_gap",
+      "label": "Space between color swatches",
+      "min": 0,
+      "max": 48,
+      "step": 1,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "checkbox",
+      "id": "kauffman_hide_color_text_values",
+      "label": "Hide color text values",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Kauffman stock status"
+    },
+    {
+      "type": "range",
+      "id": "kauffman_stock_status_font_size_desktop",
+      "label": "Stock status font size desktop",
+      "min": 10,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "kauffman_stock_status_font_size_mobile",
+      "label": "Stock status font size mobile",
+      "min": 10,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "select",
+      "id": "kauffman_stock_status_font_weight",
+      "label": "Stock status font weight",
+      "options": [
+        {
+          "value": "300",
+          "label": "Light"
+        },
+        {
+          "value": "400",
+          "label": "Regular"
+        },
+        {
+          "value": "500",
+          "label": "Medium"
+        },
+        {
+          "value": "600",
+          "label": "Semi Bold"
+        }
+      ],
+      "default": "300"
+    },
+    {
+      "type": "range",
+      "id": "kauffman_stock_status_dot_size",
+      "label": "Stock status dot size",
+      "min": 4,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "text_alignment",
+      "id": "alignment",
+      "label": "t:settings.alignment",
+      "default": "left"
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "t:settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "t:settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.product_variant_picker",
+      "category": "t:categories.product"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,184 @@
+{% comment %}
+  Theme block: Client Service Accordion
+  Upload this file to: blocks/client-service-accordion.liquid
+{% endcomment %}
+
+{{ 'client-service-accordion.css' | asset_url | stylesheet_tag }}
+
+<div
+  class="product-info-client-accordion"
+  style="
+    --accordion-title-color: {{ block.settings.title_color }};
+    --accordion-divider-color: {{ block.settings.divider_color }};
+    --accordion-icon-color: {{ block.settings.icon_color }};
+    --accordion-item-icon-size: {{ block.settings.item_icon_size }}px;
+    --accordion-icon-gap: {{ block.settings.item_icon_gap }}px;
+    --accordion-width-desktop: {{ block.settings.accordion_width_desktop | default: 382 }}px;
+    --accordion-width-mobile: {{ block.settings.accordion_width_mobile | default: 348 }}px;
+  "
+  {{ block.shopify_attributes }}
+>
+  {% capture accordion_rows %}
+    {% content_for 'blocks' %}
+  {% endcapture %}
+
+  {% assign accordion_rows = accordion_rows | strip %}
+
+  {% if accordion_rows != blank %}
+    {{ accordion_rows }}
+  {% else %}
+    {% for i in (1..6) %}
+      {% liquid
+        assign title_key = 'title_' | append: i
+        assign content_key = 'content_' | append: i
+        assign icon_key = 'icon_' | append: i
+        assign accordion_title = block.settings[title_key]
+        assign accordion_content = block.settings[content_key]
+        assign accordion_icon = block.settings[icon_key]
+      %}
+
+      {% if accordion_title != blank %}
+        <details class="product-info-client-accordion__item">
+          <summary class="product-info-client-accordion__summary">
+            <span class="product-info-client-accordion__title-wrap">
+              {% if accordion_icon != blank %}
+                <img
+                  class="product-info-client-accordion__item-icon"
+                  src="{{ accordion_icon | image_url: width: 48 }}"
+                  alt=""
+                  width="{{ block.settings.item_icon_size }}"
+                  height="{{ block.settings.item_icon_size }}"
+                  loading="lazy"
+                >
+              {% endif %}
+
+              <span class="product-info-client-accordion__title">
+                {{ accordion_title }}
+              </span>
+            </span>
+
+            <span class="product-info-client-accordion__icon" aria-hidden="true">
+              <span class="product-info-client-accordion__icon-line product-info-client-accordion__icon-line--horizontal"></span>
+              <span class="product-info-client-accordion__icon-line product-info-client-accordion__icon-line--vertical"></span>
+            </span>
+          </summary>
+
+          {% if accordion_content != blank %}
+            <div class="product-info-client-accordion__content">
+              {{ accordion_content }}
+            </div>
+          {% endif %}
+        </details>
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+</div>
+
+{% schema %}
+{
+  "name": "Client service accordion",
+  "blocks": [
+    {
+      "type": "_client-service-accordion-row"
+    },
+    {
+      "type": "_client-service-contact-form"
+    }
+  ],
+  "settings": [
+    {
+      "type": "range",
+      "id": "item_icon_size",
+      "label": "Item icon size",
+      "min": 10,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "item_icon_gap",
+      "label": "Space between icon and title",
+      "min": 4,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "accordion_width_desktop",
+      "label": "Accordion width on desktop",
+      "min": 320,
+      "max": 520,
+      "step": 2,
+      "unit": "px",
+      "default": 382
+    },
+    {
+      "type": "range",
+      "id": "accordion_width_mobile",
+      "label": "Accordion width on mobile",
+      "min": 240,
+      "max": 420,
+      "step": 2,
+      "unit": "px",
+      "default": 348
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Text color",
+      "default": "#1E1A17"
+    },
+    {
+      "type": "color",
+      "id": "divider_color",
+      "label": "Divider color",
+      "default": "#E6E0D8"
+    },
+    {
+      "type": "color",
+      "id": "icon_color",
+      "label": "Toggle icon color",
+      "default": "#1E1A17"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Client service accordion",
+      "blocks": {
+        "row_1": {
+          "type": "_client-service-accordion-row",
+          "settings": {
+            "title": "Client Service",
+            "content": "<p>Add your client service information here.</p>"
+          }
+        },
+        "row_2": {
+          "type": "_client-service-accordion-row",
+          "settings": {
+            "title": "Shipping & Returns",
+            "content": "<p>Add your shipping and returns information here.</p>"
+          }
+        },
+        "row_3": {
+          "type": "_client-service-accordion-row",
+          "settings": {
+            "title": "Product Details",
+            "content": "<p>Add your product details here.</p>"
+          }
+        },
+        "contact_form": {
+          "type": "_client-service-contact-form",
+          "settings": {
+            "title": "Customer Support"
+          }
+        }
+      },
+      "block_order": ["row_1", "row_2", "row_3", "contact_form"]
+    }
+  ]
+}
+{% endschema %}

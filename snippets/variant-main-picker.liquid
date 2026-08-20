@@ -1,0 +1,829 @@
+{%- doc -%}
+  Renders a default variant picker, used to display the variant picker in the variants block.
+
+  @param {object} product_resource - The product object.
+  @param {object} [block] - The block object
+  @param {object} section - The section object.
+  @param {object} product - The current product object (used to determine selected variant state).
+{%- enddoc -%}
+
+{% liquid
+  assign block_settings = block.settings
+  assign kauffman_size_guide_page = block_settings.kauffman_size_guide_page
+  assign product_type_handle = product_resource.type | handleize
+  assign product_family_handle = product_resource.metafields.custom.product_family.value | handleize
+  assign product_tags = product_resource.tags | join: '|' | handleize
+
+  if product_type_handle == 't-shirt' or product_type_handle == 't-shirts' or product_type_handle == 'tshirt' or product_type_handle == 'tshirts' or product_family_handle == 't-shirt' or product_family_handle == 't-shirts' or product_family_handle == 'tshirt' or product_family_handle == 'tshirts' or product_tags contains 't-shirt' or product_tags contains 'tshirt'
+    assign kauffman_size_guide_product_type = 't-shirt'
+    assign kauffman_size_guide_page = block_settings.kauffman_t_shirt_size_guide_page | default: kauffman_size_guide_page
+  elsif product_type_handle == 'hoodie' or product_type_handle == 'hoodies' or product_family_handle == 'hoodie' or product_family_handle == 'hoodies' or product_tags contains 'hoodie'
+    assign kauffman_size_guide_product_type = 'hoodie'
+    assign kauffman_size_guide_page = block_settings.kauffman_hoodie_size_guide_page | default: kauffman_size_guide_page
+  endif
+
+  if kauffman_size_guide_page == blank
+    assign kauffman_size_guide_page = pages['size-guide']
+  endif
+
+  assign kauffman_size_guide_available = block_settings.kauffman_enable_size_guide
+  assign kauffman_size_guide_component_id = 'KauffmanSizeGuide-' | append: section.id | append: '-' | append: block.id
+  assign kauffman_size_guide_dialog_id = 'KauffmanSizeGuideDialog-' | append: section.id | append: '-' | append: block.id
+%}
+
+{% unless product_resource.has_only_default_variant %}
+  {% liquid
+    assign button_background_brightness = section.settings.color_scheme.settings.foreground | color_brightness
+    if button_background_brightness < 105
+      assign strikethrough_color_mix = '#000'
+    else
+      assign strikethrough_color_mix = '#fff'
+    endif
+  %}
+  <variant-picker
+    class="variant-picker spacing-style variant-picker--{{ block_settings.alignment }}{% if block_settings.enable_kauffman_variant_picker %} variant-picker--kauffman-custom{% endif %}"
+    style="--color-strikethrough-mix: {{ strikethrough_color_mix }}; --kauffman-custom-label-font-size-desktop: {{ block_settings.kauffman_custom_label_font_size_desktop | default: 22 }}px; --kauffman-custom-label-font-size-mobile: {{ block_settings.kauffman_custom_label_font_size_mobile | default: 16 }}px; --kauffman-model-font-size-desktop: {{ block_settings.kauffman_model_font_size_desktop | default: 16 }}px; --kauffman-model-font-size-mobile: {{ block_settings.kauffman_model_font_size_mobile | default: 14 }}px; --kauffman-model-width-desktop: {{ block_settings.kauffman_model_width_desktop | default: 400 }}px; --kauffman-model-width-mobile: {{ block_settings.kauffman_model_width_mobile | default: 382 }}px; --kauffman-model-height-desktop: {{ block_settings.kauffman_model_height_desktop | default: 54 }}px; --kauffman-model-height-mobile: {{ block_settings.kauffman_model_height_mobile | default: 52 }}px; --kauffman-model-option-height-desktop: {{ block_settings.kauffman_model_option_height_desktop | default: 48 }}px; --kauffman-model-option-height-mobile: {{ block_settings.kauffman_model_option_height_mobile | default: 48 }}px; --kauffman-model-padding-desktop: {{ block_settings.kauffman_model_padding_desktop | default: 18 }}px; --kauffman-model-padding-mobile: {{ block_settings.kauffman_model_padding_mobile | default: 16 }}px; --kauffman-model-dropdown-gap: {{ block_settings.kauffman_model_dropdown_gap | default: 8 }}px; --kauffman-model-list-max-height: {{ block_settings.kauffman_model_list_max_height | default: 320 }}px; --kauffman-model-caret-size: {{ block_settings.kauffman_model_caret_size | default: 10 }}px; --kauffman-model-caret-stroke: {{ block_settings.kauffman_model_caret_stroke | default: 2 }}px; --kauffman-color-label-font-size-desktop: {{ block_settings.kauffman_color_label_font_size_desktop | default: 22 }}px; --kauffman-color-label-font-size-mobile: {{ block_settings.kauffman_color_label_font_size_mobile | default: 16 }}px; --kauffman-font-swatches-gap: {{ block_settings.kauffman_font_swatches_gap | default: 21 }}px; {% render 'spacing-style', settings: block_settings %}"
+    data-section-id="{{ section.id }}"
+    data-product-id="{{ product_resource.id }}"
+    data-block-id="{{ block.id }}"
+    data-product-url="{{ product_resource.url }}"
+    ref="mainVariantPicker"
+    {% if product.id == product_resource.id %}
+      data-template-product-match="true"
+    {% endif %}
+    {{ block.shopify_attributes }}
+    {% if request.visual_preview_mode %}
+      data-shopify-visual-preview
+    {% endif %}
+  >
+    <form class="variant-picker__form">
+      {%- for product_option in product_resource.options_with_values -%}
+        {%- liquid
+          assign option_index = forloop.index0
+          assign swatch_count = product_option.values | map: 'swatch' | compact | size
+          assign variant_style = block_settings.variant_style
+          assign option_handle = product_option.name | handleize
+          assign model_option_handle = block_settings.kauffman_model_option_name | default: 'Model' | handleize
+          assign font_color_option_handle = block_settings.kauffman_font_color_option_name | default: 'Font color' | handleize
+          assign size_guide_option_handle = block_settings.kauffman_size_guide_option_name | default: 'Size' | handleize
+          assign use_kauffman_model_dropdown = false
+          assign use_kauffman_font_swatches = false
+          assign show_kauffman_size_guide_trigger = false
+
+          if block_settings.enable_kauffman_variant_picker and block_settings.variant_style == 'dropdowns'
+            if option_handle == model_option_handle
+              assign use_kauffman_model_dropdown = true
+            endif
+
+            if option_handle == font_color_option_handle
+              assign use_kauffman_font_swatches = true
+            endif
+          endif
+
+          if kauffman_size_guide_available and option_handle == size_guide_option_handle
+            assign show_kauffman_size_guide_trigger = true
+          endif
+
+          if swatch_count > 0 and block_settings.show_swatches and use_kauffman_model_dropdown == false and use_kauffman_font_swatches == false
+            assign variant_style = 'swatch'
+          endif
+
+          if variant_style == 'buttons' and settings.variant_button_width == 'equal-width-buttons'
+            assign fieldset_id = section.id | append: '-' | append: product_resource.id | append: '-' | append: product_option.name | handleize
+            assign option_id_attribute = 'data-option-id="' | append: fieldset_id | append: '"'
+            assign longest_value = 0
+          endif
+        -%}
+
+        {%- if product_option.values.size == 1 and variant_style != 'swatch' and use_kauffman_model_dropdown == false and use_kauffman_font_swatches == false -%}
+          {%- assign single_option_value = product_option.values.first -%}
+          <select
+            id="Option-{{ block.id }}-{{ option_index }}"
+            name="options[{{ product_option.name | escape }}]"
+            hidden
+            aria-hidden="true"
+            tabindex="-1"
+            data-kauffman-native-select
+            data-single-value-option
+          >
+            <option
+              value="{{ single_option_value | escape }}"
+              data-input-id="{{ product_option.position }}-0"
+              data-option-value-id="{{ single_option_value.id }}"
+              data-option-available="{{ single_option_value.available }}"
+              data-variant-id="{{ single_option_value.variant.id }}"
+              data-connected-product-url="{{ single_option_value.product_url }}"
+              selected="selected"
+            >
+              {{- single_option_value | escape -}}
+            </option>
+          </select>
+        {%- elsif variant_style == 'swatch' or block_settings.variant_style == 'buttons' -%}
+          {%- assign fieldset_index = forloop.index0 -%}
+          <fieldset
+            class="variant-option variant-option--buttons{% if variant_style == 'swatch' %} variant-option--swatches{% else %} variant-option--{{ settings.variant_button_width }}{% endif %}"
+            data-fieldset-index="{{ fieldset_index }}"
+            ref="fieldsets[]"
+            {{ option_id_attribute }}
+          >
+            <legend>
+              {{ product_option.name | escape -}}
+              {%- if variant_style == 'swatch' -%}
+                <span class="variant-option__swatch-value">{{ product_option.selected_value }}</span>
+              {%- endif %}
+            </legend>
+            {%- for product_option_value in product_option.values -%}
+              {% if product_option_value.size > longest_value and option_id_attribute %}
+                {% assign longest_value = product_option_value.size %}
+              {% endif %}
+              <label
+                class="variant-option__button-label{% if variant_style == 'swatch' %} variant-option__button-label--has-swatch{% endif %}"
+              >
+                <input
+                  type="radio"
+                  name="{{ product_option.name | escape }}-{{ block.id }}-{{ product_resource.id }}"
+                  value="{{ product_option_value | escape }}"
+                  aria-label="{{ product_option_value.name | escape }}{% if product_option_value.available == false %} - {{ 'products.product.sold_out' | t }}{% endif %}"
+                  {% if product_option_value.available == false %}
+                    aria-disabled="true"
+                  {% endif %}
+                  data-previous-checked="false"
+                  data-fieldset-index="{{ fieldset_index }}"
+                  data-input-index="{{ forloop.index0 }}"
+                  data-input-id="{{ product_option.position }}-{{ forloop.index0 }}"
+                  data-option-value-id="{{ product_option_value.id }}"
+                  data-option-available="{{ product_option_value.available }}"
+                  data-connected-product-url="{{ product_option_value.product_url }}"
+                  {% if product_option_value.variant.id %}
+                    data-variant-id="{{ product_option_value.variant.id }}"
+                  {% endif %}
+                  {% if product_option_value.selected %}
+                    data-current-checked="true"
+                    checked
+                  {% else %}
+                    data-current-checked="false"
+                  {% endif %}
+                >
+                {% if variant_style == 'swatch' %}
+                  {% liquid
+                    assign featured_media = product_option_value.variant.featured_media
+
+                    # If the variant has no featured media, and we have a combined listing product, then fall back to
+                    # using the featured media of the child product that is linked to this option value.
+                    if featured_media == blank and product_option_value.product_url
+                      assign featured_media = product_option_value.variant.product.featured_media
+                    endif
+                  %}
+
+                  {% render 'swatch',
+                    swatch: product_option_value.swatch,
+                    variant_image: featured_media,
+                    mode: 'unscaled'
+                  %}
+                {% else %}
+                  {% if product_option_value.available == true %}
+                    <span
+                      class="variant-option__button-label__pill"
+                      data-key="variant-option-pill"
+                    ></span>
+                  {% endif %}
+                  <span
+                    class="variant-option__button-label__text"
+                    data-key="variant-option-text"
+                  >
+                    {{- product_option_value | escape -}}
+                  </span>
+                {% endif %}
+                {% render 'strikethrough-variant', product_option: product_option_value %}
+              </label>
+            {%- endfor -%}
+            {% if option_id_attribute %}
+              {% style %}
+                [data-option-id="{{ fieldset_id }}"] {
+                  --variant-ch: {{ longest_value | times: 0.65 }}em;
+                }
+              {% endstyle %}
+            {% endif %}
+          </fieldset>
+        {%- elsif block_settings.variant_style == 'dropdowns' -%}
+          {%
+            # There is an opportunity to build a custom select component that will allow us to style the select element further (animation for dropdown, swatches shown in the dropdown options, etc)
+            # It's too bad as it mean rebuilding baked in behaviours but I think we've already done that for the locale selectors
+            # in dawn. So it might mean more time spent in setting it up but worth it for future updates/styling.
+          %}
+          {% liquid
+            assign property_being_updated = false
+            if settings.variant_swatch_width != settings.variant_swatch_height
+              assign property_being_updated = true
+              # (original width / original height) x new height (20px at the moment) = new width
+              assign new_width = settings.variant_swatch_width | times: 1.0 | divided_by: settings.variant_swatch_height | times: 20
+            endif
+          %}
+
+          <div class="variant-option variant-option--dropdowns{% if use_kauffman_model_dropdown %} variant-option--kauffman-model{% endif %}{% if use_kauffman_font_swatches %} variant-option--kauffman-font-color{% endif %}">
+            {%- if show_kauffman_size_guide_trigger -%}
+              <div class="kauffman-variant-option__heading">
+                <label for="Option-{{ block.id }}-{{ forloop.index0 }}">{{ product_option.name | escape }}</label>
+                {% render 'kauffman-size-guide-trigger',
+                  component_id: kauffman_size_guide_component_id,
+                  dialog_id: kauffman_size_guide_dialog_id,
+                  label: block_settings.kauffman_size_guide_trigger_label
+                %}
+              </div>
+            {%- else -%}
+              <label for="Option-{{ block.id }}-{{ forloop.index0 }}">{{ product_option.name | escape }}</label>
+            {%- endif -%}
+            <div
+              class="variant-option__select-wrapper{% if use_kauffman_model_dropdown or use_kauffman_font_swatches %} variant-option__select-wrapper--kauffman-hidden{% endif %}"
+              style="
+                {%- if property_being_updated  -%}
+                  --variant-picker-swatch-width: clamp(10px,{{ new_width }}px, 50px);
+                {%- endif -%}
+              "
+            >
+              <select
+                id="Option-{{ block.id }}-{{ forloop.index0 }}"
+                name="options[{{ product_option.name | escape }}]"
+                class="variant-option__select"
+                data-kauffman-native-select
+              >
+                {%- for product_option_value in product_option.values -%}
+                  <option
+                    value="{{ product_option_value | escape }}"
+                    data-input-id="{{ product_option.position }}-{{ forloop.index0 }}"
+                    data-option-value-id="{{ product_option_value.id }}"
+                    data-variant-id="{{ product_option_value.variant.id }}"
+                    data-connected-product-url="{{ product_option_value.product_url }}"
+                    {% if product_option_value.selected %}
+                      selected="selected"
+                    {% endif %}
+                  >
+                    {% if product_option_value.available == false %}
+                      {{ product_option_value | escape }} - {{ 'content.unavailable' | t }}
+                    {% else %}
+                      {{ product_option_value | escape }}
+                    {% endif %}
+                  </option>
+                {%- endfor -%}
+              </select>
+              <svg
+                aria-hidden="true"
+                focusable="false"
+                class="icon icon-caret"
+                viewBox="0 0 10 6"
+              >
+                {%- render 'icon', icon: 'caret' -%}
+              </svg>
+            </div>
+
+            {%- if use_kauffman_model_dropdown -%}
+              <details class="kauffman-model-select" data-kauffman-model-select>
+                <summary class="kauffman-model-select__summary">
+                  <span class="kauffman-model-select__summary-text">
+                    {{ block_settings.kauffman_model_placeholder | default: product_option.selected_value | escape }}
+                  </span>
+                  <span class="kauffman-model-select__caret" aria-hidden="true"></span>
+                </summary>
+                <div class="kauffman-model-select__list" role="listbox">
+                  {%- for product_option_value in product_option.values -%}
+                    <button
+                      type="button"
+                      class="kauffman-model-select__option{% if product_option_value.selected %} is-selected{% endif %}"
+                      data-kauffman-option-trigger
+                      data-target-select="Option-{{ block.id }}-{{ option_index }}"
+                      data-value="{{ product_option_value | escape }}"
+                      role="option"
+                      aria-selected="{% if product_option_value.selected %}true{% else %}false{% endif %}"
+                      data-option-available="{{ product_option_value.available }}"
+                    >
+                      {{ product_option_value | escape }}
+                    </button>
+                  {%- endfor -%}
+                </div>
+              </details>
+            {%- endif -%}
+
+            {%- if use_kauffman_font_swatches -%}
+              <div class="kauffman-font-swatches" role="radiogroup" aria-label="{{ product_option.name | escape }}">
+                {%- for product_option_value in product_option.values -%}
+                  {% liquid
+                    assign value_label = product_option_value | strip
+                    assign value_handle = value_label | handleize
+                    assign fallback_color = value_handle
+
+                    case value_handle
+                      when 'black'
+                        assign fallback_color = '#111111'
+                      when 'white'
+                        assign fallback_color = '#ffffff'
+                      when 'orange'
+                        assign fallback_color = '#f05a00'
+                      when 'red'
+                        assign fallback_color = '#d71920'
+                      when 'blue'
+                        assign fallback_color = '#1f5eff'
+                      when 'green'
+                        assign fallback_color = '#1f7a3f'
+                      when 'yellow'
+                        assign fallback_color = '#f3d23b'
+                      when 'pink'
+                        assign fallback_color = '#f4a4b8'
+                      when 'brown'
+                        assign fallback_color = '#6b4328'
+                      when 'grey', 'gray'
+                        assign fallback_color = '#8d8d8d'
+                      when 'silver'
+                        assign fallback_color = '#c8c8c8'
+                      when 'gold'
+                        assign fallback_color = '#c8a24a'
+                      when 'beige'
+                        assign fallback_color = '#d8c3a5'
+                    endcase
+                  %}
+                  <button
+                    type="button"
+                    class="kauffman-font-swatches__item{% if product_option_value.selected %} is-selected{% endif %}{% if product_option_value.available == false %} is-unavailable{% endif %}"
+                    data-kauffman-option-trigger
+                    data-target-select="Option-{{ block.id }}-{{ option_index }}"
+                    data-value="{{ product_option_value | escape }}"
+                    data-option-available="{{ product_option_value.available }}"
+                    aria-pressed="{% if product_option_value.selected %}true{% else %}false{% endif %}"
+                    aria-label="{{ product_option_value | escape }}{% if product_option_value.available == false %} - {{ 'content.unavailable' | t }}{% endif %}"
+                    {% if product_option_value.available == false %}
+                      aria-disabled="true"
+                    {% endif %}
+                  >
+                    <span class="kauffman-font-swatches__circle" style="--kauffman-swatch-color: {{ product_option_value.swatch.color | default: fallback_color }};">
+                      {%- if product_option_value.swatch.image -%}
+                        <span
+                          class="kauffman-font-swatches__image"
+                          style="background-image: url({{ product_option_value.swatch.image | image_url: width: 96 }});"
+                        ></span>
+                      {%- endif -%}
+                    </span>
+                    {%- unless block_settings.kauffman_hide_color_text_values -%}
+                      <span class="kauffman-font-swatches__label">{{ product_option_value | escape }}</span>
+                    {%- endunless -%}
+                  </button>
+                {%- endfor -%}
+              </div>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+
+      <script type="application/json">
+        {{ product_resource.selected_or_first_available_variant | json }}
+      </script>
+    </form>
+    {%- if kauffman_size_guide_available -%}
+      {% render 'kauffman-size-guide-popup',
+        component_id: kauffman_size_guide_component_id,
+        dialog_id: kauffman_size_guide_dialog_id,
+        size_guide: product_resource.metafields.custom.size_guide.value,
+        size_guide_page: kauffman_size_guide_page,
+        product_type: kauffman_size_guide_product_type,
+        heading: block_settings.kauffman_size_guide_title
+      %}
+    {%- endif -%}
+    <script>
+      (() => {
+        if (window.kauffmanVariantPickerReady) return;
+        window.kauffmanVariantPickerReady = true;
+
+        const updateCustomState = (trigger, select) => {
+          const wrapper = trigger.closest('.variant-option');
+          if (!wrapper || !select) return;
+
+          wrapper.querySelectorAll('[data-kauffman-option-trigger]').forEach((item) => {
+            const isActive = item.dataset.value === select.value;
+            item.classList.toggle('is-selected', isActive);
+            item.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            item.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+          });
+
+          const summaryText = wrapper.querySelector('.kauffman-model-select__summary-text');
+          if (summaryText) summaryText.textContent = select.value;
+        };
+
+        document.addEventListener('click', (event) => {
+          const trigger = event.target.closest('[data-kauffman-option-trigger]');
+          if (!trigger) return;
+
+          const wrapper = trigger.closest('.variant-option');
+          const isModelTrigger = wrapper?.classList.contains('variant-option--kauffman-model');
+
+          if (!isModelTrigger && trigger.getAttribute('aria-disabled') === 'true') return;
+
+          const selectId = trigger.dataset.targetSelect;
+          const picker = trigger.closest('variant-picker');
+          const select = picker?.querySelector(`#${CSS.escape(selectId)}`);
+
+          if (!select || select.value === trigger.dataset.value) {
+            trigger.closest('details')?.removeAttribute('open');
+            return;
+          }
+
+          select.value = trigger.dataset.value;
+          updateCustomState(trigger, select);
+          trigger.closest('details')?.removeAttribute('open');
+          select.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+
+        document.addEventListener('click', (event) => {
+          document.querySelectorAll('[data-kauffman-model-select][open]').forEach((details) => {
+            if (!details.contains(event.target)) details.removeAttribute('open');
+          });
+        });
+      })();
+    </script>
+  </variant-picker>
+{% endunless %}
+
+{% stylesheet %}
+  /* Variant picker container styles - unique to main variant picker */
+  .variant-picker {
+    width: 100%;
+  }
+
+  .variant-picker__form {
+    width: 100%;
+  }
+
+  .variant-picker[data-shopify-visual-preview] {
+    min-width: 300px;
+    padding-inline-start: max(4px, var(--padding-inline-start));
+  }
+
+  /* Dropdown variant option styles */
+  .variant-option__select-wrapper {
+    display: flex;
+    position: relative;
+    border: var(--style-border-width-inputs) solid var(--color-border);
+    border-radius: var(--style-border-radius-inputs);
+    align-items: center;
+    margin-top: var(--margin-2xs);
+    overflow: clip;
+  }
+
+  .variant-option__select-wrapper:has(.swatch) {
+    --variant-picker-swatch-width: 20px;
+    --variant-picker-swatch-height: 20px;
+  }
+
+  .variant-option__select-wrapper:hover {
+    border-color: var(--color-variant-hover-border);
+  }
+
+  .variant-option__select:focus-visible {
+    outline: var(--focus-outline-width) solid currentcolor;
+    outline-offset: var(--focus-outline-offset);
+  }
+
+  .variant-option__select {
+    padding-block: var(--padding-md);
+    padding-inline: var(--padding-lg) calc(var(--padding-lg) + var(--icon-size-2xs));
+    appearance: none;
+    border: 0;
+    width: 100%;
+    margin: 0;
+    cursor: pointer;
+  }
+
+  .variant-option__select-wrapper .icon {
+    position: absolute;
+    right: var(--padding-md);
+    top: 50%;
+    transform: translateY(-50%);
+    width: var(--icon-size-2xs);
+    height: var(--icon-size-2xs);
+    pointer-events: none;
+  }
+
+  .variant-option__select--has-swatch {
+    padding-inline-start: calc((2 * var(--padding-sm)) + var(--variant-picker-swatch-width));
+  }
+
+  .variant-option__select-wrapper .swatch {
+    position: absolute;
+    top: 50%;
+    left: var(--padding-md);
+    transform: translateY(-50%);
+  }
+
+  /* Variant picker alignment modifiers */
+  .variant-picker--center,
+  .variant-picker--center .variant-option {
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .variant-picker--right,
+  .variant-picker--right .variant-option {
+    text-align: right;
+    justify-content: right;
+  }
+
+  .variant-option__select-wrapper--kauffman-hidden {
+    display: none;
+  }
+
+  .variant-option--kauffman-model,
+  .variant-option--kauffman-font-color {
+    width: 100%;
+    text-align: center;
+  }
+
+  .variant-option--kauffman-model > label,
+  .variant-option--kauffman-font-color > label,
+  .kauffman-variant-option__heading > label {
+    display: block;
+    margin-bottom: 28px;
+    font-size: var(--kauffman-custom-label-font-size-desktop, 22px);
+    line-height: 1;
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    color: rgb(var(--color-foreground-rgb) / 0.48);
+  }
+
+  .kauffman-variant-option__heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    width: 100%;
+    max-width: var(--kauffman-model-width-desktop, 400px);
+    margin: 0 0 20px;
+    text-align: left;
+  }
+
+  .variant-picker--center .kauffman-variant-option__heading {
+    margin-inline: auto;
+  }
+
+  .variant-picker--right .kauffman-variant-option__heading {
+    margin-left: auto;
+  }
+
+  .kauffman-variant-option__heading > label {
+    margin: 0;
+  }
+
+  .kauffman-model-select {
+    position: relative;
+    width: 100%;
+    max-width: var(--kauffman-model-width-desktop, 400px);
+    margin: 0 0 24px;
+    text-align: left;
+  }
+
+  .variant-picker--center .kauffman-model-select {
+    margin-inline: auto;
+  }
+
+  .variant-picker--right .kauffman-model-select {
+    margin-left: auto;
+  }
+
+  .kauffman-model-select__summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: var(--kauffman-model-height-desktop, 54px);
+    padding: 0 var(--kauffman-model-padding-desktop, 18px);
+    border: 1px solid #e5e0d8;
+    border-radius: 0;
+    background: #f7f5f1;
+    color: rgb(var(--color-foreground-rgb));
+    list-style: none;
+    cursor: pointer;
+  }
+
+  .kauffman-model-select__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .kauffman-model-select__summary:focus-visible {
+    outline: var(--focus-outline-width) solid currentcolor;
+    outline-offset: var(--focus-outline-offset);
+  }
+
+  .kauffman-model-select__summary-text {
+    font-size: var(--kauffman-model-font-size-desktop, 16px);
+    line-height: 1.2;
+    color: rgb(var(--color-foreground-rgb) / 0.5);
+  }
+
+  .kauffman-model-select__caret {
+    width: var(--kauffman-model-caret-size, 10px);
+    height: var(--kauffman-model-caret-size, 10px);
+    flex: 0 0 auto;
+    margin-left: 16px;
+    border-right: var(--kauffman-model-caret-stroke, 2px) solid currentcolor;
+    border-bottom: var(--kauffman-model-caret-stroke, 2px) solid currentcolor;
+    transform: rotate(45deg) translateY(-3px);
+    transition: transform 160ms ease;
+  }
+
+  .kauffman-model-select[open] .kauffman-model-select__caret {
+    transform: rotate(225deg) translateY(-3px);
+  }
+
+  .kauffman-model-select__list {
+    position: absolute;
+    z-index: 20;
+    top: calc(100% + var(--kauffman-model-dropdown-gap, 8px));
+    left: 0;
+    right: 0;
+    border: 1px solid #e5e0d8;
+    border-radius: 0;
+    background: #f7f5f1;
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.08);
+    max-height: var(--kauffman-model-list-max-height, 320px);
+    overflow-y: auto;
+  }
+
+  .kauffman-model-select__option {
+    display: block;
+    width: 100%;
+    min-height: var(--kauffman-model-option-height-desktop, 48px);
+    padding: 0 var(--kauffman-model-padding-desktop, 18px);
+    border: 0;
+    border-bottom: 1px solid rgb(var(--color-foreground-rgb) / 0.08);
+    background: transparent;
+    color: rgb(var(--color-foreground-rgb));
+    font: inherit;
+    font-size: var(--kauffman-model-font-size-desktop, 16px);
+    line-height: 1.2;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .kauffman-model-select__option:last-child {
+    border-bottom: 0;
+  }
+
+  .kauffman-model-select__option:hover,
+  .kauffman-model-select__option:focus-visible,
+  .kauffman-model-select__option.is-selected {
+    background: rgb(var(--color-foreground-rgb) / 0.04);
+  }
+
+  .kauffman-model-select__option[aria-disabled='true'] {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+
+  .kauffman-font-swatches__item[aria-disabled='true'] {
+    --kauffman-unavailable-color: #dfdfdf;
+
+    opacity: 1;
+    cursor: not-allowed;
+  }
+
+  .variant-picker--kauffman-custom .kauffman-font-swatches {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--kauffman-font-swatches-gap, 21px);
+    width: 100%;
+  }
+
+  .variant-picker--kauffman-custom .kauffman-font-swatches__item {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    gap: 10px;
+    min-width: 0;
+    width: max-content;
+    flex: 0 0 auto;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: rgb(var(--color-foreground-rgb));
+    font: inherit;
+    line-height: 1;
+    appearance: none;
+    box-shadow: none;
+    cursor: pointer;
+  }
+
+  .variant-picker--kauffman-custom
+    .kauffman-font-swatches__item[aria-disabled='true']
+    .kauffman-font-swatches__label {
+    opacity: 0.42;
+  }
+
+  .variant-picker--kauffman-custom
+    .kauffman-font-swatches__item[aria-disabled='true']
+    .kauffman-font-swatches__circle {
+    border-color: var(--kauffman-unavailable-color);
+  }
+
+  .variant-picker--kauffman-custom
+    .kauffman-font-swatches__item[aria-disabled='true']
+    .kauffman-font-swatches__label {
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+  }
+
+  .variant-picker--kauffman-custom .kauffman-font-swatches__item[aria-disabled='true']::after {
+    content: '';
+    position: absolute;
+    z-index: 3;
+    top: 16px;
+    left: 50%;
+    width: 38px;
+    height: 1px;
+    border-radius: 999px;
+    background: var(--kauffman-unavailable-color);
+    transform: translate(-50%, -50%) rotate(-45deg);
+    transform-origin: center;
+    pointer-events: none;
+  }
+
+  .variant-picker--kauffman-custom .kauffman-font-swatches__circle {
+    position: relative;
+    display: block;
+    width: 32px;
+    height: 32px;
+    border: 1px solid rgb(var(--color-foreground-rgb) / 0.18);
+    border-radius: 50%;
+    background: var(--kauffman-swatch-color);
+    box-shadow: none;
+    outline: none;
+  }
+
+  .variant-picker--kauffman-custom .kauffman-font-swatches__image {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background-position: center;
+    background-size: cover;
+  }
+
+  .variant-picker--kauffman-custom .kauffman-font-swatches__item.is-selected .kauffman-font-swatches__circle::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border: 1px solid currentcolor;
+    border-radius: 50%;
+  }
+
+  .variant-picker--kauffman-custom .kauffman-font-swatches__label {
+    font-size: var(--kauffman-color-label-font-size-desktop, 22px);
+    line-height: 1;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  @media screen and (max-width: 820px) {
+    .variant-option--kauffman-model > label,
+    .variant-option--kauffman-font-color > label,
+    .kauffman-variant-option__heading > label {
+      margin-bottom: 20px;
+      font-size: var(--kauffman-custom-label-font-size-mobile, 16px);
+      letter-spacing: 0.3em;
+    }
+
+    .kauffman-variant-option__heading {
+      max-width: var(--kauffman-model-width-mobile, 382px);
+      margin-bottom: 16px;
+    }
+
+    .kauffman-variant-option__heading > label {
+      margin: 0;
+    }
+
+    .kauffman-model-select {
+      max-width: var(--kauffman-model-width-mobile, 382px);
+    }
+
+    .kauffman-model-select__summary {
+      min-height: var(--kauffman-model-height-mobile, 52px);
+      padding: 0 var(--kauffman-model-padding-mobile, 16px);
+    }
+
+    .kauffman-model-select__summary-text,
+    .kauffman-model-select__option {
+      font-size: var(--kauffman-model-font-size-mobile, 14px);
+    }
+
+    .kauffman-model-select__option {
+      min-height: var(--kauffman-model-option-height-mobile, 48px);
+      padding: 0 var(--kauffman-model-padding-mobile, 16px);
+    }
+
+    .variant-picker--kauffman-custom .kauffman-font-swatches {
+      gap: var(--kauffman-font-swatches-gap, 21px);
+    }
+
+    .variant-picker--kauffman-custom .kauffman-font-swatches__label {
+      font-size: var(--kauffman-color-label-font-size-mobile, 16px);
+    }
+  }
+
+{% endstylesheet %}

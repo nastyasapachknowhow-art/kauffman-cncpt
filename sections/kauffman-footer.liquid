@@ -1,0 +1,1553 @@
+{% liquid
+  assign footer_id = 'kauffman-footer-' | append: section.id
+  assign logo_mode = 'text'
+
+  if section.settings.logo_svg_code != blank
+    assign logo_mode = 'svg'
+  elsif section.settings.logo_image != blank
+    assign logo_mode = 'image'
+  endif
+%}
+
+<footer
+  id="{{ footer_id }}"
+  class="kauffman-footer color-{{ section.settings.color_scheme }}"
+  style="
+    --kk-footer-bg: var(--color-background);
+    --kk-footer-text: var(--color-foreground);
+    --kk-footer-heading: var(--color-foreground-heading);
+    --kk-footer-muted: var(--color-foreground-muted);
+    --kk-footer-accent: var(--color-primary);
+    --kk-footer-border: var(--color-border);
+    --kk-footer-input-bg: var(--color-input-background);
+    --kk-footer-input-text: var(--color-input-text);
+    --kk-footer-input-border: var(--color-input-border);
+    --kk-footer-button-bg: var(--color-primary-button-background);
+    --kk-footer-button-text: var(--color-primary-button-text);
+    --kk-footer-button-border: var(--color-primary-button-border);
+    --kk-footer-logo-color: var(--color-foreground-heading);
+    --kk-footer-logo-desktop-width: {{ section.settings.logo_width_desktop }}px;
+    --kk-footer-logo-desktop-max-height: {{ section.settings.logo_max_height_desktop }}px;
+    --kk-footer-logo-desktop-text-size: {{ section.settings.logo_text_size_desktop }}px;
+    --kk-footer-logo-desktop-align: {{ section.settings.logo_alignment_desktop }};
+    --kk-footer-logo-mobile-width: {{ section.settings.logo_width_mobile }}px;
+    --kk-footer-logo-mobile-max-height: {{ section.settings.logo_max_height_mobile }}px;
+    --kk-footer-logo-mobile-text-size: {{ section.settings.logo_text_size_mobile }}px;
+    --kk-footer-logo-mobile-align: {{ section.settings.logo_alignment_mobile }};
+    --kk-footer-nav-heading-desktop-font-size: {{ section.settings.nav_heading_font_size_desktop }}px;
+    --kk-footer-nav-heading-desktop-line-height: {{ section.settings.nav_heading_line_height_desktop }}px;
+    --kk-footer-nav-heading-desktop-letter-spacing: {{ section.settings.nav_heading_letter_spacing_desktop | divided_by: 100.0 }}em;
+    --kk-footer-nav-heading-desktop-font-weight: {{ section.settings.nav_heading_font_weight_desktop }};
+    --kk-footer-nav-heading-desktop-text-transform: {{ section.settings.nav_heading_text_transform_desktop }};
+    --kk-footer-nav-heading-mobile-font-size: {{ section.settings.nav_heading_font_size_mobile }}px;
+    --kk-footer-nav-heading-mobile-line-height: {{ section.settings.nav_heading_line_height_mobile }}px;
+    --kk-footer-nav-heading-mobile-letter-spacing: {{ section.settings.nav_heading_letter_spacing_mobile | divided_by: 100.0 }}em;
+    --kk-footer-nav-heading-mobile-font-weight: {{ section.settings.nav_heading_font_weight_mobile }};
+    --kk-footer-nav-heading-mobile-text-transform: {{ section.settings.nav_heading_text_transform_mobile }};
+    --kk-footer-nav-heading-color: {% case section.settings.nav_heading_color %}{% when 'text' %}var(--kk-footer-text){% when 'accent' %}var(--kk-footer-accent){% else %}var(--kk-footer-heading){% endcase %};
+    --kk-footer-menu-item-desktop-font-size: {{ section.settings.menu_item_font_size_desktop }}px;
+    --kk-footer-menu-item-desktop-line-height: {{ section.settings.menu_item_line_height_desktop }}px;
+    --kk-footer-menu-item-desktop-letter-spacing: {{ section.settings.menu_item_letter_spacing_desktop | divided_by: 100.0 }}em;
+    --kk-footer-menu-item-desktop-font-weight: {{ section.settings.menu_item_font_weight_desktop }};
+    --kk-footer-menu-item-desktop-text-transform: {{ section.settings.menu_item_text_transform_desktop }};
+    --kk-footer-menu-item-desktop-gap: {{ section.settings.menu_item_gap_desktop }}px;
+    --kk-footer-menu-item-mobile-font-size: {{ section.settings.menu_item_font_size_mobile }}px;
+    --kk-footer-menu-item-mobile-line-height: {{ section.settings.menu_item_line_height_mobile }}px;
+    --kk-footer-menu-item-mobile-letter-spacing: {{ section.settings.menu_item_letter_spacing_mobile | divided_by: 100.0 }}em;
+    --kk-footer-menu-item-mobile-font-weight: {{ section.settings.menu_item_font_weight_mobile }};
+    --kk-footer-menu-item-mobile-text-transform: {{ section.settings.menu_item_text_transform_mobile }};
+    --kk-footer-menu-item-mobile-gap: {{ section.settings.menu_item_gap_mobile }}px;
+    --kk-footer-menu-item-color: {% case section.settings.menu_item_color %}{% when 'muted' %}var(--kk-footer-muted){% when 'accent' %}var(--kk-footer-accent){% else %}var(--kk-footer-text){% endcase %};
+    --kk-footer-menu-item-mobile-color: {% case section.settings.menu_item_mobile_color %}{% when 'text' %}var(--kk-footer-text){% when 'accent' %}var(--kk-footer-accent){% else %}var(--kk-footer-muted){% endcase %};
+    --kk-footer-menu-item-hover-color: {% case section.settings.menu_item_hover_color %}{% when 'text' %}var(--kk-footer-text){% when 'muted' %}var(--kk-footer-muted){% else %}var(--kk-footer-accent){% endcase %};
+  "
+>
+  <div class="kauffman-footer__inner">
+    <div class="kauffman-footer__top">
+      <div class="kauffman-footer__brand">
+        <a class="kauffman-footer__logo kauffman-footer__logo--{{ logo_mode }}" href="{{ routes.root_url }}" aria-label="{{ shop.name | escape }}">
+          {% if section.settings.logo_svg_code != blank %}
+            <span class="kauffman-footer__logo-svg" aria-hidden="true">
+              {{ section.settings.logo_svg_code }}
+            </span>
+          {% elsif section.settings.logo_image != blank %}
+            {{ section.settings.logo_image | image_url: width: 1200 | image_tag: class: 'kauffman-footer__logo-image', loading: 'lazy', alt: section.settings.logo_alt }}
+          {% else %}
+            <span class="kauffman-footer__logo-text">{{ section.settings.logo_text }}</span>
+          {% endif %}
+        </a>
+        {% if section.settings.mobile_tagline != blank %}
+          <div class="kauffman-footer__tagline">{{ section.settings.mobile_tagline }}</div>
+        {% endif %}
+      </div>
+
+      <div class="kauffman-footer__newsletter">
+        {% if section.settings.newsletter_title != blank %}
+          <h2 class="kauffman-footer__newsletter-title">{{ section.settings.newsletter_title }}</h2>
+        {% endif %}
+        {% if section.settings.newsletter_copy != blank %}
+          <div class="kauffman-footer__newsletter-copy">{{ section.settings.newsletter_copy }}</div>
+        {% endif %}
+
+        {% form 'customer', class: 'kauffman-footer__newsletter-form' %}
+          <input type="hidden" name="contact[tags]" value="newsletter">
+          <label class="visually-hidden" for="KauffmanFooterEmail-{{ section.id }}">{{ section.settings.email_placeholder }}</label>
+          <input
+            id="KauffmanFooterEmail-{{ section.id }}"
+            class="kauffman-footer__newsletter-input"
+            type="email"
+            name="contact[email]"
+            value="{{ form.email }}"
+            autocorrect="off"
+            autocapitalize="off"
+            autocomplete="email"
+            placeholder="{{ section.settings.email_placeholder }}"
+            required
+          >
+          <button class="kauffman-footer__newsletter-button" type="submit">
+            {{ section.settings.subscribe_label }}
+          </button>
+          {% if form.errors %}
+            <div class="kauffman-footer__form-message" role="alert">{{ form.errors | default_errors }}</div>
+          {% endif %}
+          {% if form.posted_successfully? %}
+            <div class="kauffman-footer__form-message" role="status">{{ section.settings.success_message }}</div>
+          {% endif %}
+        {% endform %}
+      </div>
+    </div>
+
+    <div class="kauffman-footer__divider kauffman-footer__divider--top"></div>
+
+    <nav class="kauffman-footer__nav" aria-label="Footer navigation">
+      <details class="kauffman-footer__nav-section">
+        <summary class="kauffman-footer__nav-heading">
+          <span>{{ section.settings.shop_title }}</span>
+          <span class="kauffman-footer__plus" aria-hidden="true"></span>
+        </summary>
+        <span class="kauffman-footer__accent-line" aria-hidden="true"></span>
+        <ul class="kauffman-footer__nav-list" role="list">
+          {% for link in section.settings.shop_menu.links %}
+            <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+          {% else %}
+            <li><a href="{{ routes.collections_url }}">Apparel</a></li> 
+            <li><a href="{{ routes.collections_url }}">Tech</a></li>
+            <li><a href="{{ routes.collections_url }}">New Arrivals</a></li>
+            <li><a href="{{ routes.collections_url }}">Sale</a></li>
+            <li><a href="/products/gift-card">Gift Cards</a></li>
+          {% endfor %}
+        </ul>
+      </details>
+
+      <details class="kauffman-footer__nav-section">
+        <summary class="kauffman-footer__nav-heading">
+          <span>{{ section.settings.help_title }}</span>
+          <span class="kauffman-footer__plus" aria-hidden="true"></span>
+        </summary>
+        <span class="kauffman-footer__accent-line" aria-hidden="true"></span>
+        <ul class="kauffman-footer__nav-list" role="list">
+          {% for link in section.settings.help_menu.links %}
+            <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+          {% else %}
+            <li><a href="/pages/shipping-delivery">Shipping & Delivery</a></li>
+            <li><a href="/pages/returns-refunds">Returns & Refunds</a></li>
+            <li><a href="/pages/size-guide">Size Guide</a></li>
+            <li><a href="/pages/device-compatibility">Device Compatibility</a></li>
+            <li><a href="/pages/contact-faq">Contact / FAQ</a></li>
+            <li><a href="/pages/order-tracking">Order tracking</a></li>
+          {% endfor %}
+        </ul>
+      </details>
+
+      <details class="kauffman-footer__nav-section">
+        <summary class="kauffman-footer__nav-heading">
+          <span>{{ section.settings.company_title }}</span>
+          <span class="kauffman-footer__plus" aria-hidden="true"></span>
+        </summary>
+        <span class="kauffman-footer__accent-line" aria-hidden="true"></span>
+        <ul class="kauffman-footer__nav-list" role="list">
+          {% for link in section.settings.company_menu.links %}
+            <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+          {% else %}
+            <li><a href="/pages/about">About</a></li>
+            <li><a href="/pages/sustainability">Sustainability</a></li>
+            <li><a href="/blogs/journal">Journal</a></li>
+            <li><a href="/pages/careers">Careers</a></li>
+            <li><a href="/pages/press">Press</a></li>
+          {% endfor %}
+        </ul>
+      </details>
+
+      <details class="kauffman-footer__nav-section">
+        <summary class="kauffman-footer__nav-heading">
+          <span>{{ section.settings.legal_title }}</span>
+          <span class="kauffman-footer__plus" aria-hidden="true"></span>
+        </summary>
+        <span class="kauffman-footer__accent-line" aria-hidden="true"></span>
+        <ul class="kauffman-footer__nav-list" role="list">
+          {% for link in section.settings.legal_menu.links %}
+            <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+          {% else %}
+            <li><a href="/policies/terms-of-service">Terms & Conditions</a></li>
+            <li><a href="/policies/privacy-policy">Privacy Policy</a></li>
+            <li><a href="/policies/cookie-policy">Cookie Policy</a></li>
+            <li><a href="/pages/legal-notice">Legal Notice</a></li>
+            <li><a href="/pages/anpc-sal-odr">ANPC · SAL · ODR</a></li>
+            <li><a href="/pages/accessibility">Accessibility</a></li>
+            <li><a href="/pages/gdpr-requests">GDPR Requests</a></li>
+          {% endfor %}
+        </ul>
+      </details>
+    </nav>
+
+    <div class="kauffman-footer__divider kauffman-footer__divider--middle"></div>
+
+    <div class="kauffman-footer__info">
+      <div class="kauffman-footer__info-block">
+        <h3>{{ section.settings.legal_info_title }}</h3>
+        <div>{{ section.settings.legal_info_copy }}</div>
+      </div>
+      <div class="kauffman-footer__info-block">
+        <h3>{{ section.settings.payments_title }}</h3>
+        <div>{{ section.settings.payments_copy }}</div>
+      </div>
+      <div class="kauffman-footer__info-block kauffman-footer__info-block--trust">
+        <h3>{{ section.settings.trust_title }}</h3>
+        <div>{{ section.settings.trust_copy }}</div>
+
+        {% if section.settings.show_footer_trust_badges %}
+          {% liquid
+            assign trust_badge_link_1 = section.settings.footer_trust_badge_link_1
+            assign trust_badge_link_2 = section.settings.footer_trust_badge_link_2
+
+            if trust_badge_link_1 == blank
+              assign trust_badge_link_1 = 'https://anpc.ro/ce-este-sal/'
+            endif
+
+            if trust_badge_link_2 == blank
+              assign trust_badge_link_2 = 'https://ec.europa.eu/consumers/odr'
+            endif
+          %}
+
+          <div class="footer-trust">
+            <a href="{{ trust_badge_link_1 }}" target="_blank" rel="noopener noreferrer" class="footer-trust__badge" aria-label="{{ section.settings.footer_trust_badge_label_1 | escape }}">
+              {% if section.settings.footer_trust_badge_image_1 != blank %}
+                {{ section.settings.footer_trust_badge_image_1 | image_url: width: 530 | image_tag: loading: 'lazy', decoding: 'async', class: 'footer-trust__image', alt: section.settings.footer_trust_badge_alt_1 }}
+              {% else %}
+                <img src="{{ '' | asset_url }}" width="530" height="136" alt="{{ section.settings.footer_trust_badge_alt_1 | escape }}" loading="lazy" decoding="async" class="footer-trust__image">
+              {% endif %}
+            </a>
+
+            <a href="{{ trust_badge_link_2 }}" target="_blank" rel="noopener noreferrer" class="footer-trust__badge" aria-label="{{ section.settings.footer_trust_badge_label_2 | escape }}">
+              {% if section.settings.footer_trust_badge_image_2 != blank %}
+                {{ section.settings.footer_trust_badge_image_2 | image_url: width: 516 | image_tag: loading: 'lazy', decoding: 'async', class: 'footer-trust__image', alt: section.settings.footer_trust_badge_alt_2 }}
+              {% else %}
+                <img src="{{ '' | asset_url }}" width="516" height="144" alt="{{ section.settings.footer_trust_badge_alt_2 | escape }}" loading="lazy" decoding="async" class="footer-trust__image">
+              {% endif %}
+            </a>
+          </div>
+        {% endif %}
+      </div>
+      <div class="kauffman-footer__info-block kauffman-footer__info-block--gdpr">
+        {% if section.settings.gdpr_link != blank %}
+          <a href="{{ section.settings.gdpr_link }}">{{ section.settings.gdpr_text }}</a>
+        {% else %}
+          <span>{{ section.settings.gdpr_text }}</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="kauffman-footer__divider kauffman-footer__divider--bottom"></div>
+
+    <div class="kauffman-footer__bottom">
+      <div class="kauffman-footer__languages" aria-label="Language selector">
+        {% if section.settings.show_language_circle %}
+          <span class="kauffman-footer__language-circle" aria-hidden="true"></span>
+        {% endif %}
+        {% form 'localization', class: 'kauffman-footer__localization-form' %}
+          {% if localization.available_languages.size > 1 %}
+            {% for language in localization.available_languages %}
+              <button
+                type="submit"
+                name="locale_code"
+                value="{{ language.iso_code }}"
+                class="kauffman-footer__language-button{% if language.iso_code == localization.language.iso_code %} is-active{% endif %}"
+                {% if language.iso_code == localization.language.iso_code %}aria-current="true"{% endif %}
+              >
+                {{ language.iso_code | upcase }}
+              </button>
+            {% endfor %}
+          {% else %}
+            {% assign language_codes = section.settings.language_codes | split: ' ' %}
+            {% for code in language_codes %}
+              <span class="kauffman-footer__language-code">{{ code }}</span>
+            {% endfor %}
+          {% endif %}
+        {% endform %}
+      </div>
+
+      <div class="kauffman-footer__copyright">
+        {{ section.settings.copyright_text }}
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  (() => {
+    const footer = document.getElementById({{ footer_id | json }});
+
+    if (!footer) {
+      return;
+    }
+
+    const desktopQuery = window.matchMedia('(min-width: 990px)');
+    const navSections = Array.from(footer.querySelectorAll('.kauffman-footer__nav-section'));
+
+    const syncDesktopAccordionState = () => {
+      navSections.forEach((section) => {
+        if (desktopQuery.matches) {
+          section.open = true;
+          section.setAttribute('data-desktop-locked', 'true');
+        } else {
+          section.open = false;
+          section.removeAttribute('data-desktop-locked');
+        }
+      });
+    };
+
+    navSections.forEach((section) => {
+      const summary = section.querySelector('summary');
+
+      if (summary) {
+        summary.addEventListener('click', (event) => {
+          if (!desktopQuery.matches) {
+            return;
+          }
+
+          event.preventDefault();
+          section.open = true;
+        });
+      }
+
+      section.addEventListener('toggle', () => {
+        if (desktopQuery.matches && !section.open) {
+          section.open = true;
+        }
+      });
+    });
+
+    syncDesktopAccordionState();
+
+    if (desktopQuery.addEventListener) {
+      desktopQuery.addEventListener('change', syncDesktopAccordionState);
+    } else {
+      desktopQuery.addListener(syncDesktopAccordionState);
+    }
+  })();
+</script>
+
+{% stylesheet %}
+  .kauffman-footer {
+    background: var(--kk-footer-bg);
+    color: var(--kk-footer-text);
+    font-family: Inter, var(--font-body--family), sans-serif;
+  }
+
+  .kauffman-footer * {
+    box-sizing: border-box;
+  }
+
+  .kauffman-footer a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .kauffman-footer__inner {
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 70px 80px 14px;
+  }
+
+  .kauffman-footer__top {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 500px;
+    gap: 80px;
+    align-items: start;
+  }
+
+  .kauffman-footer__brand {
+    padding-top: 39px;
+    text-align: var(--kk-footer-logo-desktop-align);
+  }
+
+  .kauffman-footer__logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: var(--kk-footer-logo-desktop-align);
+    color: var(--kk-footer-logo-color);
+  }
+
+  .kauffman-footer__logo--image {
+    color: inherit;
+  }
+
+  .kauffman-footer__logo-svg,
+  .kauffman-footer__logo-svg svg {
+    display: block;
+    width: var(--kk-footer-logo-desktop-width);
+    max-width: 100%;
+    max-height: var(--kk-footer-logo-desktop-max-height);
+    height: auto;
+    color: var(--kk-footer-logo-color);
+    fill: currentColor;
+  }
+
+  .kauffman-footer__logo-svg svg * {
+    fill: currentColor;
+  }
+
+  .kauffman-footer__logo-image {
+    display: block;
+    width: var(--kk-footer-logo-desktop-width);
+    max-width: 100%;
+    max-height: var(--kk-footer-logo-desktop-max-height);
+    height: auto;
+    object-fit: contain;
+  }
+
+  .kauffman-footer__logo-text {
+    font-family: Garamond, 'Cormorant Garamond', Georgia, serif;
+    font-size: var(--kk-footer-logo-desktop-text-size);
+    line-height: 1;
+    letter-spacing: 0.035em;
+    color: var(--kk-footer-logo-color);
+    white-space: nowrap;
+  }
+
+  .kauffman-footer__tagline {
+    display: none;
+  }
+
+  .kauffman-footer__newsletter-title {
+    margin: 0 0 12px;
+    font: 400 13px/20px Inter, var(--font-body--family), sans-serif;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--kk-footer-accent);
+  }
+
+  .kauffman-footer__newsletter-copy {
+    margin: 0 0 24px;
+    font: 300 16px/24px Inter, var(--font-body--family), sans-serif;
+    color: var(--kk-footer-muted);
+  }
+
+  .kauffman-footer__newsletter-form {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 150px;
+    width: 500px;
+    max-width: 100%;
+    min-height: 56px;
+    border: 1px solid var(--kk-footer-border);
+    border-radius: 2px;
+    background: var(--kk-footer-input-bg);
+  }
+
+  .kauffman-footer__newsletter-input {
+    width: 100%;
+    min-width: 0;
+    height: 54px;
+    padding: 0 24px;
+    border: 0;
+    background: transparent;
+    color: var(--kk-footer-input-text);
+    font: 300 16px/22px Inter, var(--font-body--family), sans-serif;
+    text-transform: uppercase;
+  }
+
+  .kauffman-footer__newsletter-input::placeholder {
+    color: var(--kk-footer-muted);
+    opacity: 1;
+  }
+
+  .kauffman-footer__newsletter-button {
+    width: 150px;
+    height: 54px;
+    border: 0;
+    border-left: 1px solid var(--kk-footer-button-border);
+    border-radius: 0 1px 1px 0;
+    background: var(--kk-footer-button-bg);
+    color: var(--kk-footer-button-text);
+    font: 400 16px/22px Inter, var(--font-body--family), sans-serif;
+    text-align: center;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .kauffman-footer__form-message {
+    grid-column: 1 / -1;
+    padding: 10px 24px 0;
+    color: var(--kk-footer-muted);
+    font-size: 13px;
+    line-height: 18px;
+  }
+
+  .kauffman-footer__divider {
+    width: 100%;
+    height: 1px;
+    background: var(--kk-footer-border);
+  }
+
+  .kauffman-footer__divider--top {
+    margin-top: 44px;
+  }
+
+  .kauffman-footer__nav {
+    display: grid;
+    grid-template-columns: 25% 25% 25% 25%;
+    justify-content: space-between;
+    gap: 40px;
+    margin-top: 53px;
+  }
+
+  .kauffman-footer__nav-section {
+    display: block;
+  }
+
+  .kauffman-footer__nav-section summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .kauffman-footer__nav-heading {
+    display: block;
+    list-style: none;
+    cursor: default;
+    font-family: Inter, var(--font-body--family), sans-serif;
+    font-size: var(--kk-footer-nav-heading-desktop-font-size);
+    font-weight: var(--kk-footer-nav-heading-desktop-font-weight);
+    line-height: var(--kk-footer-nav-heading-desktop-line-height);
+    letter-spacing: var(--kk-footer-nav-heading-desktop-letter-spacing);
+    text-transform: var(--kk-footer-nav-heading-desktop-text-transform);
+    color: var(--kk-footer-nav-heading-color);
+  }
+
+  .kauffman-footer__plus {
+    display: none;
+  }
+
+  .kauffman-footer__accent-line {
+    display: block;
+    width: 34px;
+    height: 1px;
+    margin-top: 21px;
+    background: var(--kk-footer-accent);
+  }
+
+  .kauffman-footer__nav-list {
+    display: grid;
+    gap: var(--kk-footer-menu-item-desktop-gap);
+    margin: 28px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .kauffman-footer__nav-list a {
+    display: inline-block;
+    font-family: Inter, var(--font-body--family), sans-serif;
+    font-size: var(--kk-footer-menu-item-desktop-font-size);
+    font-weight: var(--kk-footer-menu-item-desktop-font-weight);
+    line-height: var(--kk-footer-menu-item-desktop-line-height);
+    letter-spacing: var(--kk-footer-menu-item-desktop-letter-spacing);
+    text-transform: var(--kk-footer-menu-item-desktop-text-transform);
+    color: var(--kk-footer-menu-item-color);
+  }
+
+  .kauffman-footer__nav-list a:hover,
+  .kauffman-footer__language-button:hover,
+  .kauffman-footer__info-block--gdpr a:hover {
+    color: var(--kk-footer-menu-item-hover-color);
+  }
+
+  .kauffman-footer__divider--middle {
+    margin-top: 31px;
+  }
+
+  .kauffman-footer__info {
+    display: grid;
+    grid-template-columns: 33% 34% 33%;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 19px;
+  }
+
+  .kauffman-footer__info-block h3 {
+    margin: 0 0 8px;
+    font: 400 15px/22px Inter, var(--font-body--family), sans-serif;
+    text-transform: uppercase;
+    color: var(--kk-footer-text);
+  }
+
+  .kauffman-footer__info-block div,
+  .kauffman-footer__info-block span,
+  .kauffman-footer__info-block a {
+    font: 400 14px/22px Inter, var(--font-body--family), sans-serif;
+    color: var(--kk-footer-muted);
+  }
+
+  .kauffman-footer__info-block--gdpr {
+    padding-top: 0;
+  }
+
+  .kauffman-footer__info-block--gdpr span,
+  .kauffman-footer__info-block--gdpr a {
+    display: inline-block;
+    font: 400 16px/24px Inter, var(--font-body--family), sans-serif;
+    text-transform: uppercase;
+    color: var(--kk-footer-text);
+  }
+
+  .kauffman-footer__divider--bottom {
+    margin-top: 14px;
+  }
+
+  .kauffman-footer__bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 36px;
+    padding-top: 12px;
+  }
+
+  .kauffman-footer__languages {
+    display: flex;
+    align-items: center;
+    gap: 26px;
+  }
+
+  .kauffman-footer__language-circle {
+    display: block;
+    width: 24px;
+    height: 24px;
+    border: 1px solid var(--kk-footer-accent);
+    border-radius: 50%;
+  }
+
+  .kauffman-footer__localization-form {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .kauffman-footer__language-button,
+  .kauffman-footer__language-code {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--kk-footer-text);
+    font: 500 13px/18px Inter, var(--font-body--family), sans-serif;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .kauffman-footer__language-button.is-active {
+    color: var(--kk-footer-accent);
+  }
+
+  .kauffman-footer__copyright {
+    color: var(--kk-footer-muted);
+    font: 400 13px/18px Inter, var(--font-body--family), sans-serif;
+    text-align: right;
+  }
+
+
+
+  .footer-trust {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+  }
+
+  .footer-trust__badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 0;
+    text-decoration: none;
+  }
+
+  .footer-trust__image {
+    display: block;
+    width: auto;
+    max-width: 132px;
+    height: auto;
+  }
+
+  @media screen and (min-width: 990px) {
+    .kauffman-footer__nav-section {
+      pointer-events: none;
+    }
+
+    .kauffman-footer__nav-section a {
+      pointer-events: auto;
+    }
+  }
+
+  @media screen and (max-width: 989px) {
+    .kauffman-footer__inner {
+      max-width: 430px;
+      padding: 74px 32px 23px;
+    }
+
+    .kauffman-footer__top {
+      display: block;
+    }
+
+    .kauffman-footer__brand {
+      padding-top: 0;
+      text-align: var(--kk-footer-logo-mobile-align);
+    }
+
+    .kauffman-footer__logo {
+      justify-content: var(--kk-footer-logo-mobile-align);
+      width: 100%;
+    }
+
+    .kauffman-footer__logo-svg,
+    .kauffman-footer__logo-svg svg,
+    .kauffman-footer__logo-image {
+      width: var(--kk-footer-logo-mobile-width);
+      max-height: var(--kk-footer-logo-mobile-max-height);
+      object-fit: contain;
+    }
+
+    .kauffman-footer__logo-text {
+      font-size: var(--kk-footer-logo-mobile-text-size);
+      letter-spacing: 0.035em;
+    }
+
+    .kauffman-footer__tagline {
+      display: block;
+      margin-top: 16px;
+      color: var(--kk-footer-accent);
+      font: 400 10px/14px Inter, var(--font-body--family), sans-serif;
+      letter-spacing: 0.22em;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .kauffman-footer__newsletter {
+      margin-top: 38px;
+      text-align: center;
+    }
+
+    .kauffman-footer__newsletter-title {
+      margin-bottom: 13px;
+      font: 500 12px/18px Inter, var(--font-body--family), sans-serif;
+      text-align: center;
+    }
+
+    .kauffman-footer__newsletter-copy {
+      max-width: 364px;
+      margin: 0 auto 20px;
+      font: 400 14px/22px Inter, var(--font-body--family), sans-serif;
+      color: var(--kk-footer-muted);
+      text-align: center;
+    }
+
+    .kauffman-footer__newsletter-form {
+      grid-template-columns: minmax(0, 1fr) 128px;
+      width: 100%;
+      min-height: 52px;
+    }
+
+    .kauffman-footer__newsletter-input {
+      height: 50px;
+      padding: 0 20px;
+      font: 300 14px/20px Inter, var(--font-body--family), sans-serif;
+    }
+
+    .kauffman-footer__newsletter-button {
+      width: 128px;
+      height: 50px;
+      font: 400 14px/20px Inter, var(--font-body--family), sans-serif;
+    }
+
+    .kauffman-footer__divider--top {
+      display: none;
+    }
+
+    .kauffman-footer__nav {
+      display: block;
+      margin-top: 43px;
+    }
+
+    .kauffman-footer__nav-section {
+      border-top: 1px solid var(--kk-footer-border);
+      padding-top: 12px;
+      margin-top: 0;
+      padding-bottom: 16px;
+    }
+
+    .kauffman-footer__nav-section + .kauffman-footer__nav-section {
+      margin-top: 0;
+    }
+
+    .kauffman-footer__nav-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      font-family: Inter, var(--font-body--family), sans-serif;
+      font-size: var(--kk-footer-nav-heading-mobile-font-size);
+      font-weight: var(--kk-footer-nav-heading-mobile-font-weight);
+      line-height: var(--kk-footer-nav-heading-mobile-line-height);
+      letter-spacing: var(--kk-footer-nav-heading-mobile-letter-spacing);
+      text-transform: var(--kk-footer-nav-heading-mobile-text-transform);
+    }
+
+    .kauffman-footer__plus {
+      position: relative;
+      display: block;
+      width: 16px;
+      height: 16px;
+      flex: 0 0 16px;
+    }
+
+    .kauffman-footer__plus::before,
+    .kauffman-footer__plus::after {
+      content: '';
+      position: absolute;
+      left: 2px;
+      top: 7.5px;
+      width: 12px;
+      height: 1px;
+      background: var(--kk-footer-text);
+    }
+
+    .kauffman-footer__plus::after {
+      transform: rotate(90deg);
+    }
+
+    .kauffman-footer__nav-section[open] .kauffman-footer__plus::after {
+      opacity: 0;
+    }
+
+    .kauffman-footer__accent-line {
+      display: none;
+    }
+
+    .kauffman-footer__nav-list {
+      gap: var(--kk-footer-menu-item-mobile-gap);
+      margin-top: 18px;
+    }
+
+    .kauffman-footer__nav-list a {
+      font-size: var(--kk-footer-menu-item-mobile-font-size);
+      font-weight: var(--kk-footer-menu-item-mobile-font-weight);
+      line-height: var(--kk-footer-menu-item-mobile-line-height);
+      letter-spacing: var(--kk-footer-menu-item-mobile-letter-spacing);
+      text-transform: var(--kk-footer-menu-item-mobile-text-transform);
+      color: var(--kk-footer-menu-item-mobile-color);
+    }
+
+    .kauffman-footer__divider--middle {
+      margin-top: 0;
+    }
+
+    .kauffman-footer__info {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+      margin-top: 28px;
+    }
+
+    .kauffman-footer__info-block h3 {
+      margin-bottom: 8px;
+      font: 500 14px/20px Inter, var(--font-body--family), sans-serif;
+      text-transform: none;
+    }
+
+    .kauffman-footer__info-block div,
+    .kauffman-footer__info-block span,
+    .kauffman-footer__info-block a {
+      font: 400 13px/21px Inter, var(--font-body--family), sans-serif;
+      color: var(--kk-footer-muted);
+    }
+
+    .kauffman-footer__info-block--gdpr {
+      padding-top: 0;
+    }
+
+    .kauffman-footer__info-block--gdpr span,
+    .kauffman-footer__info-block--gdpr a {
+      font: 400 13px/21px Inter, var(--font-body--family), sans-serif;
+      text-transform: none;
+      color: var(--kk-footer-muted);
+    }
+
+
+    .footer-trust {
+      justify-content: flex-start;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .footer-trust__image {
+      max-width: 118px;
+    }
+
+    .kauffman-footer__divider--bottom {
+      margin-top: 23px;
+    }
+
+    .kauffman-footer__bottom {
+      display: block;
+      min-height: 0;
+      padding-top: 20px;
+    }
+
+    .kauffman-footer__language-circle {
+      display: none;
+    }
+
+    .kauffman-footer__languages,
+    .kauffman-footer__localization-form {
+      gap: 24px;
+    }
+
+    .kauffman-footer__copyright {
+      margin-top: 26px;
+      font: 400 12px/18px Inter, var(--font-body--family), sans-serif;
+      text-align: left;
+      color: var(--kk-footer-muted);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Kauffman footer",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Logo"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo_image",
+      "label": "Logo image or SVG"
+    },
+    {
+      "type": "textarea",
+      "id": "logo_svg_code",
+      "label": "Inline SVG code for recolorable logo",
+      "info": "Paste raw SVG here if you need color scheme control. Use currentColor in the SVG fills where possible. This overrides the uploaded image."
+    },
+    {
+      "type": "text",
+      "id": "logo_alt",
+      "label": "Logo image alt text",
+      "default": "Kauffman Concept"
+    },
+    {
+      "type": "text",
+      "id": "logo_text",
+      "label": "Text fallback logo",
+      "default": "KAUFFMAN CONCEPT"
+    },
+    {
+      "type": "range",
+      "id": "logo_width_desktop",
+      "label": "Desktop logo width",
+      "min": 160,
+      "max": 760,
+      "step": 10,
+      "unit": "px",
+      "default": 600
+    },
+    {
+      "type": "range",
+      "id": "logo_max_height_desktop",
+      "label": "Desktop logo max height",
+      "min": 20,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "logo_text_size_desktop",
+      "label": "Desktop text logo size",
+      "min": 24,
+      "max": 90,
+      "step": 1,
+      "unit": "px",
+      "default": 55
+    },
+    {
+      "type": "select",
+      "id": "logo_alignment_desktop",
+      "label": "Desktop logo alignment",
+      "default": "left",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "logo_width_mobile",
+      "label": "Mobile logo width",
+      "min": 120,
+      "max": 380,
+      "step": 5,
+      "unit": "px",
+      "default": 300
+    },
+    {
+      "type": "range",
+      "id": "logo_max_height_mobile",
+      "label": "Mobile logo max height",
+      "min": 18,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 42
+    },
+    {
+      "type": "range",
+      "id": "logo_text_size_mobile",
+      "label": "Mobile text logo size",
+      "min": 16,
+      "max": 48,
+      "step": 1,
+      "unit": "px",
+      "default": 29
+    },
+    {
+      "type": "select",
+      "id": "logo_alignment_mobile",
+      "label": "Mobile logo alignment",
+      "default": "center",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "mobile_tagline",
+      "label": "Mobile tagline",
+      "default": "PREMIUM APPAREL & TECH"
+    },
+    {
+      "type": "header",
+      "content": "Newsletter"
+    },
+    {
+      "type": "text",
+      "id": "newsletter_title",
+      "label": "Title",
+      "default": "STAY IN THE LOOP"
+    },
+    {
+      "type": "text",
+      "id": "newsletter_copy",
+      "label": "Copy",
+      "default": "Sign up for private sale access, product drops and selected offers."
+    },
+    {
+      "type": "text",
+      "id": "email_placeholder",
+      "label": "Email placeholder",
+      "default": "YOUR EMAIL ADDRESS"
+    },
+    {
+      "type": "text",
+      "id": "subscribe_label",
+      "label": "Button label",
+      "default": "SUBSCRIBE"
+    },
+    {
+      "type": "text",
+      "id": "success_message",
+      "label": "Success message",
+      "default": "Thank you for subscribing."
+    },
+    {
+      "type": "header",
+      "content": "Menus"
+    },
+    {
+      "type": "text",
+      "id": "shop_title",
+      "label": "Shop title",
+      "default": "SHOP"
+    },
+    {
+      "type": "link_list",
+      "id": "shop_menu",
+      "label": "Shop menu"
+    },
+    {
+      "type": "text",
+      "id": "help_title",
+      "label": "Help title",
+      "default": "HELP"
+    },
+    {
+      "type": "link_list",
+      "id": "help_menu",
+      "label": "Help menu"
+    },
+    {
+      "type": "text",
+      "id": "company_title",
+      "label": "Company title",
+      "default": "COMPANY"
+    },
+    {
+      "type": "link_list",
+      "id": "company_menu",
+      "label": "Company menu"
+    },
+    {
+      "type": "text",
+      "id": "legal_title",
+      "label": "Legal title",
+      "default": "LEGAL"
+    },
+    {
+      "type": "link_list",
+      "id": "legal_menu",
+      "label": "Legal menu"
+    },
+    {
+      "type": "header",
+      "content": "Menu heading style"
+    },
+    {
+      "type": "range",
+      "id": "nav_heading_font_size_desktop",
+      "label": "Desktop heading font size",
+      "min": 14,
+      "max": 44,
+      "step": 1,
+      "unit": "px",
+      "default": 27
+    },
+    {
+      "type": "range",
+      "id": "nav_heading_line_height_desktop",
+      "label": "Desktop heading line height",
+      "min": 18,
+      "max": 56,
+      "step": 1,
+      "unit": "px",
+      "default": 34
+    },
+    {
+      "type": "select",
+      "id": "nav_heading_font_weight_desktop",
+      "label": "Desktop heading font weight",
+      "default": "400",
+      "options": [
+        { "value": "300", "label": "Light" },
+        { "value": "400", "label": "Regular" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semi-bold" },
+        { "value": "700", "label": "Bold" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "nav_heading_letter_spacing_desktop",
+      "label": "Desktop heading letter spacing",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "%",
+      "default": 18
+    },
+    {
+      "type": "select",
+      "id": "nav_heading_text_transform_desktop",
+      "label": "Desktop heading case",
+      "default": "uppercase",
+      "options": [
+        { "value": "none", "label": "Original" },
+        { "value": "uppercase", "label": "Uppercase" },
+        { "value": "capitalize", "label": "Capitalize" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "nav_heading_font_size_mobile",
+      "label": "Mobile heading font size",
+      "min": 14,
+      "max": 38,
+      "step": 1,
+      "unit": "px",
+      "default": 25
+    },
+    {
+      "type": "range",
+      "id": "nav_heading_line_height_mobile",
+      "label": "Mobile heading line height",
+      "min": 5,
+      "max": 48,
+      "step": 1,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "select",
+      "id": "nav_heading_font_weight_mobile",
+      "label": "Mobile heading font weight",
+      "default": "400",
+      "options": [
+        { "value": "300", "label": "Light" },
+        { "value": "400", "label": "Regular" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semi-bold" },
+        { "value": "700", "label": "Bold" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "nav_heading_letter_spacing_mobile",
+      "label": "Mobile heading letter spacing",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "%",
+      "default": 18
+    },
+    {
+      "type": "select",
+      "id": "nav_heading_text_transform_mobile",
+      "label": "Mobile heading case",
+      "default": "uppercase",
+      "options": [
+        { "value": "none", "label": "Original" },
+        { "value": "uppercase", "label": "Uppercase" },
+        { "value": "capitalize", "label": "Capitalize" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "nav_heading_color",
+      "label": "Heading color",
+      "default": "heading",
+      "options": [
+        { "value": "heading", "label": "Color scheme heading" },
+        { "value": "text", "label": "Color scheme text" },
+        { "value": "accent", "label": "Color scheme accent" }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Menu item style"
+    },
+    {
+      "type": "range",
+      "id": "menu_item_font_size_desktop",
+      "label": "Desktop item font size",
+      "min": 10,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "menu_item_line_height_desktop",
+      "label": "Desktop item line height",
+      "min": 14,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "select",
+      "id": "menu_item_font_weight_desktop",
+      "label": "Desktop item font weight",
+      "default": "300",
+      "options": [
+        { "value": "300", "label": "Light" },
+        { "value": "400", "label": "Regular" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semi-bold" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "menu_item_letter_spacing_desktop",
+      "label": "Desktop item letter spacing",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "%",
+      "default": 8
+    },
+    {
+      "type": "select",
+      "id": "menu_item_text_transform_desktop",
+      "label": "Desktop item case",
+      "default": "uppercase",
+      "options": [
+        { "value": "none", "label": "Original" },
+        { "value": "uppercase", "label": "Uppercase" },
+        { "value": "capitalize", "label": "Capitalize" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "menu_item_gap_desktop",
+      "label": "Desktop item vertical gap",
+      "min": 4,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "select",
+      "id": "menu_item_color",
+      "label": "Desktop item color",
+      "default": "text",
+      "options": [
+        { "value": "text", "label": "Color scheme text" },
+        { "value": "muted", "label": "Color scheme muted text" },
+        { "value": "accent", "label": "Color scheme accent" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "menu_item_font_size_mobile",
+      "label": "Mobile item font size",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "menu_item_line_height_mobile",
+      "label": "Mobile item line height",
+      "min": 14,
+      "max": 34,
+      "step": 1,
+      "unit": "px",
+      "default": 22
+    },
+    {
+      "type": "select",
+      "id": "menu_item_font_weight_mobile",
+      "label": "Mobile item font weight",
+      "default": "400",
+      "options": [
+        { "value": "300", "label": "Light" },
+        { "value": "400", "label": "Regular" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semi-bold" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "menu_item_letter_spacing_mobile",
+      "label": "Mobile item letter spacing",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "%",
+      "default": 0
+    },
+    {
+      "type": "select",
+      "id": "menu_item_text_transform_mobile",
+      "label": "Mobile item case",
+      "default": "none",
+      "options": [
+        { "value": "none", "label": "Original" },
+        { "value": "uppercase", "label": "Uppercase" },
+        { "value": "capitalize", "label": "Capitalize" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "menu_item_gap_mobile",
+      "label": "Mobile item vertical gap",
+      "min": 4,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "select",
+      "id": "menu_item_mobile_color",
+      "label": "Mobile item color",
+      "default": "muted",
+      "options": [
+        { "value": "text", "label": "Color scheme text" },
+        { "value": "muted", "label": "Color scheme muted text" },
+        { "value": "accent", "label": "Color scheme accent" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "menu_item_hover_color",
+      "label": "Item hover color",
+      "default": "accent",
+      "options": [
+        { "value": "text", "label": "Color scheme text" },
+        { "value": "muted", "label": "Color scheme muted text" },
+        { "value": "accent", "label": "Color scheme accent" }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Legal and bottom info"
+    },
+    {
+      "type": "text",
+      "id": "legal_info_title",
+      "label": "Legal info title",
+      "default": "LEGAL INFO"
+    },
+    {
+      "type": "textarea",
+      "id": "legal_info_copy",
+      "label": "Legal info copy",
+      "default": "ANPC · SAL · SOL (ODR)<br>CUI + Nr. ORC + address"
+    },
+    {
+      "type": "text",
+      "id": "payments_title",
+      "label": "Secure payments title",
+      "default": "SECURE PAYMENTS"
+    },
+    {
+      "type": "textarea",
+      "id": "payments_copy",
+      "label": "Secure payments copy",
+      "default": "Visa · Mastercard · Maestro · Apple Pay<br>Google Pay · PayPal · Revolut Pay"
+    },
+    {
+      "type": "text",
+      "id": "trust_title",
+      "label": "Trusted Shops title",
+      "default": "TRUSTED SHOPS"
+    },
+    {
+      "type": "textarea",
+      "id": "trust_copy",
+      "label": "Trusted Shops copy",
+      "default": "Judge.me Verified<br>Optional trust badge"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_footer_trust_badges",
+      "label": "Show trust badges",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "footer_trust_badge_image_1",
+      "label": "First trust badge image"
+    },
+    {
+      "type": "url",
+      "id": "footer_trust_badge_link_1",
+      "label": "First trust badge link"
+    },
+    {
+      "type": "text",
+      "id": "footer_trust_badge_label_1",
+      "label": "First trust badge aria label",
+      "default": "ANPC — Soluționarea Alternativă a Litigiilor"
+    },
+    {
+      "type": "text",
+      "id": "footer_trust_badge_alt_1",
+      "label": "First trust badge alt text",
+      "default": "ANPC SAL"
+    },
+    {
+      "type": "image_picker",
+      "id": "footer_trust_badge_image_2",
+      "label": "Second trust badge image"
+    },
+    {
+      "type": "url",
+      "id": "footer_trust_badge_link_2",
+      "label": "Second trust badge link"
+    },
+    {
+      "type": "text",
+      "id": "footer_trust_badge_label_2",
+      "label": "Second trust badge aria label",
+      "default": "Soluționarea Online a Litigiilor"
+    },
+    {
+      "type": "text",
+      "id": "footer_trust_badge_alt_2",
+      "label": "Second trust badge alt text",
+      "default": "ANPC SOL"
+    },
+    {
+      "type": "text",
+      "id": "gdpr_text",
+      "label": "GDPR text",
+      "default": "GDPR REQUESTS"
+    },
+    {
+      "type": "url",
+      "id": "gdpr_link",
+      "label": "GDPR link"
+    },
+    {
+      "type": "text",
+      "id": "language_codes",
+      "label": "Fallback language codes",
+      "default": "RO EN DE"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_language_circle",
+      "label": "Show desktop language circle",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "copyright_text",
+      "label": "Copyright text",
+      "default": "© KAUFFMAN CONCEPT All rights reserved."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Kauffman footer"
+    }
+  ]
+}
+{% endschema %}

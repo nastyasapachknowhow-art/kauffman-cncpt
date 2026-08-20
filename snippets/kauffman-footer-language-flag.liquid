@@ -1,0 +1,27 @@
+{% liquid
+  assign normalized_code = code | downcase
+  case normalized_code
+    when 'en'
+      echo '🇬🇧'
+    when 'ro'
+      echo '🇷🇴'
+    when 'de'
+      echo '🇩🇪'
+    when 'fr'
+      echo '🇫🇷'
+    when 'it'
+      echo '🇮🇹'
+    when 'es'
+      echo '🇪🇸'
+    when 'pt'
+      echo '🇵🇹'
+    when 'nl'
+      echo '🇳🇱'
+    when 'pl'
+      echo '🇵🇱'
+    when 'bg'
+      echo '🇧🇬'
+    else
+      echo '🌐'
+  endcase
+%}

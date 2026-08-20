@@ -1,0 +1,852 @@
+{%- liquid
+  assign section_id = 'kauffman-faq-' | append: section.id
+  assign categories = 'shipping,returns,warranty,payment,invoice,personalisation,care' | split: ','
+-%}
+
+<section
+  id="{{ section_id }}"
+  class="kauffman-faq color-{{ section.settings.color_scheme }}"
+  style="
+    --kauffman-faq-padding-top-desktop: {{ section.settings.padding_top_desktop }}px;
+    --kauffman-faq-padding-bottom-desktop: {{ section.settings.padding_bottom_desktop }}px;
+    --kauffman-faq-padding-top-mobile: {{ section.settings.padding_top_mobile }}px;
+    --kauffman-faq-padding-bottom-mobile: {{ section.settings.padding_bottom_mobile }}px;
+    --kauffman-faq-heading-size-desktop: {{ section.settings.heading_size_desktop }}px;
+    --kauffman-faq-heading-size-mobile: {{ section.settings.heading_size_mobile }}px;
+    --kauffman-faq-body-size: {{ section.settings.body_size }}px;
+    --kauffman-faq-radius: {{ section.settings.card_radius }}px;
+  "
+>
+  <div class="kauffman-faq__inner {% if section.settings.section_width == 'page-width' %}page-width{% endif %}">
+    <header class="kauffman-faq__header">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="kauffman-faq__eyebrow">{{ section.settings.eyebrow }}</p>
+      {%- endif -%}
+
+      {%- if section.settings.heading != blank -%}
+        <h1 class="kauffman-faq__heading">{{ section.settings.heading }}</h1>
+      {%- endif -%}
+
+      {%- if section.settings.intro != blank -%}
+        <div class="kauffman-faq__intro rte">{{ section.settings.intro }}</div>
+      {%- endif -%}
+    </header>
+
+    <div class="kauffman-faq__layout">
+      <aside class="kauffman-faq__nav" aria-label="{{ section.settings.nav_aria_label | escape }}">
+        <p class="kauffman-faq__nav-title">{{ section.settings.nav_title }}</p>
+
+        <nav class="kauffman-faq__nav-list">
+          {%- for category in categories -%}
+            {%- liquid
+              assign has_items = false
+              for block in section.blocks
+                if block.type == 'faq_item' and block.settings.category == category
+                  assign has_items = true
+                  break
+                endif
+              endfor
+            -%}
+
+            {%- if has_items -%}
+              <a class="kauffman-faq__nav-link" href="#{{ section_id }}-{{ category }}">
+                {%- case category -%}
+                  {%- when 'shipping' -%}{{ section.settings.shipping_label }}
+                  {%- when 'returns' -%}{{ section.settings.returns_label }}
+                  {%- when 'warranty' -%}{{ section.settings.warranty_label }}
+                  {%- when 'payment' -%}{{ section.settings.payment_label }}
+                  {%- when 'invoice' -%}{{ section.settings.invoice_label }}
+                  {%- when 'personalisation' -%}{{ section.settings.personalisation_label }}
+                  {%- when 'care' -%}{{ section.settings.care_label }}
+                {%- endcase -%}
+              </a>
+            {%- endif -%}
+          {%- endfor -%}
+        </nav>
+      </aside>
+
+      <div class="kauffman-faq__content">
+        {%- for category in categories -%}
+          {%- liquid
+            assign has_items = false
+            for block in section.blocks
+              if block.type == 'faq_item' and block.settings.category == category
+                assign has_items = true
+                break
+              endif
+            endfor
+          -%}
+
+          {%- if has_items -%}
+            <section id="{{ section_id }}-{{ category }}" class="kauffman-faq__group">
+              <div class="kauffman-faq__group-head">
+                <p class="kauffman-faq__group-kicker">
+                  {%- case category -%}
+                    {%- when 'shipping' -%}{{ section.settings.shipping_kicker }}
+                    {%- when 'returns' -%}{{ section.settings.returns_kicker }}
+                    {%- when 'warranty' -%}{{ section.settings.warranty_kicker }}
+                    {%- when 'payment' -%}{{ section.settings.payment_kicker }}
+                    {%- when 'invoice' -%}{{ section.settings.invoice_kicker }}
+                    {%- when 'personalisation' -%}{{ section.settings.personalisation_kicker }}
+                    {%- when 'care' -%}{{ section.settings.care_kicker }}
+                  {%- endcase -%}
+                </p>
+
+                <h2 class="kauffman-faq__group-title">
+                  {%- case category -%}
+                    {%- when 'shipping' -%}{{ section.settings.shipping_label }}
+                    {%- when 'returns' -%}{{ section.settings.returns_label }}
+                    {%- when 'warranty' -%}{{ section.settings.warranty_label }}
+                    {%- when 'payment' -%}{{ section.settings.payment_label }}
+                    {%- when 'invoice' -%}{{ section.settings.invoice_label }}
+                    {%- when 'personalisation' -%}{{ section.settings.personalisation_label }}
+                    {%- when 'care' -%}{{ section.settings.care_label }}
+                  {%- endcase -%}
+                </h2>
+              </div>
+
+              <div class="kauffman-faq__items">
+                {%- for block in section.blocks -%}
+                  {%- if block.type == 'faq_item' and block.settings.category == category -%}
+                    <details class="kauffman-faq__item" {{ block.shopify_attributes }}>
+                      <summary class="kauffman-faq__question">
+                        <span>{{ block.settings.question }}</span>
+                        <span class="kauffman-faq__icon" aria-hidden="true"></span>
+                      </summary>
+
+                      <div class="kauffman-faq__answer rte">
+                        {{ block.settings.answer }}
+                      </div>
+                    </details>
+                  {%- endif -%}
+                {%- endfor -%}
+              </div>
+            </section>
+          {%- endif -%}
+        {%- endfor -%}
+
+        {%- if section.settings.show_contact_card -%}
+          <div class="kauffman-faq__contact kauffman-faq__contact--bottom">
+            {%- if section.settings.contact_title != blank -%}
+              <p class="kauffman-faq__contact-title">{{ section.settings.contact_title }}</p>
+            {%- endif -%}
+
+            {%- if section.settings.contact_text != blank -%}
+              <div class="kauffman-faq__contact-text rte">{{ section.settings.contact_text }}</div>
+            {%- endif -%}
+
+            {%- if section.settings.contact_link_label != blank and section.settings.contact_link != blank -%}
+              <a class="kauffman-faq__contact-link" href="{{ section.settings.contact_link }}">
+                {{ section.settings.contact_link_label }}
+              </a>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+
+        {%- if section.settings.bottom_note != blank -%}
+          <div class="kauffman-faq__bottom-note rte">
+            {{ section.settings.bottom_note }}
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  #{{ section_id }} {
+    padding-top: var(--kauffman-faq-padding-top-desktop);
+    padding-bottom: var(--kauffman-faq-padding-bottom-desktop);
+    background: rgb(var(--color-background));
+    color: rgb(var(--color-foreground));
+  }
+
+  #{{ section_id }} .kauffman-faq__inner {
+    width: 100%;
+    max-width: {% if section.settings.section_width == 'page-width' %}var(--page-width){% else %}none{% endif %};
+    margin: 0 auto;
+  }
+
+  #{{ section_id }} .kauffman-faq__header {
+    max-width: 860px;
+    margin: 0 auto 56px;
+    text-align: {{ section.settings.header_alignment }};
+    padding-inline: {% if section.settings.section_width == 'full-width' %}clamp(20px, 4vw, 64px){% else %}0{% endif %};
+  }
+
+  #{{ section_id }} .kauffman-faq__eyebrow,
+  #{{ section_id }} .kauffman-faq__nav-title,
+  #{{ section_id }} .kauffman-faq__group-kicker {
+    margin: 0;
+    font-family: var(--font-body-family);
+    font-size: 11px;
+    line-height: 1.3;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    opacity: 0.62;
+  }
+
+  #{{ section_id }} .kauffman-faq__heading {
+    margin: 0;
+    font-size: var(--kauffman-faq-heading-size-desktop);
+    line-height: 0.95;
+    font-weight: 400;
+    letter-spacing: -0.035em;
+  }
+
+  #{{ section_id }} .kauffman-faq__eyebrow + .kauffman-faq__heading {
+    margin-top: 18px;
+  }
+
+  #{{ section_id }} .kauffman-faq__intro {
+    margin-top: 22px;
+    font-size: var(--kauffman-faq-body-size);
+    line-height: 1.65;
+    opacity: 0.72;
+  }
+
+  #{{ section_id }} .kauffman-faq__layout {
+    display: grid;
+    grid-template-columns: minmax(180px, 260px) minmax(0, 1fr);
+    gap: clamp(48px, 7vw, 112px);
+    align-items: start;
+    padding-inline: {% if section.settings.section_width == 'full-width' %}clamp(20px, 4vw, 64px){% else %}0{% endif %};
+  }
+
+  #{{ section_id }} .kauffman-faq__nav {
+    position: sticky;
+    top: calc(var(--header-height, 80px) + 28px);
+    align-self: start;
+  }
+
+  #{{ section_id }} .kauffman-faq__nav-list {
+    display: grid;
+    gap: 2px;
+    margin-top: 20px;
+  }
+
+  #{{ section_id }} .kauffman-faq__nav-link {
+    display: inline-flex;
+    width: fit-content;
+    padding: 8px 0;
+    color: currentColor;
+    text-decoration: none;
+    font-size: 13px;
+    line-height: 1.35;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.64;
+    transition: opacity 180ms ease;
+  }
+
+  #{{ section_id }} .kauffman-faq__nav-link:hover {
+    opacity: 1;
+  }
+
+  #{{ section_id }} .kauffman-faq__contact {
+    margin-top: 40px;
+    padding-top: 28px;
+    border-top: 1px solid rgba(var(--color-foreground), 0.16);
+  }
+
+  #{{ section_id }} .kauffman-faq__contact-title {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.4;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  #{{ section_id }} .kauffman-faq__contact-text {
+    margin-top: 12px;
+    font-size: 13px;
+    line-height: 1.55;
+    opacity: 0.7;
+  }
+
+  #{{ section_id }} .kauffman-faq__contact-link {
+    display: inline-flex;
+    margin-top: 16px;
+    color: currentColor;
+    font-size: 12px;
+    line-height: 1.3;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: underline;
+    text-underline-offset: 5px;
+  }
+
+  #{{ section_id }} .kauffman-faq__content {
+    min-width: 0;
+  }
+
+  #{{ section_id }} .kauffman-faq__group {
+    scroll-margin-top: calc(var(--header-height, 80px) + 32px);
+    padding: 40px 0;
+    border-top: 1px solid rgba(var(--color-foreground), 0.16);
+  }
+
+  #{{ section_id }} .kauffman-faq__group:first-child {
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  #{{ section_id }} .kauffman-faq__group-head {
+    display: grid;
+    grid-template-columns: minmax(0, 0.42fr) minmax(0, 1fr);
+    gap: 28px;
+    align-items: baseline;
+    margin-bottom: 24px;
+  }
+
+  #{{ section_id }} .kauffman-faq__group-title {
+    margin: 0;
+    font-size: clamp(26px, 3vw, 44px);
+    line-height: 1.05;
+    font-weight: 400;
+    letter-spacing: -0.025em;
+  }
+
+  #{{ section_id }} .kauffman-faq__items {
+    border-top: 1px solid rgba(var(--color-foreground), 0.16);
+  }
+
+  #{{ section_id }} .kauffman-faq__item {
+    border-bottom: 1px solid rgba(var(--color-foreground), 0.16);
+  }
+
+  #{{ section_id }} .kauffman-faq__question {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 22px 0;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1.45;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  #{{ section_id }} .kauffman-faq__question::-webkit-details-marker {
+    display: none;
+  }
+
+  #{{ section_id }} .kauffman-faq__icon {
+    position: relative;
+    flex: 0 0 14px;
+    width: 14px;
+    height: 14px;
+    opacity: 0.72;
+  }
+
+  #{{ section_id }} .kauffman-faq__icon::before,
+  #{{ section_id }} .kauffman-faq__icon::after {
+    content: "";
+    position: absolute;
+    inset: 50% auto auto 0;
+    width: 14px;
+    height: 1px;
+    background: currentColor;
+    transform: translateY(-50%);
+    transition: transform 180ms ease, opacity 180ms ease;
+  }
+
+  #{{ section_id }} .kauffman-faq__icon::after {
+    transform: translateY(-50%) rotate(90deg);
+  }
+
+  #{{ section_id }} .kauffman-faq__item[open] .kauffman-faq__icon::after {
+    transform: translateY(-50%) rotate(0deg);
+    opacity: 0;
+  }
+
+  #{{ section_id }} .kauffman-faq__answer {
+    max-width: 760px;
+    padding: 0 56px 24px 0;
+    font-size: var(--kauffman-faq-body-size);
+    line-height: 1.65;
+    opacity: 0.74;
+  }
+
+  #{{ section_id }} .kauffman-faq__answer p,
+  #{{ section_id }} .kauffman-faq__answer ul,
+  #{{ section_id }} .kauffman-faq__answer ol,
+  #{{ section_id }} .kauffman-faq__bottom-note p {
+    margin-top: 0;
+  }
+
+  #{{ section_id }} .kauffman-faq__answer > *:last-child,
+  #{{ section_id }} .kauffman-faq__bottom-note > *:last-child {
+    margin-bottom: 0;
+  }
+
+  #{{ section_id }} .kauffman-faq__bottom-note {
+    margin-top: 24px;
+    padding: 24px;
+    border: 1px solid rgba(var(--color-foreground), 0.16);
+    border-radius: var(--kauffman-faq-radius);
+    font-size: 13px;
+    line-height: 1.6;
+    opacity: 0.74;
+  }
+
+  @media screen and (max-width: 749px) {
+    #{{ section_id }} {
+      padding-top: var(--kauffman-faq-padding-top-mobile);
+      padding-bottom: var(--kauffman-faq-padding-bottom-mobile);
+    }
+
+    #{{ section_id }} .kauffman-faq__header {
+      margin-bottom: 34px;
+      padding-inline: 20px;
+      text-align: {{ section.settings.header_alignment_mobile }};
+    }
+
+    #{{ section_id }} .kauffman-faq__heading {
+      font-size: var(--kauffman-faq-heading-size-mobile);
+      line-height: 1;
+    }
+
+    #{{ section_id }} .kauffman-faq__intro {
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    #{{ section_id }} .kauffman-faq__layout {
+      display: block;
+      padding-inline: 20px;
+    }
+
+    #{{ section_id }} .kauffman-faq__nav {
+      position: relative;
+      top: auto;
+      margin-bottom: 34px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid rgba(var(--color-foreground), 0.16);
+    }
+
+    #{{ section_id }} .kauffman-faq__nav-title {
+      display: none;
+    }
+
+    #{{ section_id }} .kauffman-faq__nav-list {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      margin: 0 -20px;
+      padding: 0 20px 2px;
+      scroll-snap-type: x proximity;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    #{{ section_id }} .kauffman-faq__nav-link {
+      flex: 0 0 auto;
+      padding: 10px 14px;
+      border: 1px solid rgba(var(--color-foreground), 0.18);
+      border-radius: 999px;
+      font-size: 11px;
+      scroll-snap-align: start;
+      opacity: 0.78;
+    }
+
+    #{{ section_id }} .kauffman-faq__contact {
+      margin-top: 28px;
+      padding-top: 22px;
+    }
+
+    #{{ section_id }} .kauffman-faq__group {
+      padding: 34px 0;
+    }
+
+    #{{ section_id }} .kauffman-faq__group-head {
+      display: block;
+      margin-bottom: 20px;
+    }
+
+    #{{ section_id }} .kauffman-faq__group-title {
+      margin-top: 10px;
+      font-size: 28px;
+    }
+
+    #{{ section_id }} .kauffman-faq__question {
+      padding: 19px 0;
+      font-size: 12px;
+      line-height: 1.45;
+      letter-spacing: 0.08em;
+    }
+
+    #{{ section_id }} .kauffman-faq__answer {
+      padding: 0 28px 22px 0;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    #{{ section_id }} .kauffman-faq__bottom-note {
+      padding: 18px;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Kauffman FAQ hub",
+  "tag": "section",
+  "class": "section-kauffman-faq-hub",
+  "settings": [
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "t:settings.width",
+      "options": [
+        {
+          "value": "page-width",
+          "label": "t:options.page"
+        },
+        {
+          "value": "full-width",
+          "label": "t:options.full"
+        }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:settings.color_scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Client service"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Help Center"
+    },
+    {
+      "type": "richtext",
+      "id": "intro",
+      "label": "Intro",
+      "default": "<p>Everything you need to know about delivery, returns, payment, product care and customer support.</p>"
+    },
+    {
+      "type": "select",
+      "id": "header_alignment",
+      "label": "Header alignment desktop",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "header_alignment_mobile",
+      "label": "Header alignment mobile",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "text",
+      "id": "nav_title",
+      "label": "Navigation title",
+      "default": "Topics"
+    },
+    {
+      "type": "text",
+      "id": "nav_aria_label",
+      "label": "Navigation aria label",
+      "default": "FAQ categories"
+    },
+    {
+      "type": "text",
+      "id": "shipping_label",
+      "label": "Shipping label",
+      "default": "Shipping & Delivery"
+    },
+    {
+      "type": "text",
+      "id": "returns_label",
+      "label": "Returns label",
+      "default": "Returns & Exchanges"
+    },
+    {
+      "type": "text",
+      "id": "warranty_label",
+      "label": "Warranty label",
+      "default": "Warranty"
+    },
+    {
+      "type": "text",
+      "id": "payment_label",
+      "label": "Payment label",
+      "default": "Payment Methods"
+    },
+    {
+      "type": "text",
+      "id": "invoice_label",
+      "label": "Invoice label",
+      "default": "Company Invoice"
+    },
+    {
+      "type": "text",
+      "id": "personalisation_label",
+      "label": "Personalisation label",
+      "default": "Personalisation"
+    },
+    {
+      "type": "text",
+      "id": "care_label",
+      "label": "Care label",
+      "default": "Product Care"
+    },
+    {
+      "type": "text",
+      "id": "shipping_kicker",
+      "label": "Shipping kicker",
+      "default": "Delivery"
+    },
+    {
+      "type": "text",
+      "id": "returns_kicker",
+      "label": "Returns kicker",
+      "default": "Orders"
+    },
+    {
+      "type": "text",
+      "id": "warranty_kicker",
+      "label": "Warranty kicker",
+      "default": "Protection"
+    },
+    {
+      "type": "text",
+      "id": "payment_kicker",
+      "label": "Payment kicker",
+      "default": "Checkout"
+    },
+    {
+      "type": "text",
+      "id": "invoice_kicker",
+      "label": "Invoice kicker",
+      "default": "Business"
+    },
+    {
+      "type": "text",
+      "id": "personalisation_kicker",
+      "label": "Personalisation kicker",
+      "default": "Custom"
+    },
+    {
+      "type": "text",
+      "id": "care_kicker",
+      "label": "Care kicker",
+      "default": "Materials"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_contact_card",
+      "label": "Show contact card",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "contact_title",
+      "label": "Contact title",
+      "default": "Need more help?"
+    },
+    {
+      "type": "richtext",
+      "id": "contact_text",
+      "label": "Contact text",
+      "default": "<p>Contact our customer support team and include your order number when relevant.</p>"
+    },
+    {
+      "type": "text",
+      "id": "contact_link_label",
+      "label": "Contact link label",
+      "default": "Contact us"
+    },
+    {
+      "type": "url",
+      "id": "contact_link",
+      "label": "Contact link"
+    },
+    {
+      "type": "richtext",
+      "id": "bottom_note",
+      "label": "Bottom note",
+      "default": "<p>This page provides general customer service information. Final delivery, tax and payment details are confirmed at checkout.</p>"
+    },
+    {
+      "type": "range",
+      "id": "heading_size_desktop",
+      "label": "Heading size desktop",
+      "min": 36,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "heading_size_mobile",
+      "label": "Heading size mobile",
+      "min": 30,
+      "max": 72,
+      "step": 2,
+      "unit": "px",
+      "default": 44
+    },
+    {
+      "type": "range",
+      "id": "body_size",
+      "label": "Body size",
+      "min": 12,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "card_radius",
+      "label": "Card radius",
+      "min": 0,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_top_desktop",
+      "label": "Padding top desktop",
+      "min": 0,
+      "max": 180,
+      "step": 4,
+      "unit": "px",
+      "default": 96
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_desktop",
+      "label": "Padding bottom desktop",
+      "min": 0,
+      "max": 180,
+      "step": 4,
+      "unit": "px",
+      "default": 104
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "label": "Padding top mobile",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "label": "Padding bottom mobile",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 64
+    }
+  ],
+  "blocks": [
+    {
+      "type": "faq_item",
+      "name": "FAQ item",
+      "settings": [
+        {
+          "type": "select",
+          "id": "category",
+          "label": "Category",
+          "options": [
+            {
+              "value": "shipping",
+              "label": "Shipping & Delivery"
+            },
+            {
+              "value": "returns",
+              "label": "Returns & Exchanges"
+            },
+            {
+              "value": "warranty",
+              "label": "Warranty"
+            },
+            {
+              "value": "payment",
+              "label": "Payment Methods"
+            },
+            {
+              "value": "invoice",
+              "label": "Company Invoice"
+            },
+            {
+              "value": "personalisation",
+              "label": "Personalisation"
+            },
+            {
+              "value": "care",
+              "label": "Product Care"
+            }
+          ],
+          "default": "shipping"
+        },
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Question",
+          "default": "Question"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "Answer",
+          "default": "<p>Answer text.</p>"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Kauffman FAQ hub"
+    }
+  ]
+}
+{% endschema %}

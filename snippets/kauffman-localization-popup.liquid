@@ -1,0 +1,567 @@
+{% liquid
+  assign popup_id = 'KauffmanLocalizationPopup'
+%}
+
+<kauffman-localization-popup id="{{ popup_id }}" class="kflp" hidden>
+  <div class="kflp__backdrop" data-kflp-close></div>
+
+  <section
+    class="kflp__dialog color-{{ settings.popover_color_scheme }}"
+    role="dialog"
+    aria-modal="true"
+    aria-label="{{ 'content.preferences' | t }}"
+    tabindex="-1"
+  >
+    <div class="kflp__mobile">
+      <section class="kflp__view" data-kflp-view="preferences">
+        <div class="kflp__mobile-header">
+          <span class="kflp__header-spacer" aria-hidden="true"></span>
+          <h2 class="kflp__mobile-title">{{ 'content.preferences' | t }}</h2>
+          <button type="button" class="kflp__close" data-kflp-close aria-label="{{ 'actions.close' | t }}">&times;</button>
+        </div>
+
+        <div class="kflp__mobile-groups">
+          <div class="kflp__group">
+            <span class="kflp__mobile-label">{{ 'content.country' | t }}</span>
+            <button type="button" class="kflp__mobile-select" data-kflp-open-view="country">
+              <span class="kflp__mobile-value">
+                <span
+                  class="kflp__flag"
+                  data-kflp-current-flag
+                  style="background-image: url({{ localization.country | image_url: width: 64 }});"
+                  aria-hidden="true"
+                ></span>
+                <span data-kflp-current-label="country_code">{{ localization.country.name }}</span>
+              </span>
+              <span class="kflp__forward" aria-hidden="true">{{- 'icon-caret.svg' | inline_asset_content -}}</span>
+            </button>
+          </div>
+
+          <div class="kflp__group">
+            <span class="kflp__mobile-label">{{ 'content.language' | t }}</span>
+            <button type="button" class="kflp__mobile-select" data-kflp-open-view="language">
+              <span data-kflp-current-label="locale_code">{{ localization.language.endonym_name | capitalize }}</span>
+              <span class="kflp__forward" aria-hidden="true">{{- 'icon-caret.svg' | inline_asset_content -}}</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="kflp__actions">
+          <button type="submit" class="kflp__save" form="KauffmanLocalizationForm">
+            {{- 'actions.save' | t -}}
+          </button>
+        </div>
+      </section>
+
+      <section class="kflp__view" data-kflp-view="country" hidden>
+        <div class="kflp__mobile-header">
+          <button type="button" class="kflp__back" data-kflp-back aria-label="{{ 'actions.back' | t }}">
+            <span aria-hidden="true">{{- 'icon-caret.svg' | inline_asset_content -}}</span>
+          </button>
+          <h2 class="kflp__mobile-title">{{ 'content.country' | t }}</h2>
+          <button type="button" class="kflp__close" data-kflp-close aria-label="{{ 'actions.close' | t }}">&times;</button>
+        </div>
+
+        <label class="kflp__search">
+          <span class="svg-wrapper" aria-hidden="true">{{- 'icon-search.svg' | inline_asset_content -}}</span>
+          <span class="visually-hidden">{{ 'content.search' | t }} {{ 'content.country' | t }}</span>
+          <input
+            type="search"
+            autocomplete="off"
+            data-kflp-search="country"
+            placeholder="{{ 'content.search' | t }} {{ 'content.country' | t | downcase }}"
+          >
+        </label>
+
+        <div class="kflp__options" data-kflp-options="country">
+          {% for country in localization.available_countries %}
+            <button
+              type="button"
+              class="kflp__option{% if country.iso_code == localization.country.iso_code %} is-active{% endif %}"
+              data-kflp-option="country_code"
+              data-kflp-value="{{ country.iso_code }}"
+              data-kflp-label="{{ country.name | escape }}"
+              data-kflp-flag-url="{{ country | image_url: width: 64 }}"
+              data-kflp-search-value="{{ country.name | escape }} {{ country.iso_code }}"
+              {% if country.iso_code == localization.country.iso_code %}aria-current="true"{% endif %}
+            >
+              <span class="kflp__option-value">
+                <span
+                  class="kflp__flag"
+                  style="background-image: url({{ country | image_url: width: 64 }});"
+                  aria-hidden="true"
+                ></span>
+                <span>{{ country.name }}</span>
+              </span>
+              <span class="kflp__check" aria-hidden="true">✓</span>
+            </button>
+          {% endfor %}
+          <p class="kflp__empty" data-kflp-empty hidden>{{ 'content.no_results_found' | t }}</p>
+        </div>
+
+        <div class="kflp__actions">
+          <button type="submit" class="kflp__save" form="KauffmanLocalizationForm">
+            {{- 'actions.save' | t -}}
+          </button>
+        </div>
+      </section>
+
+      <section class="kflp__view" data-kflp-view="language" hidden>
+        <div class="kflp__mobile-header">
+          <button type="button" class="kflp__back" data-kflp-back aria-label="{{ 'actions.back' | t }}">
+            <span aria-hidden="true">{{- 'icon-caret.svg' | inline_asset_content -}}</span>
+          </button>
+          <h2 class="kflp__mobile-title">{{ 'content.language' | t }}</h2>
+          <button type="button" class="kflp__close" data-kflp-close aria-label="{{ 'actions.close' | t }}">&times;</button>
+        </div>
+
+        <label class="kflp__search">
+          <span class="svg-wrapper" aria-hidden="true">{{- 'icon-search.svg' | inline_asset_content -}}</span>
+          <span class="visually-hidden">{{ 'content.search' | t }} {{ 'content.language' | t }}</span>
+          <input
+            type="search"
+            autocomplete="off"
+            data-kflp-search="language"
+            placeholder="{{ 'content.search' | t }} {{ 'content.language' | t | downcase }}"
+          >
+        </label>
+
+        <div class="kflp__options" data-kflp-options="language">
+          {% for language in localization.available_languages %}
+            <button
+              type="button"
+              class="kflp__option{% if language.iso_code == localization.language.iso_code %} is-active{% endif %}"
+              data-kflp-option="locale_code"
+              data-kflp-value="{{ language.iso_code }}"
+              data-kflp-label="{{ language.endonym_name | capitalize | escape }}"
+              data-kflp-search-value="{{ language.endonym_name | escape }} {{ language.name | escape }} {{ language.iso_code }}"
+              {% if language.iso_code == localization.language.iso_code %}aria-current="true"{% endif %}
+            >
+              <span class="kflp__option-value">{{ language.endonym_name | capitalize }}</span>
+              <span class="kflp__check" aria-hidden="true">✓</span>
+            </button>
+          {% endfor %}
+          <p class="kflp__empty" data-kflp-empty hidden>{{ 'content.no_results_found' | t }}</p>
+        </div>
+
+        <div class="kflp__actions">
+          <button type="submit" class="kflp__save" form="KauffmanLocalizationForm">
+            {{- 'actions.save' | t -}}
+          </button>
+        </div>
+      </section>
+
+      {% form 'localization', id: 'KauffmanLocalizationForm', class: 'kflp__mobile-form' %}
+        <input type="hidden" name="country_code" value="{{ localization.country.iso_code }}" data-kflp-initial-value="{{ localization.country.iso_code }}">
+        <input type="hidden" name="locale_code" value="{{ localization.language.iso_code }}" data-kflp-initial-value="{{ localization.language.iso_code }}">
+      {% endform %}
+    </div>
+  </section>
+</kauffman-localization-popup>
+
+<style>
+  .kauffman-localization-trigger { appearance: none; border: 0; background: transparent; color: inherit; cursor: pointer; font: inherit; letter-spacing: inherit; padding: 0; }
+  .kflp[hidden], .kflp__view[hidden] { display: none; }
+  .kflp { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; padding: 20px; }
+  .kflp__backdrop { position: absolute; inset: 0; background: rgb(0 0 0 / .38); animation: kflp-fade-in .22s ease-out both; }
+  .kflp__dialog { position: relative; background: var(--color-background); color: var(--color-foreground); box-shadow: 0 24px 70px rgb(0 0 0 / .18); }
+  .kflp__close, .kflp__back { appearance: none; border: 0; background: transparent; color: inherit; cursor: pointer; padding: 0; }
+  .kflp__close { font-size: 30px; font-weight: 300; line-height: 1; }
+  .kflp__group { min-inline-size: 0; }
+  .kflp__flag { flex: 0 0 auto; width: 24px; height: 24px; border-radius: 50%; background-position: center; background-repeat: no-repeat; background-size: cover; box-shadow: 0 0 0 1px rgb(var(--color-foreground-rgb) / .12); }
+  .kflp__check { visibility: hidden; }
+  body.kflp-open { overflow: hidden; }
+
+  @keyframes kflp-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes kflp-slide-up {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+
+  @keyframes kflp-modal-in {
+    from { opacity: 0; transform: translateY(12px) scale(.985); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  /* Use the same bottom-sheet Preferences flow at every viewport width. */
+  @media (min-width: 0) {
+    .kflp { align-items: end; padding: 0; }
+    .kflp__dialog {
+      width: 100%;
+      height: min(74dvh, 720px);
+      max-height: calc(100dvh - 24px);
+      overflow: hidden;
+      padding: 0;
+      animation: kflp-slide-up .32s cubic-bezier(.22, 1, .36, 1) both;
+    }
+    .kflp__mobile { display: block; height: 100%; }
+    .kflp__view {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      min-height: 0;
+      padding: 24px 20px calc(24px + env(safe-area-inset-bottom));
+    }
+    .kflp__mobile-header { display: grid; grid-template-columns: 36px 1fr 36px; align-items: center; min-height: 44px; margin-bottom: 28px; }
+    .kflp__mobile-title { margin: 0; text-align: center; font: inherit; font-size: 18px; font-weight: 600; letter-spacing: .04em; }
+    .kflp__header-spacer { width: 36px; }
+    .kflp__close { justify-self: end; font-size: 32px; }
+    .kflp__back { justify-self: start; width: 36px; height: 36px; }
+    .kflp__back span { display: block; width: 14px; height: 14px; transform: rotate(90deg); }
+    .kflp__back svg { display: block; width: 100%; height: 100%; }
+    .kflp__mobile-groups { display: grid; gap: 28px; }
+    .kflp__mobile-label { display: block; margin-bottom: 8px; font-size: 13px; font-weight: 600; opacity: .62; }
+    .kflp__mobile-select {
+      appearance: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      width: 100%;
+      min-height: 66px;
+      padding: 12px 18px;
+      border: 1px solid var(--color-border);
+      border-radius: 0;
+      background: color-mix(in srgb, var(--color-foreground) 5%, var(--color-background));
+      color: inherit;
+      text-align: left;
+      font: inherit;
+      font-size: 16px;
+    }
+    .kflp__mobile-value, .kflp__option-value { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .kflp__forward { display: block; flex: 0 0 auto; width: 12px; height: 12px; transform: rotate(-90deg); }
+    .kflp__forward svg { display: block; width: 100%; height: 100%; }
+    .kflp__flag { width: 28px; height: 28px; }
+    .kflp__search {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 54px;
+      margin-bottom: 18px;
+      padding: 0 16px;
+      border: 1px solid var(--color-border);
+      background: color-mix(in srgb, var(--color-foreground) 5%, var(--color-background));
+    }
+    .kflp__search .svg-wrapper { flex: 0 0 auto; width: 20px; height: 20px; opacity: .55; }
+    .kflp__search input { appearance: none; width: 100%; min-width: 0; border: 0; outline: 0; background: transparent; color: inherit; font: inherit; font-size: 16px; }
+    .kflp__search input::placeholder { color: inherit; opacity: .5; }
+    .kflp__options { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; border: 1px solid var(--color-border); }
+    .kflp__option {
+      appearance: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      width: 100%;
+      min-height: 62px;
+      padding: 12px 18px;
+      border: 0;
+      border-bottom: 1px solid var(--color-border);
+      background: transparent;
+      color: inherit;
+      text-align: left;
+      font: inherit;
+      font-size: 16px;
+    }
+    .kflp__option:last-of-type { border-bottom: 0; }
+    .kflp__option[hidden] { display: none; }
+    .kflp__option.is-active { background: color-mix(in srgb, var(--color-foreground) 5%, var(--color-background)); font-weight: 600; }
+    .kflp__check { visibility: hidden; font-size: 20px; }
+    .kflp__option.is-active .kflp__check { visibility: visible; }
+    .kflp__empty { margin: 0; padding: 24px 18px; text-align: center; opacity: .6; }
+    .kflp__mobile-form { display: none; }
+    .kflp__actions { flex: 0 0 auto; margin-top: 20px; }
+    [data-kflp-view='preferences'] .kflp__actions { margin-top: auto; }
+    .kflp__save {
+      appearance: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-height: 56px;
+      padding: 14px 24px;
+      border: 1px solid var(--color-foreground);
+      border-radius: 0;
+      background: var(--color-foreground);
+      color: var(--color-background);
+      cursor: pointer;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      transition: opacity .18s ease;
+    }
+    .kflp__save:hover { opacity: .82; }
+    .kflp__save:focus-visible { outline: 1px solid currentColor; outline-offset: -4px; }
+  }
+
+  @media screen and (min-width: 821px) {
+    .kflp {
+      align-items: center;
+      place-items: center;
+      padding: 32px;
+    }
+    .kflp__dialog {
+      width: min(100%, 620px);
+      height: min(76dvh, 720px);
+      max-height: calc(100dvh - 64px);
+      border-radius: 18px;
+      animation: kflp-modal-in .24s cubic-bezier(.22, 1, .36, 1) both;
+    }
+    .kflp[data-kflp-active-view='preferences'] .kflp__dialog {
+      height: auto;
+      min-height: 0;
+    }
+    .kflp[data-kflp-active-view='preferences'] .kflp__mobile,
+    .kflp[data-kflp-active-view='preferences'] .kflp__view {
+      height: auto;
+    }
+    .kflp__view { padding: 38px 40px 34px; }
+    .kflp__mobile-header,
+    .kflp__mobile-groups,
+    .kflp__search,
+    .kflp__options,
+    .kflp__actions {
+      width: 100%;
+      margin-inline: auto;
+    }
+    .kflp__mobile-header {
+      grid-template-columns: 52px 1fr 52px;
+      min-height: 52px;
+      margin-bottom: 34px;
+    }
+    .kflp__header-spacer { width: 52px; }
+    .kflp__mobile-title { font-size: 22px; font-weight: 600; letter-spacing: .02em; }
+    .kflp__close {
+      width: 52px;
+      height: 52px;
+      border: 1px solid currentColor;
+      border-radius: 50%;
+      font-size: 36px;
+      line-height: 48px;
+    }
+    .kflp__back {
+      align-self: center;
+      width: 40px;
+      height: 40px;
+    }
+    .kflp__mobile-groups { grid-template-columns: minmax(0, 1fr); gap: 26px; }
+    .kflp__mobile-label {
+      margin-bottom: 9px;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0;
+      text-transform: none;
+      opacity: .72;
+    }
+    .kflp__mobile-select {
+      min-height: 72px;
+      padding-inline: 20px;
+      border-color: transparent;
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--color-foreground) 4%, var(--color-background));
+      cursor: pointer;
+      font-size: 17px;
+    }
+    .kflp__mobile-select:hover { background: color-mix(in srgb, var(--color-foreground) 4%, var(--color-background)); }
+    .kflp__search { margin-bottom: 18px; }
+    .kflp__options { width: 100%; }
+    .kflp__option { min-height: 58px; cursor: pointer; }
+    .kflp__option:hover { background: color-mix(in srgb, var(--color-foreground) 4%, var(--color-background)); }
+    .kflp__actions { margin-top: 34px; }
+    .kflp[data-kflp-active-view='preferences'] .kflp__actions { margin-top: 32px; }
+    .kflp__save {
+      min-height: 58px;
+      border-radius: 999px;
+      font-size: 15px;
+      letter-spacing: .02em;
+      text-transform: none;
+    }
+  }
+</style>
+
+<script>
+  if (!customElements.get('kauffman-localization-popup')) {
+    customElements.define('kauffman-localization-popup', class extends HTMLElement {
+      connectedCallback() {
+        this.dialog = this.querySelector('[role="dialog"]');
+        this.localizationForm = this.querySelector('#KauffmanLocalizationForm');
+        this.onDocumentClick = this.onDocumentClick.bind(this);
+        this.onComponentClick = this.onComponentClick.bind(this);
+        this.onKeydown = this.onKeydown.bind(this);
+        this.onSearch = this.onSearch.bind(this);
+
+        document.addEventListener('click', this.onDocumentClick);
+        document.addEventListener('keydown', this.onKeydown);
+        this.addEventListener('click', this.onComponentClick);
+        this.querySelectorAll('[data-kflp-search]').forEach((input) => input.addEventListener('input', this.onSearch));
+        this.showView('preferences');
+      }
+
+      disconnectedCallback() {
+        document.removeEventListener('click', this.onDocumentClick);
+        document.removeEventListener('keydown', this.onKeydown);
+        this.removeEventListener('click', this.onComponentClick);
+        this.querySelectorAll('[data-kflp-search]').forEach((input) => input.removeEventListener('input', this.onSearch));
+      }
+
+      async onDocumentClick(event) {
+        const trigger = event.target.closest('[data-kauffman-localization-trigger]');
+        if (!trigger) return;
+
+        event.preventDefault();
+        const headerDrawer = trigger.closest('header-drawer');
+
+        if (headerDrawer?.isOpen) {
+          const details = headerDrawer.querySelector(':scope > details');
+          const menuToggle = details?.querySelector(':scope > summary');
+          headerDrawer.close();
+          await this.waitForDrawer(details);
+          this.open(trigger, menuToggle);
+          return;
+        }
+
+        this.open(trigger);
+      }
+
+      onComponentClick(event) {
+        const closeButton = event.target.closest('[data-kflp-close]');
+        if (closeButton) {
+          this.close();
+          return;
+        }
+
+        const viewButton = event.target.closest('[data-kflp-open-view]');
+        if (viewButton) {
+          this.showView(viewButton.dataset.kflpOpenView);
+          return;
+        }
+
+        if (event.target.closest('[data-kflp-back]')) {
+          this.showView('preferences');
+          return;
+        }
+
+        const option = event.target.closest('[data-kflp-option]');
+        if (option && this.localizationForm) {
+          const fieldName = option.dataset.kflpOption;
+          const input = this.localizationForm.elements.namedItem(fieldName);
+          if (!input) return;
+          input.value = option.dataset.kflpValue;
+          this.updateDraftSelection(fieldName, option);
+          return;
+        }
+      }
+
+      updateDraftSelection(fieldName, selectedOption) {
+        this.querySelectorAll(`[data-kflp-option="${fieldName}"]`).forEach((option) => {
+          const isSelected = option === selectedOption;
+          option.classList.toggle('is-active', isSelected);
+          option.toggleAttribute('aria-current', isSelected);
+        });
+
+        const currentLabel = this.querySelector(`[data-kflp-current-label="${fieldName}"]`);
+        if (currentLabel) currentLabel.textContent = selectedOption.dataset.kflpLabel || '';
+
+        if (fieldName === 'country_code') {
+          const currentFlag = this.querySelector('[data-kflp-current-flag]');
+          const flagUrl = selectedOption.dataset.kflpFlagUrl;
+          if (currentFlag && flagUrl) currentFlag.style.backgroundImage = `url("${flagUrl}")`;
+        }
+      }
+
+      resetDraft() {
+        if (!this.localizationForm) return;
+
+        this.localizationForm.querySelectorAll('[data-kflp-initial-value]').forEach((input) => {
+          input.value = input.dataset.kflpInitialValue;
+          const selectedOption = Array.from(this.querySelectorAll(`[data-kflp-option="${input.name}"]`))
+            .find((option) => option.dataset.kflpValue === input.value);
+          if (selectedOption) this.updateDraftSelection(input.name, selectedOption);
+        });
+      }
+
+      onSearch(event) {
+        const input = event.currentTarget;
+        const group = input.dataset.kflpSearch;
+        const query = input.value.trim().toLocaleLowerCase();
+        const container = this.querySelector(`[data-kflp-options="${group}"]`);
+        if (!container) return;
+
+        let visibleCount = 0;
+        container.querySelectorAll('[data-kflp-search-value]').forEach((option) => {
+          const matches = option.dataset.kflpSearchValue.toLocaleLowerCase().includes(query);
+          option.hidden = !matches;
+          if (matches) visibleCount += 1;
+        });
+        const emptyState = container.querySelector('[data-kflp-empty]');
+        if (emptyState) emptyState.hidden = visibleCount !== 0;
+      }
+
+      onKeydown(event) {
+        if (this.hidden || event.key !== 'Escape') return;
+        const activeView = this.querySelector('.kflp__view:not([hidden])')?.dataset.kflpView;
+        if (activeView !== 'preferences') {
+          event.preventDefault();
+          this.showView('preferences');
+          return;
+        }
+        this.close();
+      }
+
+      waitForDrawer(details) {
+        return new Promise((resolve) => {
+          if (!details?.hasAttribute('open')) {
+            resolve();
+            return;
+          }
+
+          const startedAt = performance.now();
+          const check = () => {
+            if (!details.hasAttribute('open') || performance.now() - startedAt > 600) {
+              resolve();
+              return;
+            }
+            requestAnimationFrame(check);
+          };
+          requestAnimationFrame(check);
+        });
+      }
+
+      open(trigger, returnFocus = trigger) {
+        this.returnFocus = returnFocus;
+        this.resetDraft();
+        this.showView('preferences');
+        this.hidden = false;
+        document.body.classList.add('kflp-open');
+        requestAnimationFrame(() => this.dialog?.focus());
+      }
+
+      close() {
+        this.hidden = true;
+        document.body.classList.remove('kflp-open');
+        this.showView('preferences');
+        if (this.returnFocus?.isConnected) this.returnFocus.focus();
+      }
+
+      showView(name) {
+        this.dataset.kflpActiveView = name;
+        this.querySelectorAll('[data-kflp-view]').forEach((view) => {
+          view.hidden = view.dataset.kflpView !== name;
+        });
+        this.querySelectorAll('[data-kflp-search]').forEach((input) => {
+          input.value = '';
+          input.dispatchEvent(new Event('input'));
+        });
+        if (!this.hidden && name !== 'preferences') {
+          requestAnimationFrame(() => this.querySelector(`[data-kflp-view="${name}"] [data-kflp-search]`)?.focus());
+        }
+      }
+    });
+  }
+</script>

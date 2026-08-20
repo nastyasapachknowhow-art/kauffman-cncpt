@@ -1,0 +1,983 @@
+{% liquid
+  assign sid = section.id
+  assign shop_menu = section.settings.shop_menu
+  assign customer_menu = section.settings.customer_service_menu
+  assign legal_menu = section.settings.legal_menu
+  assign bottom_legal_menu = section.settings.bottom_legal_menu
+
+  assign social_count = 0
+  assign trust_count = 0
+  for block in section.blocks
+    if block.type == 'social_link' and block.settings.url != blank
+      assign social_count = social_count | plus: 1
+    elsif block.type == 'trust_badge'
+      if block.settings.image != blank or block.settings.label != blank
+        assign trust_count = trust_count | plus: 1
+      endif
+    endif
+  endfor
+%}
+
+<footer
+  id="kauffman-brand-three-columns-footer-{{ sid }}"
+  class="kbf color-scheme color-{{ section.settings.color_scheme }} color-scheme--{{ section.settings.color_scheme }} {% if section.settings.use_custom_colors %}kbf--custom-colors{% endif %} {% if section.settings.monochrome_logos %}kbf--mono{% endif %} kbf--bottom-desktop-{{ section.settings.bottom_icons_alignment_desktop }} kbf--bottom-mobile-{{ section.settings.bottom_icons_alignment_mobile }} kbf--social-desktop-{{ section.settings.social_alignment_desktop }} kbf--social-mobile-{{ section.settings.social_alignment_mobile }}"
+  style="
+    --kbf-bg: {{ section.settings.background_color }};
+    --kbf-text: {{ section.settings.text_color }};
+    --kbf-heading: {{ section.settings.heading_color }};
+    --kbf-accent: {{ section.settings.accent_color }};
+    --kbf-accent-hover: {{ section.settings.accent_hover_color }};
+    --kbf-muted: {{ section.settings.muted_color }};
+    --kbf-link: {{ section.settings.link_color }};
+    --kbf-line: {{ section.settings.line_color }};
+    --kbf-chip-border: {{ section.settings.chip_border_color }};
+    --kbf-logo-width-desktop: {{ section.settings.logo_width_desktop }}px;
+    --kbf-logo-width-mobile: {{ section.settings.logo_width_mobile }}px;
+    --kbf-newsletter-padding-y: {{ section.settings.newsletter_padding_y }}px;
+    --kbf-column-padding-y: {{ section.settings.column_padding_y }}px;
+    --kbf-column-padding-x: {{ section.settings.column_padding_x }}px;
+    --kbf-bottom-padding-y: {{ section.settings.bottom_padding_y }}px;
+    --kbf-monochrome-opacity: {{ section.settings.monochrome_opacity | divided_by: 100.0 }};
+  "
+>
+  <style>
+    #kauffman-brand-three-columns-footer-{{ sid }} {
+      --kbf-font-body: var(--font-body-family, var(--text-font-family, Inter, Arial, sans-serif));
+      --kbf-font-heading: var(--font-heading-family, var(--heading-font-family, inherit));
+      background: var(--color-background, transparent);
+      color: var(--color-foreground, inherit);
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }}.kbf--custom-colors {
+      background: var(--kbf-bg);
+      color: var(--kbf-text);
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} *,
+    #kauffman-brand-three-columns-footer-{{ sid }} *::before,
+    #kauffman-brand-three-columns-footer-{{ sid }} *::after { box-sizing: border-box; }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} p,
+    #kauffman-brand-three-columns-footer-{{ sid }} h2,
+    #kauffman-brand-three-columns-footer-{{ sid }} h3,
+    #kauffman-brand-three-columns-footer-{{ sid }} ul { margin: 0; padding: 0; }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} ul { list-style: none; }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} a { color: inherit; text-decoration: none; }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} button,
+    #kauffman-brand-three-columns-footer-{{ sid }} input { font: inherit; }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__inner { width: 100%; }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__newsletter {
+      border-bottom: 1px solid var(--kbf-line);
+      padding: var(--kbf-newsletter-padding-y) 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__nl-title {
+      font-family: var(--kbf-font-heading);
+      color: var(--kbf-heading);
+      font-size: 26px;
+      line-height: 1.15;
+      font-weight: 400;
+      margin-bottom: 6px;
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__nl-text {
+      font-family: var(--kbf-font-body);
+      font-size: 12px;
+      line-height: 1.5;
+      font-weight: 300;
+      color: var(--kbf-muted);
+      letter-spacing: .06em;
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__nl-form {
+      display: flex;
+      gap: 0;
+      flex: 1;
+      max-width: 420px;
+      min-width: 280px;
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__nl-form input {
+      flex: 1;
+      min-width: 0;
+      background: transparent;
+      border: 1px solid var(--kbf-chip-border);
+      border-right: none;
+      color: currentColor;
+      font-family: var(--kbf-font-body);
+      font-weight: 300;
+      font-size: 12px;
+      padding: 14px 18px;
+      outline: none;
+      letter-spacing: .05em;
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__nl-form input::placeholder { color: var(--kbf-muted); opacity: .7; }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__nl-button {
+      border: 1px solid var(--kbf-accent);
+      font-family: var(--kbf-font-body);
+      font-weight: 400;
+      font-size: 9px;
+      letter-spacing: .3em;
+      text-transform: uppercase;
+      padding: 14px 22px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background .2s ease, color .2s ease, border-color .2s ease;
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__nl-button--primary {
+      background: var(--kbf-accent);
+      color: #fff;
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__nl-button--secondary {
+      background: transparent;
+      color: var(--kbf-accent);
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__nl-button:hover {
+      background: var(--kbf-accent-hover);
+      border-color: var(--kbf-accent-hover);
+      color: #fff;
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__columns {
+      display: grid;
+      grid-template-columns: 1.6fr 1fr 1fr 1fr;
+      gap: 0;
+      border-bottom: 1px solid var(--kbf-line);
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__col {
+      padding: var(--kbf-column-padding-y) var(--kbf-column-padding-x);
+      border-right: 1px solid color-mix(in srgb, var(--kbf-line) 75%, transparent);
+      min-width: 0;
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__col:last-child { border-right: none; }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__brand-logo-wrap {
+      display: flex;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__brand-logo-wrap--left { justify-content: flex-start; text-align: left; }
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__brand-logo-wrap--center { justify-content: center; text-align: center; }
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__brand-logo-wrap--right { justify-content: flex-end; text-align: right; }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__brand-logo {
+      max-width: var(--kbf-logo-width-desktop);
+      width: auto;
+      height: auto;
+      display: block;
+      color: var(--kbf-heading);
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__brand-logo svg,
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__brand-logo svg * {
+      fill: currentColor;
+      stroke: currentColor;
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__brand-logo-text {
+      font-family: var(--kbf-font-heading);
+      color: var(--kbf-heading);
+      font-size: 20px;
+      font-weight: 400;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      line-height: 1.2;
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__brand-tag {
+      font-family: var(--kbf-font-body);
+      font-size: 9px;
+      line-height: 1.4;
+      letter-spacing: .35em;
+      text-transform: uppercase;
+      color: var(--kbf-accent);
+      margin-bottom: 24px;
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__brand-desc {
+      font-family: var(--kbf-font-body);
+      font-size: 12px;
+      font-weight: 300;
+      color: var(--kbf-muted);
+      line-height: 1.8;
+      margin-bottom: 32px;
+      max-width: 260px;
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__brand-align-left { text-align: left; }
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__brand-align-center { text-align: center; }
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__brand-align-center .kbf__brand-desc { margin-left: auto; margin-right: auto; }
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__brand-align-right { text-align: right; }
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__brand-align-right .kbf__brand-desc { margin-left: auto; }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__social-label {
+      font-family: var(--kbf-font-body);
+      font-size: 8px;
+      letter-spacing: .35em;
+      text-transform: uppercase;
+      color: color-mix(in srgb, var(--kbf-muted) 55%, transparent);
+      margin-bottom: 14px;
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__social-line {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+
+    #kauffman-brand-three-columns-footer-{{ sid }}.kbf--social-desktop-left .kbf__social-line,
+    #kauffman-brand-three-columns-footer-{{ sid }}.kbf--social-desktop-left .kbf__social-icons { justify-content: flex-start; }
+    #kauffman-brand-three-columns-footer-{{ sid }}.kbf--social-desktop-center .kbf__social-line,
+    #kauffman-brand-three-columns-footer-{{ sid }}.kbf--social-desktop-center .kbf__social-icons { justify-content: center; }
+    #kauffman-brand-three-columns-footer-{{ sid }}.kbf--social-desktop-right .kbf__social-line,
+    #kauffman-brand-three-columns-footer-{{ sid }}.kbf--social-desktop-right .kbf__social-icons { justify-content: flex-end; }
+
+    #kauffman-brand-three-columns-footer-{{ sid }}.kbf--social-desktop-left .kbf__social-label { text-align: left; }
+    #kauffman-brand-three-columns-footer-{{ sid }}.kbf--social-desktop-center .kbf__social-label { text-align: center; }
+    #kauffman-brand-three-columns-footer-{{ sid }}.kbf--social-desktop-right .kbf__social-label { text-align: right; }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__social-divider {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, var(--kbf-chip-border), transparent);
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__social-icons {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__social-icon {
+      width: 34px;
+      height: 34px;
+      border: 1px solid var(--kbf-chip-border);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--kbf-muted);
+      transition: border-color .2s ease, background .2s ease, color .2s ease;
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__social-icon:hover {
+      border-color: var(--kbf-accent);
+      color: var(--kbf-accent);
+      background: color-mix(in srgb, var(--kbf-accent) 8%, transparent);
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__social-icon svg { width: 15px; height: 15px; display: block; }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__col-title,
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__mobile-accordion summary {
+      font-family: var(--kbf-font-body);
+      font-size: 9px;
+      letter-spacing: .35em;
+      text-transform: uppercase;
+      color: var(--kbf-accent);
+      padding-bottom: 10px;
+      border-bottom: 1px solid color-mix(in srgb, var(--kbf-line) 86%, transparent);
+      line-height: 1.4;
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__col-title { margin-bottom: 22px; }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__link-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__link-list a {
+      color: var(--kbf-link);
+      font-family: var(--kbf-font-body);
+      font-size: 12px;
+      font-weight: 300;
+      letter-spacing: .04em;
+      transition: color .2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__dot {
+      width: 3px;
+      height: 3px;
+      background: var(--kbf-accent);
+      border-radius: 50%;
+      opacity: 0;
+      transition: opacity .2s ease;
+      flex: 0 0 auto;
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__link-list a:hover { color: var(--kbf-accent); }
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__link-list a:hover .kbf__dot { opacity: 1; }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__mobile-columns { display: none; }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__mobile-accordion {
+      border-bottom: 1px solid color-mix(in srgb, var(--kbf-line) 85%, transparent);
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__mobile-accordion summary {
+      list-style: none;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 24px;
+      border-bottom: 0;
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__mobile-accordion summary::-webkit-details-marker { display: none; }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__mobile-arrow {
+      font-size: 16px;
+      color: var(--kbf-muted);
+      transition: transform .25s ease;
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__mobile-accordion[open] .kbf__mobile-arrow { transform: rotate(90deg); }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__mobile-accordion-content {
+      padding: 0 24px 24px;
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__bottom {
+      padding: var(--kbf-bottom-padding-y) 48px;
+      border-bottom: 1px solid color-mix(in srgb, var(--kbf-line) 75%, transparent);
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__badges,
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__trust,
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__payments {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }}.kbf--bottom-desktop-left .kbf__bottom { justify-content: flex-start; }
+    #kauffman-brand-three-columns-footer-{{ sid }}.kbf--bottom-desktop-center .kbf__bottom { justify-content: center; }
+    #kauffman-brand-three-columns-footer-{{ sid }}.kbf--bottom-desktop-right .kbf__bottom { justify-content: flex-end; }
+
+    #kauffman-brand-three-columns-footer-{{ sid }}.kbf--bottom-desktop-left .kbf__badges,
+    #kauffman-brand-three-columns-footer-{{ sid }}.kbf--bottom-desktop-left .kbf__trust,
+    #kauffman-brand-three-columns-footer-{{ sid }}.kbf--bottom-desktop-left .kbf__payments { justify-content: flex-start; }
+
+    #kauffman-brand-three-columns-footer-{{ sid }}.kbf--bottom-desktop-center .kbf__badges,
+    #kauffman-brand-three-columns-footer-{{ sid }}.kbf--bottom-desktop-center .kbf__trust,
+    #kauffman-brand-three-columns-footer-{{ sid }}.kbf--bottom-desktop-center .kbf__payments { justify-content: center; }
+
+    #kauffman-brand-three-columns-footer-{{ sid }}.kbf--bottom-desktop-right .kbf__badges,
+    #kauffman-brand-three-columns-footer-{{ sid }}.kbf--bottom-desktop-right .kbf__trust,
+    #kauffman-brand-three-columns-footer-{{ sid }}.kbf--bottom-desktop-right .kbf__payments { justify-content: flex-end; }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__badge,
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__trust-badge,
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__pay-chip {
+      border: 0;
+      background: transparent;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: color .2s ease, filter .2s ease, opacity .2s ease;
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__badge {
+      gap: 8px;
+      padding: 0;
+      min-height: auto;
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__badge:hover,
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__trust-badge:hover { color: var(--kbf-accent); }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__badge-image {
+      display: block;
+      width: var(--kbf-badge-width, 96px);
+      height: auto;
+      max-height: 42px;
+      object-fit: contain;
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__badge-fallback {
+      width: 32px;
+      height: 32px;
+      background: transparent;
+      color: var(--kbf-accent);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--kbf-font-heading);
+      font-size: 13px;
+      font-weight: 500;
+      flex: 0 0 auto;
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__badge-text {
+      font-family: var(--kbf-font-body);
+      font-size: 9px;
+      letter-spacing: .15em;
+      color: var(--kbf-muted);
+      line-height: 1.5;
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__badge-text strong {
+      color: var(--kbf-heading);
+      font-weight: 400;
+      display: block;
+      font-size: 10px;
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__trust-badge {
+      padding: 0;
+      min-height: auto;
+      font-family: var(--kbf-font-body);
+      font-size: 9px;
+      letter-spacing: .12em;
+      color: var(--kbf-muted);
+      gap: 6px;
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__trust-badge img {
+      width: var(--kbf-trust-width, 96px);
+      height: auto;
+      max-height: 34px;
+      object-fit: contain;
+      display: block;
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__pay-chip {
+      height: auto;
+      min-width: 0;
+      padding: 0;
+      color: var(--kbf-muted);
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__pay-chip svg,
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__pay-chip img {
+      width: 38px;
+      height: 24px;
+      display: block;
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }}.kbf--mono .kbf__badge-image,
+    #kauffman-brand-three-columns-footer-{{ sid }}.kbf--mono .kbf__trust-badge img,
+    #kauffman-brand-three-columns-footer-{{ sid }}.kbf--mono .kbf__pay-chip svg,
+    #kauffman-brand-three-columns-footer-{{ sid }}.kbf--mono .kbf__pay-chip img {
+      filter: grayscale(1) brightness(.88) contrast(1.15);
+      opacity: var(--kbf-monochrome-opacity);
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }}.kbf--mono .kbf__badge:hover .kbf__badge-image,
+    #kauffman-brand-three-columns-footer-{{ sid }}.kbf--mono .kbf__trust-badge:hover img,
+    #kauffman-brand-three-columns-footer-{{ sid }}.kbf--mono .kbf__pay-chip:hover svg,
+    #kauffman-brand-three-columns-footer-{{ sid }}.kbf--mono .kbf__pay-chip:hover img {
+      filter: none;
+      opacity: 1;
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__legal {
+      padding: 22px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      border-bottom: 1px solid color-mix(in srgb, var(--kbf-line) 65%, transparent);
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__legal-left {
+      font-family: var(--kbf-font-body);
+      font-size: 10px;
+      color: color-mix(in srgb, var(--kbf-muted) 62%, transparent);
+      font-weight: 300;
+      letter-spacing: .04em;
+      line-height: 1.7;
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__legal-links {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__legal-links a,
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__lang button,
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__country button {
+      font-family: var(--kbf-font-body);
+      font-size: 9px;
+      letter-spacing: .12em;
+      color: var(--kbf-muted);
+      text-decoration: none;
+      text-transform: uppercase;
+      transition: color .2s ease, background .2s ease;
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__legal-links a:hover { color: var(--kbf-accent); }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__localization { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__lang,
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__country {
+      display: flex;
+      gap: 2px;
+      align-items: center;
+      border: 1px solid var(--kbf-line);
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__lang button,
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__country button {
+      background: transparent;
+      border: none;
+      padding: 7px 12px;
+      cursor: pointer;
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__lang button[aria-current="true"] {
+      background: var(--kbf-accent);
+      color: #fff;
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__lang button:hover:not([aria-current="true"]),
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__country button:hover { color: var(--kbf-accent); }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__copy {
+      padding: 16px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__copy p {
+      font-family: var(--kbf-font-body);
+      font-size: 10px;
+      color: color-mix(in srgb, var(--kbf-muted) 56%, transparent);
+      font-weight: 300;
+      letter-spacing: .06em;
+      line-height: 1.5;
+    }
+
+    #kauffman-brand-three-columns-footer-{{ sid }} .kbf__copy-accent { color: var(--kbf-accent); }
+
+    @media screen and (max-width: 900px) {
+      #kauffman-brand-three-columns-footer-{{ sid }} .kbf__columns { grid-template-columns: 1fr 1fr; }
+      #kauffman-brand-three-columns-footer-{{ sid }} .kbf__col { border-right: none; border-bottom: 1px solid color-mix(in srgb, var(--kbf-line) 75%, transparent); }
+      #kauffman-brand-three-columns-footer-{{ sid }} .kbf__col:nth-child(odd) { border-right: 1px solid color-mix(in srgb, var(--kbf-line) 75%, transparent); }
+      #kauffman-brand-three-columns-footer-{{ sid }} .kbf__newsletter { flex-direction: column; align-items: flex-start; }
+      #kauffman-brand-three-columns-footer-{{ sid }} .kbf__nl-form { max-width: 100%; width: 100%; }
+      #kauffman-brand-three-columns-footer-{{ sid }} .kbf__bottom,
+      #kauffman-brand-three-columns-footer-{{ sid }} .kbf__legal,
+      #kauffman-brand-three-columns-footer-{{ sid }} .kbf__copy { flex-direction: column; align-items: flex-start; }
+    }
+
+    @media screen and (max-width: 560px) {
+      #kauffman-brand-three-columns-footer-{{ sid }} .kbf__desktop-columns { display: none; }
+      #kauffman-brand-three-columns-footer-{{ sid }} .kbf__mobile-columns { display: block; border-bottom: 1px solid var(--kbf-line); }
+      #kauffman-brand-three-columns-footer-{{ sid }} .kbf__mobile-brand { padding: 36px 24px; border-bottom: 1px solid color-mix(in srgb, var(--kbf-line) 75%, transparent); }
+      #kauffman-brand-three-columns-footer-{{ sid }} .kbf__newsletter { padding: 36px 24px; }
+      #kauffman-brand-three-columns-footer-{{ sid }} .kbf__nl-title { font-size: 24px; }
+      #kauffman-brand-three-columns-footer-{{ sid }} .kbf__nl-form { min-width: 0; }
+      #kauffman-brand-three-columns-footer-{{ sid }} .kbf__nl-form input { padding: 13px 14px; }
+      #kauffman-brand-three-columns-footer-{{ sid }} .kbf__nl-button { padding: 13px 16px; letter-spacing: .22em; }
+      #kauffman-brand-three-columns-footer-{{ sid }} .kbf__brand-logo { max-width: var(--kbf-logo-width-mobile); }
+      #kauffman-brand-three-columns-footer-{{ sid }} .kbf__bottom { padding: 24px; }
+      #kauffman-brand-three-columns-footer-{{ sid }} .kbf__legal { padding: 20px 24px; }
+      #kauffman-brand-three-columns-footer-{{ sid }} .kbf__copy { padding: 14px 24px; }
+      #kauffman-brand-three-columns-footer-{{ sid }} .kbf__badges,
+      #kauffman-brand-three-columns-footer-{{ sid }} .kbf__trust,
+      #kauffman-brand-three-columns-footer-{{ sid }} .kbf__payments,
+      #kauffman-brand-three-columns-footer-{{ sid }} .kbf__legal-links,
+      #kauffman-brand-three-columns-footer-{{ sid }} .kbf__localization { width: 100%; }
+
+      #kauffman-brand-three-columns-footer-{{ sid }}.kbf--bottom-mobile-left .kbf__bottom,
+      #kauffman-brand-three-columns-footer-{{ sid }}.kbf--bottom-mobile-left .kbf__badges,
+      #kauffman-brand-three-columns-footer-{{ sid }}.kbf--bottom-mobile-left .kbf__trust,
+      #kauffman-brand-three-columns-footer-{{ sid }}.kbf--bottom-mobile-left .kbf__payments { align-items: flex-start; justify-content: flex-start; }
+
+      #kauffman-brand-three-columns-footer-{{ sid }}.kbf--bottom-mobile-center .kbf__bottom,
+      #kauffman-brand-three-columns-footer-{{ sid }}.kbf--bottom-mobile-center .kbf__badges,
+      #kauffman-brand-three-columns-footer-{{ sid }}.kbf--bottom-mobile-center .kbf__trust,
+      #kauffman-brand-three-columns-footer-{{ sid }}.kbf--bottom-mobile-center .kbf__payments { align-items: center; justify-content: center; }
+
+      #kauffman-brand-three-columns-footer-{{ sid }}.kbf--bottom-mobile-right .kbf__bottom,
+      #kauffman-brand-three-columns-footer-{{ sid }}.kbf--bottom-mobile-right .kbf__badges,
+      #kauffman-brand-three-columns-footer-{{ sid }}.kbf--bottom-mobile-right .kbf__trust,
+      #kauffman-brand-three-columns-footer-{{ sid }}.kbf--bottom-mobile-right .kbf__payments { align-items: flex-end; justify-content: flex-end; }
+    }
+  </style>
+
+  <div class="kbf__inner">
+    {% if section.settings.show_newsletter %}
+      <div class="kbf__newsletter">
+        <div class="kbf__nl-copy">
+          {% if section.settings.newsletter_title != blank %}<h2 class="kbf__nl-title">{{ section.settings.newsletter_title }}</h2>{% endif %}
+          {% if section.settings.newsletter_text != blank %}<p class="kbf__nl-text">{{ section.settings.newsletter_text }}</p>{% endif %}
+        </div>
+        {% form 'customer', class: 'kbf__nl-form' %}
+          <input type="hidden" name="contact[tags]" value="newsletter">
+          <input type="email" name="contact[email]" autocomplete="email" placeholder="{{ section.settings.newsletter_placeholder | escape }}" required>
+          <button class="kbf__nl-button kbf__nl-button--{{ section.settings.newsletter_button_style }}" type="submit">{{ section.settings.newsletter_button_label }}</button>
+        {% endform %}
+      </div>
+    {% endif %}
+
+
+    <div class="kbf__columns kbf__desktop-columns">
+      <div class="kbf__col kbf__brand-align-{{ section.settings.brand_text_alignment_desktop }}">
+        {% liquid
+          assign logo_align = section.settings.logo_alignment_desktop
+        %}
+        <div class="kbf__brand-logo-wrap kbf__brand-logo-wrap--{{ logo_align }}">
+          {% if section.settings.inline_svg_logo != blank %}
+            <div class="kbf__brand-logo kbf__brand-logo-svg">{{ section.settings.inline_svg_logo }}</div>
+          {% elsif section.settings.footer_logo != blank %}
+            {{ section.settings.footer_logo | image_url: width: 500 | image_tag: class: 'kbf__brand-logo', loading: 'lazy' }}
+          {% elsif section.settings.brand_heading != blank %}
+            <p class="kbf__brand-logo-text">{{ section.settings.brand_heading }}</p>
+          {% endif %}
+        </div>
+        {% if section.settings.brand_tagline != blank %}<p class="kbf__brand-tag">{{ section.settings.brand_tagline }}</p>{% endif %}
+        {% if section.settings.brand_text != blank %}<div class="kbf__brand-desc">{{ section.settings.brand_text }}</div>{% endif %}
+
+        {% if social_count > 0 %}
+          <div class="kbf__social">
+            {% if section.settings.social_label != blank %}<p class="kbf__social-label">{{ section.settings.social_label }}</p>{% endif %}
+            <div class="kbf__social-line">
+              <div class="kbf__social-divider"></div>
+              <div class="kbf__social-icons">
+                {% for block in section.blocks %}
+                  {% if block.type == 'social_link' and block.settings.url != blank %}
+                    <a class="kbf__social-icon" href="{{ block.settings.url }}" target="_blank" rel="noopener noreferrer" aria-label="{{ block.settings.label | escape }}" {{ block.shopify_attributes }}>
+                      {% if block.settings.custom_icon != blank %}
+                        {{ block.settings.custom_icon | image_url: width: 40 | image_tag: loading: 'lazy' }}
+                      {% else %}
+                        {% case block.settings.social_type %}
+                          {% when 'instagram' %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+                          {% when 'tiktok' %}<svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.3 6.3 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.79 1.52V6.77a4.85 4.85 0 0 1-1.02-.08z"/></svg>
+                          {% when 'facebook' %}<svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+                          {% when 'pinterest' %}<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.24 2.65 7.86 6.39 9.29-.09-.78-.17-1.98.04-2.83.18-.77 1.22-5.14 1.22-5.14s-.31-.62-.31-1.54c0-1.45.84-2.53 1.88-2.53.89 0 1.32.67 1.32 1.47 0 .89-.57 2.23-.86 3.47-.24 1.04.51 1.88 1.52 1.88 1.83 0 3.05-2.34 3.05-5.11 0-2.1-1.41-3.67-3.96-3.67-2.89 0-4.69 2.16-4.69 4.57 0 .83.24 1.41.62 1.86.17.2.19.28.13.51-.04.17-.14.57-.18.72-.06.23-.24.31-.45.23-1.26-.52-1.85-1.91-1.85-3.47 0-2.57 2.17-5.67 6.46-5.67 3.47 0 5.75 2.52 5.75 5.23 0 3.59-1.99 6.29-4.9 6.29-.98 0-1.9-.53-2.22-1.13l-.61 2.34c-.2.78-.61 1.55-1 2.14.77.23 1.58.35 2.42.35 5.52 0 10-4.48 10-10S17.52 2 12 2z"/></svg>
+                          {% else %}<span>{{ block.settings.label | slice: 0 | upcase }}</span>
+                        {% endcase %}
+                      {% endif %}
+                    </a>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="kbf__col">
+        <p class="kbf__col-title">{{ section.settings.shop_title }}</p>
+        <ul class="kbf__link-list">
+          {% for link in linklists[shop_menu].links %}<li><a href="{{ link.url }}"><span class="kbf__dot"></span>{{ link.title }}</a></li>{% endfor %}
+        </ul>
+      </div>
+
+      <div class="kbf__col">
+        <p class="kbf__col-title">{{ section.settings.customer_service_title }}</p>
+        <ul class="kbf__link-list">
+          {% for link in linklists[customer_menu].links %}<li><a href="{{ link.url }}"><span class="kbf__dot"></span>{{ link.title }}</a></li>{% endfor %}
+        </ul>
+      </div>
+
+      <div class="kbf__col">
+        <p class="kbf__col-title">{{ section.settings.legal_title }}</p>
+        <ul class="kbf__link-list">
+          {% for link in linklists[legal_menu].links %}<li><a href="{{ link.url }}"><span class="kbf__dot"></span>{{ link.title }}</a></li>{% endfor %}
+        </ul>
+      </div>
+    </div>
+
+    <div class="kbf__mobile-columns">
+      <div class="kbf__mobile-brand kbf__brand-align-{{ section.settings.brand_text_alignment_mobile }}">
+        <div class="kbf__brand-logo-wrap kbf__brand-logo-wrap--{{ section.settings.logo_alignment_mobile }}">
+          {% if section.settings.inline_svg_logo != blank %}
+            <div class="kbf__brand-logo kbf__brand-logo-svg">{{ section.settings.inline_svg_logo }}</div>
+          {% elsif section.settings.footer_logo != blank %}
+            {{ section.settings.footer_logo | image_url: width: 400 | image_tag: class: 'kbf__brand-logo', loading: 'lazy' }}
+          {% elsif section.settings.brand_heading != blank %}
+            <p class="kbf__brand-logo-text">{{ section.settings.brand_heading }}</p>
+          {% endif %}
+        </div>
+        {% if section.settings.brand_tagline != blank %}<p class="kbf__brand-tag">{{ section.settings.brand_tagline }}</p>{% endif %}
+        {% if section.settings.brand_text != blank %}<div class="kbf__brand-desc">{{ section.settings.brand_text }}</div>{% endif %}
+        {% if social_count > 0 %}
+          <div class="kbf__social">
+            {% if section.settings.social_label != blank %}<p class="kbf__social-label">{{ section.settings.social_label }}</p>{% endif %}
+            <div class="kbf__social-icons">
+              {% for block in section.blocks %}
+                {% if block.type == 'social_link' and block.settings.url != blank %}
+                  <a class="kbf__social-icon" href="{{ block.settings.url }}" target="_blank" rel="noopener noreferrer" aria-label="{{ block.settings.label | escape }}" {{ block.shopify_attributes }}>
+                    {% if block.settings.custom_icon != blank %}
+                      {{ block.settings.custom_icon | image_url: width: 40 | image_tag: loading: 'lazy' }}
+                    {% else %}
+                      {% case block.settings.social_type %}
+                        {% when 'instagram' %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+                        {% when 'tiktok' %}<svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.3 6.3 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.79 1.52V6.77a4.85 4.85 0 0 1-1.02-.08z"/></svg>
+                        {% when 'facebook' %}<svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+                        {% when 'pinterest' %}<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.24 2.65 7.86 6.39 9.29-.09-.78-.17-1.98.04-2.83.18-.77 1.22-5.14 1.22-5.14s-.31-.62-.31-1.54c0-1.45.84-2.53 1.88-2.53.89 0 1.32.67 1.32 1.47 0 .89-.57 2.23-.86 3.47-.24 1.04.51 1.88 1.52 1.88 1.83 0 3.05-2.34 3.05-5.11 0-2.1-1.41-3.67-3.96-3.67-2.89 0-4.69 2.16-4.69 4.57 0 .83.24 1.41.62 1.86.17.2.19.28.13.51-.04.17-.14.57-.18.72-.06.23-.24.31-.45.23-1.26-.52-1.85-1.91-1.85-3.47 0-2.57 2.17-5.67 6.46-5.67 3.47 0 5.75 2.52 5.75 5.23 0 3.59-1.99 6.29-4.9 6.29-.98 0-1.9-.53-2.22-1.13l-.61 2.34c-.2.78-.61 1.55-1 2.14.77.23 1.58.35 2.42.35 5.52 0 10-4.48 10-10S17.52 2 12 2z"/></svg>
+                        {% else %}<span>{{ block.settings.label | slice: 0 | upcase }}</span>
+                      {% endcase %}
+                    {% endif %}
+                  </a>
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
+      </div>
+
+      {% assign mobile_menus = 'shop,customer,legal' | split: ',' %}
+      {% for mobile_menu in mobile_menus %}
+        {% liquid
+          if mobile_menu == 'shop'
+            assign menu_handle = shop_menu
+            assign menu_title = section.settings.shop_title
+          elsif mobile_menu == 'customer'
+            assign menu_handle = customer_menu
+            assign menu_title = section.settings.customer_service_title
+          else
+            assign menu_handle = legal_menu
+            assign menu_title = section.settings.legal_title
+          endif
+        %}
+        <details class="kbf__mobile-accordion">
+          <summary><span>{{ menu_title }}</span><span class="kbf__mobile-arrow">›</span></summary>
+          <div class="kbf__mobile-accordion-content">
+            <ul class="kbf__link-list">
+              {% for link in linklists[menu_handle].links %}<li><a href="{{ link.url }}"><span class="kbf__dot"></span>{{ link.title }}</a></li>{% endfor %}
+            </ul>
+          </div>
+        </details>
+      {% endfor %}
+    </div>
+
+    <div class="kbf__bottom">
+      <div class="kbf__badges">
+        {% if section.settings.show_sal_badge %}
+          <a class="kbf__badge" href="{{ section.settings.sal_url | default: 'https://anpc.ro/ce-este-sal/' }}" target="_blank" rel="noopener noreferrer" aria-label="{{ section.settings.sal_label | escape }}">
+            {% if section.settings.sal_image != blank %}
+              {% assign sal_image_style = '--kbf-badge-width: ' | append: section.settings.sal_width | append: 'px;' %}
+              {{ section.settings.sal_image | image_url: width: 600 | image_tag: class: 'kbf__badge-image', loading: 'lazy', style: sal_image_style }}
+            {% else %}
+              <span class="kbf__badge-text"><strong>ANPC • SAL</strong>Soluționarea Alternativă a Litigiilor</span>
+            {% endif %}
+          </a>
+        {% endif %}
+        {% if section.settings.show_odr_badge %}
+          <a class="kbf__badge" href="{{ section.settings.odr_url | default: 'https://ec.europa.eu/consumers/odr' }}" target="_blank" rel="noopener noreferrer" aria-label="{{ section.settings.odr_label | escape }}">
+            {% if section.settings.odr_image != blank %}
+              {% assign odr_image_style = '--kbf-badge-width: ' | append: section.settings.odr_width | append: 'px;' %}
+              {{ section.settings.odr_image | image_url: width: 600 | image_tag: class: 'kbf__badge-image', loading: 'lazy', style: odr_image_style }}
+            {% else %}
+              <span class="kbf__badge-text"><strong>SOL (ODR)</strong>Soluționarea Online a Litigiilor</span>
+            {% endif %}
+          </a>
+        {% endif %}
+      </div>
+
+      {% if trust_count > 0 %}
+        <div class="kbf__trust">
+          {% for block in section.blocks %}
+            {% if block.type == 'trust_badge' %}
+              {% assign trust_url = block.settings.url %}
+              {% if block.settings.image != blank or block.settings.label != blank %}
+                {% if trust_url != blank %}<a class="kbf__trust-badge" href="{{ trust_url }}" target="_blank" rel="noopener noreferrer" {{ block.shopify_attributes }}>{% else %}<div class="kbf__trust-badge" {{ block.shopify_attributes }}>{% endif %}
+                  {% if block.settings.image != blank %}{% assign trust_image_style = '--kbf-trust-width: ' | append: block.settings.width | append: 'px;' %}{{ block.settings.image | image_url: width: 400 | image_tag: loading: 'lazy', style: trust_image_style }}{% endif %}
+                  {% if block.settings.label != blank %}<span>{{ block.settings.label }}</span>{% endif %}
+                {% if trust_url != blank %}</a>{% else %}</div>{% endif %}
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {% if section.settings.show_payment_icons %}
+        <div class="kbf__payments">
+          {% assign payment_icons = section.settings.payment_icons | remove: ' ' | split: ',' %}
+          {% for payment_type in payment_icons %}
+            {% if payment_type != blank %}<span class="kbf__pay-chip">{{ payment_type | payment_type_svg_tag }}</span>{% endif %}
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="kbf__legal">
+      {% if section.settings.company_legal_text != blank %}<div class="kbf__legal-left">{{ section.settings.company_legal_text }}</div>{% endif %}
+      {% if bottom_legal_menu != blank %}
+        <div class="kbf__legal-links">
+          {% for link in linklists[bottom_legal_menu].links %}<a href="{{ link.url }}">{{ link.title }}</a>{% endfor %}
+        </div>
+      {% endif %}
+      <div class="kbf__localization">
+        {% if section.settings.show_language_selector and localization.available_languages.size > 1 %}
+          {% form 'localization', class: 'kbf__lang' %}
+            {% for language in localization.available_languages %}
+              <button type="submit" name="locale_code" value="{{ language.iso_code }}" {% if language.iso_code == localization.language.iso_code %}aria-current="true"{% endif %}>{{ language.iso_code | upcase }}</button>
+            {% endfor %}
+          {% endform %}
+        {% endif %}
+        {% if section.settings.show_country_selector and localization.available_countries.size > 1 %}
+          {% form 'localization', class: 'kbf__country' %}
+            <button type="submit" name="country_code" value="{{ localization.country.iso_code }}">{{ localization.country.iso_code }}</button>
+          {% endform %}
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="kbf__copy">
+      {% if section.settings.copyright_text != blank %}<p>{{ section.settings.copyright_text }}</p>{% endif %}
+      {% if section.settings.copy_tagline != blank %}<p><span class="kbf__copy-accent">{{ section.settings.copy_tagline }}</span></p>{% endif %}
+    </div>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Kauffman brand 3 cols",
+  "settings": [
+    { "type": "header", "content": "Color" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Color scheme", "default": "scheme-1" },
+    { "type": "checkbox", "id": "use_custom_colors", "label": "Use custom footer colors", "default": true },
+    { "type": "color", "id": "background_color", "label": "Background", "default": "#0e0e0e" },
+    { "type": "color", "id": "text_color", "label": "Text", "default": "#ffffff" },
+    { "type": "color", "id": "heading_color", "label": "Heading / logo", "default": "#ffffff" },
+    { "type": "color", "id": "accent_color", "label": "Accent", "default": "#DE5219" },
+    { "type": "color", "id": "accent_hover_color", "label": "Accent hover", "default": "#FF6D28" },
+    { "type": "color", "id": "muted_color", "label": "Muted text", "default": "#75726E" },
+    { "type": "color", "id": "link_color", "label": "Link", "default": "#AAAAAA" },
+    { "type": "color", "id": "line_color", "label": "Divider", "default": "#222222" },
+    { "type": "color", "id": "chip_border_color", "label": "Badge/icon border", "default": "#2A2A2A" },
+
+    { "type": "header", "content": "Newsletter" },
+    { "type": "checkbox", "id": "show_newsletter", "label": "Show newsletter", "default": true },
+    { "type": "text", "id": "newsletter_title", "label": "Title", "default": "Stay in the loop" },
+    { "type": "text", "id": "newsletter_text", "label": "Text", "default": "Private drops, new arrivals & selected offers — straight to your inbox." },
+    { "type": "text", "id": "newsletter_placeholder", "label": "Input placeholder", "default": "YOUR EMAIL ADDRESS" },
+    { "type": "text", "id": "newsletter_button_label", "label": "Button label", "default": "Subscribe" },
+    { "type": "select", "id": "newsletter_button_style", "label": "Button style", "options": [{ "value": "primary", "label": "Primary" }, { "value": "secondary", "label": "Secondary" }], "default": "primary" },
+
+    { "type": "header", "content": "Brand column" },
+    { "type": "image_picker", "id": "footer_logo", "label": "Footer logo" },
+    { "type": "html", "id": "inline_svg_logo", "label": "Inline SVG logo code" },
+    { "type": "text", "id": "brand_heading", "label": "Fallback logo text", "default": "Kauffman Concept" },
+    { "type": "text", "id": "brand_tagline", "label": "Tagline", "default": "Premium Apparel & Tech" },
+    { "type": "richtext", "id": "brand_text", "label": "Brand text", "default": "<p>Born digital. Built for Europe.<br>We believe the objects you carry and the clothes you wear say something about who you are.</p>" },
+    { "type": "range", "id": "logo_width_desktop", "label": "Logo width desktop", "min": 60, "max": 260, "step": 4, "unit": "px", "default": 140 },
+    { "type": "range", "id": "logo_width_mobile", "label": "Logo width mobile", "min": 48, "max": 220, "step": 4, "unit": "px", "default": 120 },
+    { "type": "select", "id": "logo_alignment_desktop", "label": "Logo alignment desktop", "options": [{ "value": "left", "label": "Left" }, { "value": "center", "label": "Center" }, { "value": "right", "label": "Right" }], "default": "left" },
+    { "type": "select", "id": "logo_alignment_mobile", "label": "Logo alignment mobile", "options": [{ "value": "left", "label": "Left" }, { "value": "center", "label": "Center" }, { "value": "right", "label": "Right" }], "default": "left" },
+    { "type": "select", "id": "brand_text_alignment_desktop", "label": "Brand text alignment desktop", "options": [{ "value": "left", "label": "Left" }, { "value": "center", "label": "Center" }, { "value": "right", "label": "Right" }], "default": "left" },
+    { "type": "select", "id": "brand_text_alignment_mobile", "label": "Brand text alignment mobile", "options": [{ "value": "left", "label": "Left" }, { "value": "center", "label": "Center" }, { "value": "right", "label": "Right" }], "default": "left" },
+
+    { "type": "header", "content": "Menus" },
+    { "type": "text", "id": "shop_title", "label": "Shop column title", "default": "Shop" },
+    { "type": "link_list", "id": "shop_menu", "label": "Shop menu" },
+    { "type": "text", "id": "customer_service_title", "label": "Customer service column title", "default": "Customer Service" },
+    { "type": "link_list", "id": "customer_service_menu", "label": "Customer service menu" },
+    { "type": "text", "id": "legal_title", "label": "Legal column title", "default": "Legal" },
+    { "type": "link_list", "id": "legal_menu", "label": "Legal menu" },
+    { "type": "link_list", "id": "bottom_legal_menu", "label": "Bottom legal menu" },
+
+    { "type": "header", "content": "Social" },
+    { "type": "text", "id": "social_label", "label": "Social label", "default": "Find us on" },
+    { "type": "select", "id": "social_alignment_desktop", "label": "Social alignment desktop", "options": [{ "value": "left", "label": "Left" }, { "value": "center", "label": "Center" }, { "value": "right", "label": "Right" }], "default": "left" },
+    { "type": "select", "id": "social_alignment_mobile", "label": "Social alignment mobile", "options": [{ "value": "left", "label": "Left" }, { "value": "center", "label": "Center" }, { "value": "right", "label": "Right" }], "default": "center" },
+
+    { "type": "header", "content": "Compliance badges" },
+    { "type": "checkbox", "id": "show_sal_badge", "label": "Show ANPC SAL badge", "default": true },
+    { "type": "image_picker", "id": "sal_image", "label": "ANPC SAL logo" },
+    { "type": "text", "id": "sal_label", "label": "ANPC SAL accessible label", "default": "ANPC SAL" },
+    { "type": "url", "id": "sal_url", "label": "ANPC SAL URL" },
+    { "type": "range", "id": "sal_width", "label": "ANPC SAL logo width", "min": 40, "max": 260, "step": 4, "unit": "px", "default": 120 },
+    { "type": "checkbox", "id": "show_odr_badge", "label": "Show ODR badge", "default": true },
+    { "type": "image_picker", "id": "odr_image", "label": "ODR logo" },
+    { "type": "text", "id": "odr_label", "label": "ODR accessible label", "default": "ODR" },
+    { "type": "url", "id": "odr_url", "label": "ODR URL" },
+    { "type": "range", "id": "odr_width", "label": "ODR logo width", "min": 40, "max": 260, "step": 4, "unit": "px", "default": 120 },
+    { "type": "checkbox", "id": "monochrome_logos", "label": "Show trust and payment logos in monochrome until hover", "default": true },
+    { "type": "range", "id": "monochrome_opacity", "label": "Monochrome logo opacity", "min": 20, "max": 100, "step": 5, "unit": "%", "default": 70 },
+    { "type": "select", "id": "bottom_icons_alignment_desktop", "label": "Trust and payment alignment desktop", "options": [{ "value": "left", "label": "Left" }, { "value": "center", "label": "Center" }, { "value": "right", "label": "Right" }], "default": "left" },
+    { "type": "select", "id": "bottom_icons_alignment_mobile", "label": "Trust and payment alignment mobile", "options": [{ "value": "left", "label": "Left" }, { "value": "center", "label": "Center" }, { "value": "right", "label": "Right" }], "default": "left" },
+
+    { "type": "header", "content": "Payments" },
+    { "type": "checkbox", "id": "show_payment_icons", "label": "Show payment icons", "default": true },
+    { "type": "text", "id": "payment_icons", "label": "Payment icons", "default": "visa,master,maestro,apple_pay,google_pay,paypal" },
+
+    { "type": "header", "content": "Localization and legal" },
+    { "type": "richtext", "id": "company_legal_text", "label": "Company legal text", "default": "<p>CUI: RO12345678 · Nr. ORC: J40/1234/2024 · Bucharest, Romania</p>" },
+    { "type": "checkbox", "id": "show_language_selector", "label": "Show language selector", "default": true },
+    { "type": "checkbox", "id": "show_country_selector", "label": "Show country selector", "default": false },
+    { "type": "text", "id": "copyright_text", "label": "Copyright text", "default": "© 2024–2026 Kauffman Concept. All rights reserved." },
+    { "type": "text", "id": "copy_tagline", "label": "Copyright tagline", "default": "BORN DIGITAL. BUILT FOR EUROPE." },
+
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "newsletter_padding_y", "label": "Newsletter vertical padding", "min": 24, "max": 90, "step": 2, "unit": "px", "default": 52 },
+    { "type": "range", "id": "column_padding_y", "label": "Column vertical padding", "min": 24, "max": 90, "step": 2, "unit": "px", "default": 52 },
+    { "type": "range", "id": "column_padding_x", "label": "Column horizontal padding", "min": 20, "max": 72, "step": 2, "unit": "px", "default": 40 },
+    { "type": "range", "id": "bottom_padding_y", "label": "Bottom bar vertical padding", "min": 16, "max": 60, "step": 2, "unit": "px", "default": 28 }
+  ],
+  "blocks": [
+    {
+      "type": "social_link",
+      "name": "Social link",
+      "settings": [
+        { "type": "select", "id": "social_type", "label": "Social type", "options": [{ "value": "instagram", "label": "Instagram" }, { "value": "tiktok", "label": "TikTok" }, { "value": "facebook", "label": "Facebook" }, { "value": "pinterest", "label": "Pinterest" }, { "value": "custom", "label": "Custom" }], "default": "instagram" },
+        { "type": "text", "id": "label", "label": "Label", "default": "Instagram" },
+        { "type": "url", "id": "url", "label": "Link URL" },
+        { "type": "image_picker", "id": "custom_icon", "label": "Custom icon" }
+      ]
+    },
+    {
+      "type": "trust_badge",
+      "name": "Trust badge",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Badge / service logo" },
+        { "type": "text", "id": "label", "label": "Label", "default": "Trust badge" },
+        { "type": "url", "id": "url", "label": "Link URL" },
+        { "type": "range", "id": "width", "label": "Badge width", "min": 40, "max": 220, "step": 4, "unit": "px", "default": 96 }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Kauffman brand and 3 columns",
+      "blocks": [
+        { "type": "social_link", "settings": { "social_type": "instagram", "label": "Instagram" } },
+        { "type": "social_link", "settings": { "social_type": "tiktok", "label": "TikTok" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

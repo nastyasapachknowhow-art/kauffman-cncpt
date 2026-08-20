@@ -1,0 +1,743 @@
+{% liquid
+  assign section_id = 'KauffmanSplitArtworkHero-' | append: section.id
+  assign fetch_priority = 'auto'
+  assign loading = 'lazy'
+
+  if section.index == 1
+    assign fetch_priority = 'high'
+    assign loading = 'eager'
+  endif
+
+  assign desktop_image = section.settings.desktop_image
+  assign mobile_image = section.settings.mobile_image
+  assign has_mobile_image = false
+
+  if section.settings.use_mobile_image and mobile_image != blank
+    assign has_mobile_image = true
+  endif
+
+  assign mobile_text_align = 'left'
+  if section.settings.mobile_content_align == 'center'
+    assign mobile_text_align = 'center'
+  elsif section.settings.mobile_content_align == 'flex-end'
+    assign mobile_text_align = 'right'
+  endif
+
+  assign desktop_sizes = '(min-width: 1920px) 1180px, (min-width: 1600px) 62vw, (min-width: 1280px) 64vw, (min-width: 1024px) 58vw, 100vw'
+  assign mobile_sizes = '100vw'
+  assign cta_padding_inline_start = 0
+  assign cta_padding_inline_end = 0
+
+  for block in section.blocks
+    if block.type == 'kauffman-heading' or block.type == 'kauffman-text'
+      assign cta_padding_inline_start = block.settings['padding-inline-start'] | default: 0
+      assign cta_padding_inline_end = block.settings['padding-inline-end'] | default: 0
+      break
+    endif
+  endfor
+%}
+
+<section
+  id="{{ section_id }}"
+  class="
+    kauffman-split-artwork-hero
+    kauffman-split-artwork-hero--mobile-{{ section.settings.mobile_content_order }}
+    color-{{ section.settings.color_scheme }}
+  "
+  style="
+    --ksah-bg: {{ section.settings.background_color }};
+    --ksah-page-width: {{ section.settings.page_width }}px;
+    --ksah-min-height-desktop: {{ section.settings.desktop_height }}svh;
+    --ksah-min-height-mobile: {{ section.settings.mobile_height }}dvh;
+    --ksah-desktop-padding-block: {{ section.settings.desktop_padding_vertical }}px;
+    --ksah-desktop-padding-inline: 48px;
+    --ksah-mobile-padding-block: {{ section.settings.mobile_padding_vertical }}px;
+    --ksah-mobile-padding-inline: {{ section.settings.mobile_padding_horizontal }}px;
+    --ksah-grid-gap-desktop: {{ section.settings.desktop_gap }}px;
+    --ksah-grid-gap-mobile: {{ section.settings.mobile_gap }}px;
+    --ksah-content-max-width: {{ section.settings.content_max_width }}px;
+    --ksah-content-align-desktop: flex-start;
+    --ksah-content-align-mobile: {{ section.settings.mobile_content_align }};
+    --ksah-text-align-desktop: left;
+    --ksah-text-align-mobile: {{ mobile_text_align }};
+    --ksah-content-vertical-desktop: center;
+    --ksah-content-vertical-mobile: flex-start;
+    --ksah-media-vertical-desktop: center;
+    --ksah-media-vertical-mobile: flex-start;
+    --ksah-image-position-desktop: {{ section.settings.desktop_image_position }};
+    --ksah-image-position-mobile: {{ section.settings.mobile_image_position }};
+    --ksah-cta-width-desktop: 220px;
+    --ksah-cta-width-mobile: 260px;
+    --ksah-cta-bg: {{ section.settings.cta_background }};
+    --ksah-cta-color: {{ section.settings.cta_text_color }};
+    --ksah-cta-border: {{ section.settings.cta_border_color }};
+    --ksah-cta-padding-inline-start: {{ cta_padding_inline_start }}px;
+    --ksah-cta-padding-inline-end: {{ cta_padding_inline_end }}px;
+  "
+>
+  <div class="kauffman-split-artwork-hero__inner">
+    <div class="kauffman-split-artwork-hero__content">
+      <div class="kauffman-split-artwork-hero__content-inner">
+        <div class="kauffman-split-artwork-hero__copy">
+          {% content_for 'blocks' %}
+        </div>
+
+        {% if section.settings.cta_label != blank and section.settings.cta_link != blank %}
+          <div class="kauffman-split-artwork-hero__actions">
+            <a
+              class="kauffman-split-artwork-hero__cta kauffman-split-artwork-hero__cta--desktop-{{ section.settings.cta_width_mode_desktop }} kauffman-split-artwork-hero__cta--mobile-{{ section.settings.cta_width_mode_mobile }}"
+              href="{{ section.settings.cta_link }}"
+            >
+              {{ section.settings.cta_label | escape }}
+            </a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="kauffman-split-artwork-hero__media">
+      {% if desktop_image != blank %}
+        <picture>
+          {% if has_mobile_image %}
+            <source
+              media="(max-width: 820px)"
+              srcset="
+                {{ mobile_image | image_url: width: 375 }} 375w,
+                {{ mobile_image | image_url: width: 550 }} 550w,
+                {{ mobile_image | image_url: width: 750 }} 750w,
+                {{ mobile_image | image_url: width: 1000 }} 1000w,
+                {{ mobile_image | image_url: width: 1200 }} 1200w,
+                {{ mobile_image | image_url: width: 1600 }} 1600w
+              "
+              sizes="{{ mobile_sizes }}"
+              width="{{ mobile_image.width }}"
+              height="{{ mobile_image.height }}"
+            >
+          {% endif %}
+
+          {{
+            desktop_image
+            | image_url: width: 2400
+            | image_tag:
+              widths: '600, 800, 1000, 1200, 1500, 1800, 2100, 2400',
+              sizes: desktop_sizes,
+              width: desktop_image.width,
+              height: desktop_image.height,
+              alt: desktop_image.alt,
+              class: 'kauffman-split-artwork-hero__image',
+              loading: loading,
+              fetchpriority: fetch_priority
+          }}
+        </picture>
+      {% elsif has_mobile_image %}
+        {{
+          mobile_image
+          | image_url: width: 1600
+          | image_tag:
+            widths: '375, 550, 750, 1000, 1200, 1600',
+            sizes: mobile_sizes,
+            width: mobile_image.width,
+            height: mobile_image.height,
+            alt: mobile_image.alt,
+            class: 'kauffman-split-artwork-hero__image',
+            loading: loading,
+            fetchpriority: fetch_priority
+        }}
+      {% else %}
+        {{ 'hero-apparel-1' | placeholder_svg_tag: 'kauffman-split-artwork-hero__placeholder' }}
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<style>
+  #{{ section_id }} {
+    background: var(--ksah-bg);
+    color: rgb(var(--color-foreground));
+  }
+
+  #{{ section_id }} .kauffman-split-artwork-hero__inner {
+    width: min(100%, var(--ksah-page-width));
+    min-height: 0;
+    margin-inline: auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--ksah-grid-gap-mobile);
+    padding-block: var(--ksah-mobile-padding-block);
+    padding-inline: 0;
+  }
+
+  #{{ section_id }} .kauffman-split-artwork-hero__content,
+  #{{ section_id }} .kauffman-split-artwork-hero__media {
+    min-width: 0;
+  }
+
+  #{{ section_id }} .kauffman-split-artwork-hero__content {
+    display: flex;
+    align-items: var(--ksah-content-vertical-mobile);
+    justify-content: var(--ksah-content-align-mobile);
+    box-sizing: border-box;
+    order: 1;
+    padding-inline: var(--ksah-mobile-padding-inline);
+  }
+
+  #{{ section_id }} .kauffman-split-artwork-hero__content-inner {
+    width: 100%;
+    max-width: min(100%, var(--ksah-content-max-width));
+    text-align: var(--ksah-text-align-mobile);
+  }
+
+  #{{ section_id }} .kauffman-split-artwork-hero__copy,
+  #{{ section_id }} .kauffman-split-artwork-hero__actions {
+    width: 100%;
+  }
+
+  #{{ section_id }} .kauffman-split-artwork-hero__actions {
+    display: flex;
+    justify-content: flex-start;
+    padding-inline-start: var(--ksah-cta-padding-inline-start);
+    padding-inline-end: var(--ksah-cta-padding-inline-end);
+  }
+
+  #{{ section_id }} .kauffman-split-artwork-hero__media {
+    order: 2;
+    display: flex;
+    align-items: var(--ksah-media-vertical-mobile);
+    justify-content: center;
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  #{{ section_id }} .kauffman-split-artwork-hero__media picture {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  #{{ section_id }} .kauffman-split-artwork-hero__image,
+  #{{ section_id }} .kauffman-split-artwork-hero__placeholder {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    object-position: var(--ksah-image-position-mobile);
+  }
+
+  #{{ section_id }} .kauffman-split-artwork-hero__cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    margin-top: 22px;
+    padding: 0 22px;
+    border: 1px solid var(--ksah-cta-border);
+    background: var(--ksah-cta-bg);
+    color: var(--ksah-cta-color);
+    font-family: var(--font-body--family);
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: opacity 180ms ease, background-color 180ms ease, color 180ms ease;
+  }
+
+  #{{ section_id }} .kauffman-split-artwork-hero__cta:hover {
+    opacity: 0.72;
+  }
+
+  #{{ section_id }} .kauffman-split-artwork-hero__cta--mobile-full {
+    width: 100%;
+  }
+
+  #{{ section_id }} .kauffman-split-artwork-hero__cta--mobile-custom {
+    width: min(100%, var(--ksah-cta-width-mobile));
+  }
+
+  {% if section.settings.account_for_header %}
+    body:has(> #header-group) #{{ section_id }} .kauffman-split-artwork-hero__inner {
+      min-height: 0;
+    }
+  {% endif %}
+
+  @media screen and (max-width: 820px) {
+    #{{ section_id }}.kauffman-split-artwork-hero--mobile-media_first .kauffman-split-artwork-hero__content {
+      order: 2;
+    }
+
+    #{{ section_id }}.kauffman-split-artwork-hero--mobile-media_first .kauffman-split-artwork-hero__media {
+      order: 1;
+    }
+  }
+
+  @media screen and (min-width: 821px) {
+    #{{ section_id }} .kauffman-split-artwork-hero__inner {
+      min-height: var(--ksah-min-height-desktop);
+      grid-template-columns: minmax(320px, 5fr) minmax(0, 7fr);
+      gap: var(--ksah-grid-gap-desktop);
+      padding: var(--ksah-desktop-padding-block) var(--ksah-desktop-padding-inline);
+      align-items: stretch;
+    }
+
+    #{{ section_id }} .kauffman-split-artwork-hero__content {
+      grid-column: 1;
+      order: 1;
+      align-items: stretch;
+      justify-content: var(--ksah-content-align-desktop);
+      padding-inline: 0;
+    }
+
+    #{{ section_id }} .kauffman-split-artwork-hero__content-inner {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      min-height: 100%;
+      text-align: var(--ksah-text-align-desktop);
+    }
+
+    #{{ section_id }} .kauffman-split-artwork-hero__actions {
+      margin-top: auto;
+      padding-top: 32px;
+    }
+
+    #{{ section_id }} .kauffman-split-artwork-hero__media {
+      grid-column: 2;
+      order: 2;
+      align-items: stretch;
+      justify-content: stretch;
+      height: calc(var(--ksah-min-height-desktop) - var(--ksah-desktop-padding-block));
+      margin-right: calc(var(--ksah-desktop-padding-inline) * -1);
+      margin-bottom: calc(var(--ksah-desktop-padding-block) * -1);
+    }
+
+    #{{ section_id }} .kauffman-split-artwork-hero__media picture,
+    #{{ section_id }} .kauffman-split-artwork-hero__image,
+    #{{ section_id }} .kauffman-split-artwork-hero__placeholder {
+      height: 100%;
+    }
+
+    #{{ section_id }} .kauffman-split-artwork-hero__image,
+    #{{ section_id }} .kauffman-split-artwork-hero__placeholder {
+      object-fit: cover;
+    }
+
+    #{{ section_id }}.kauffman-split-artwork-hero .kauffman-split-artwork-hero__content {
+      grid-column: 1;
+      order: 1;
+    }
+
+    #{{ section_id }}.kauffman-split-artwork-hero .kauffman-split-artwork-hero__media {
+      grid-column: 2;
+      order: 2;
+    }
+
+    #{{ section_id }} .kauffman-split-artwork-hero__image,
+    #{{ section_id }} .kauffman-split-artwork-hero__placeholder {
+      object-position: var(--ksah-image-position-desktop);
+    }
+
+    #{{ section_id }} .kauffman-split-artwork-hero__cta {
+      min-height: 46px;
+      margin-top: 0;
+      padding: 0 28px;
+      font-size: 13px;
+    }
+
+    #{{ section_id }} .kauffman-split-artwork-hero__cta--desktop-full {
+      width: 100%;
+    }
+
+    #{{ section_id }} .kauffman-split-artwork-hero__cta--desktop-custom {
+      width: min(100%, var(--ksah-cta-width-desktop));
+    }
+
+    {% if section.settings.account_for_header %}
+      body:has(> #header-group) #{{ section_id }} .kauffman-split-artwork-hero__inner {
+        min-height: calc(var(--ksah-min-height-desktop) - var(--header-group-height, 0px));
+      }
+
+      body:has(> #header-group) #{{ section_id }} .kauffman-split-artwork-hero__media {
+        height: calc(var(--ksah-min-height-desktop) - var(--header-group-height, 0px) - var(--ksah-desktop-padding-block));
+      }
+    {% endif %}
+  }
+
+  @media screen and (min-width: 1024px) and (max-width: 1279px) {
+    #{{ section_id }} .kauffman-split-artwork-hero__inner {
+      --ksah-desktop-padding-inline: 32px;
+      grid-template-columns: minmax(300px, 5fr) minmax(0, 7fr);
+    }
+  }
+
+  @media screen and (min-width: 1280px) and (max-width: 1599px) {
+    #{{ section_id }} .kauffman-split-artwork-hero__inner {
+      --ksah-desktop-padding-inline: 48px;
+      grid-template-columns: minmax(360px, 5fr) minmax(0, 7fr);
+    }
+  }
+
+  @media screen and (min-width: 1600px) and (max-width: 1919px) {
+    #{{ section_id }} .kauffman-split-artwork-hero__inner {
+      --ksah-desktop-padding-inline: 64px;
+      grid-template-columns: minmax(420px, 5fr) minmax(0, 7fr);
+    }
+  }
+
+  @media screen and (min-width: 1920px) {
+    #{{ section_id }} .kauffman-split-artwork-hero__inner {
+      --ksah-desktop-padding-inline: 88px;
+      grid-template-columns: minmax(460px, 5fr) minmax(0, 7fr);
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "KAUFFMAN Split hero",
+  "tag": "section",
+  "class": "section-wrapper kauffman-split-artwork-hero-wrapper",
+  "settings": [
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "CTA label",
+      "default": "Shop now"
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "CTA link"
+    },
+    {
+      "type": "header",
+      "content": "Images"
+    },
+    {
+      "type": "image_picker",
+      "id": "desktop_image",
+      "label": "Desktop image"
+    },
+    {
+      "type": "checkbox",
+      "id": "use_mobile_image",
+      "label": "Use separate mobile image",
+      "default": true
+    },
+    {
+      "type": "image_picker",
+      "id": "mobile_image",
+      "label": "Mobile image",
+      "visible_if": "{{ section.settings.use_mobile_image }}"
+    },
+    {
+      "type": "select",
+      "id": "desktop_image_position",
+      "label": "Desktop image position",
+      "options": [
+        {
+          "value": "center center",
+          "label": "Center"
+        },
+        {
+          "value": "center top",
+          "label": "Top"
+        },
+        {
+          "value": "center bottom",
+          "label": "Bottom"
+        },
+        {
+          "value": "left center",
+          "label": "Left"
+        },
+        {
+          "value": "right center",
+          "label": "Right"
+        }
+      ],
+      "default": "left center"
+    },
+    {
+      "type": "select",
+      "id": "mobile_image_position",
+      "label": "Mobile image position",
+      "options": [
+        {
+          "value": "center center",
+          "label": "Center"
+        },
+        {
+          "value": "center top",
+          "label": "Top"
+        },
+        {
+          "value": "center bottom",
+          "label": "Bottom"
+        },
+        {
+          "value": "left center",
+          "label": "Left"
+        },
+        {
+          "value": "right center",
+          "label": "Right"
+        }
+      ],
+      "default": "center center"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "checkbox",
+      "id": "account_for_header",
+      "label": "Subtract header height",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "page_width",
+      "label": "Max width",
+      "min": 960,
+      "max": 2200,
+      "step": 20,
+      "unit": "px",
+      "default": 1800
+    },
+    {
+      "type": "range",
+      "id": "desktop_height",
+      "label": "Desktop height",
+      "min": 50,
+      "max": 100,
+      "step": 1,
+      "unit": "svh",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "mobile_height",
+      "label": "Mobile height",
+      "min": 50,
+      "max": 100,
+      "step": 1,
+      "unit": "svh",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "desktop_padding_vertical",
+      "label": "Desktop vertical padding",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "mobile_padding_vertical",
+      "label": "Mobile vertical padding",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "mobile_padding_horizontal",
+      "label": "Mobile horizontal padding",
+      "min": 0,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "desktop_gap",
+      "label": "Desktop content/media gap",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "mobile_gap",
+      "label": "Mobile content/media gap",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 28
+    },
+    {
+      "type": "select",
+      "id": "mobile_content_order",
+      "label": "Mobile order",
+      "options": [
+        {
+          "value": "content_first",
+          "label": "Content first"
+        },
+        {
+          "value": "media_first",
+          "label": "Media first"
+        }
+      ],
+      "default": "media_first"
+    },
+    {
+      "type": "select",
+      "id": "mobile_content_align",
+      "label": "Mobile content alignment",
+      "options": [
+        {
+          "value": "flex-start",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "flex-end",
+          "label": "Right"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "content_max_width",
+      "label": "Content max width",
+      "min": 260,
+      "max": 760,
+      "step": 20,
+      "unit": "px",
+      "default": 520
+    },
+    {
+      "type": "header",
+      "content": "CTA"
+    },
+    {
+      "type": "select",
+      "id": "cta_width_mode_desktop",
+      "label": "CTA width desktop",
+      "options": [
+        {
+          "value": "auto",
+          "label": "Auto"
+        },
+        {
+          "value": "full",
+          "label": "Full width"
+        },
+        {
+          "value": "custom",
+          "label": "Custom width"
+        }
+      ],
+      "default": "auto"
+    },
+    {
+      "type": "select",
+      "id": "cta_width_mode_mobile",
+      "label": "CTA width mobile",
+      "options": [
+        {
+          "value": "auto",
+          "label": "Auto"
+        },
+        {
+          "value": "full",
+          "label": "Full width"
+        },
+        {
+          "value": "custom",
+          "label": "Custom width"
+        }
+      ],
+      "default": "full"
+    },
+    {
+      "type": "color",
+      "id": "cta_background",
+      "label": "CTA background",
+      "default": "#de5219"
+    },
+    {
+      "type": "color",
+      "id": "cta_text_color",
+      "label": "CTA text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "cta_border_color",
+      "label": "CTA border color",
+      "default": "#de5219"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "kauffman-heading"
+    },
+    {
+      "type": "kauffman-text"
+    }
+  ],
+  "presets": [
+    {
+      "name": "KAUFFMAN Split hero",
+      "blocks": {
+        "heading": {
+          "type": "kauffman-heading",
+          "settings": {
+            "text": "<p>Energy saving mode</p>",
+            "type_preset": "custom",
+            "font": "var(--font-heading--family)",
+            "font_size": "4.5rem",
+            "line_height": "tight",
+            "letter_spacing": "normal",
+            "case": "none",
+            "width": "100%",
+            "max_width": "none",
+            "alignment": "left"
+          }
+        },
+        "text": {
+          "type": "kauffman-text",
+          "settings": {
+            "text": "<p>Cases, apparel, and details designed to carry your point of view.</p>",
+            "type_preset": "paragraph",
+            "width": "100%",
+            "max_width": "normal",
+            "alignment": "left",
+            "padding-block-start": 16
+          }
+        }
+      },
+      "block_order": ["heading", "text"]
+    }
+  ]
+}
+{% endschema %}

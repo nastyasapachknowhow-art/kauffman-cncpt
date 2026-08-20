@@ -1,0 +1,1224 @@
+{% liquid
+  assign footer_id = 'kauffman-compact-footer-' | append: section.id
+  assign catalogue_menu = section.settings.catalogue_menu
+  assign help_menu = section.settings.help_menu
+  assign company_menu = section.settings.company_menu
+  assign legal_menu = section.settings.legal_menu
+  assign enabled_payment_types = section.settings.payment_icons | remove: ' ' | split: ','
+  assign has_social_links = false
+  for block in section.blocks
+    if block.type == 'social_link' and block.settings.url != blank
+      assign has_social_links = true
+    endif
+  endfor
+  assign has_localization_tools = false
+  if section.settings.show_language_selector and localization.available_languages.size > 1
+    assign has_localization_tools = true
+  endif
+  if section.settings.show_country_selector and localization.available_countries.size > 1
+    assign has_localization_tools = true
+  endif
+%}
+
+
+<footer id="{{ footer_id }}" class="kauffman-compact-footer color-scheme color-{{ section.settings.color_scheme }} color-scheme--{{ section.settings.color_scheme }}{% if section.settings.enable_monochrome_logos %} kcf--mono-logos{% endif %} kcf--logo-desktop-{{ section.settings.logo_alignment_desktop }} kcf--logo-mobile-{{ section.settings.logo_alignment_mobile }} kcf--brand-{{ section.settings.brand_text_alignment }} kcf--trust-{{ section.settings.trust_payment_alignment }} kcf--social-{{ section.settings.social_alignment }} kcf--utility-{{ section.settings.utility_alignment }}" style="--kcf-logo-width-desktop: {{ section.settings.logo_width_desktop }}px; --kcf-logo-width-mobile: {{ section.settings.logo_width_mobile }}px; --kcf-padding-top-desktop: {{ section.settings.padding_top_desktop }}px; --kcf-padding-bottom-desktop: {{ section.settings.padding_bottom_desktop }}px; --kcf-padding-top-mobile: {{ section.settings.padding_top_mobile }}px; --kcf-padding-bottom-mobile: {{ section.settings.padding_bottom_mobile }}px; --kcf-anpc-width: {{ section.settings.anpc_sal_width }}px; --kcf-odr-width: {{ section.settings.odr_width }}px; --kcf-mono-opacity: {{ section.settings.monochrome_opacity | divided_by: 100.0 }};">
+  <div class="kcf__inner">
+    <div class="kcf__brand-row">
+      <div class="kcf__brand-lockup">
+        <a class="kcf__logo" href="{{ routes.root_url }}" aria-label="{{ shop.name | escape }}">
+          {% if section.settings.logo_svg_code != blank %}
+            <span class="kcf__logo-svg" aria-hidden="true">{{ section.settings.logo_svg_code }}</span>
+          {% elsif section.settings.footer_logo != blank %}
+            {{ section.settings.footer_logo | image_url: width: 600 | image_tag: loading: 'lazy', class: 'kcf__logo-image', alt: section.settings.logo_alt }}
+          {% else %}
+            <span class="kcf__logo-text">{{ section.settings.logo_text }}</span>
+          {% endif %}
+        </a>
+        {% if section.settings.logo_compact_text != blank %}
+          <p class="kcf__logo-compact-text">{{ section.settings.logo_compact_text }}</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="kcf__desktop-grid">
+      {% if section.settings.show_newsletter %}
+        <section class="kcf__newsletter" aria-labelledby="kcf-newsletter-{{ section.id }}">
+          {% if section.settings.newsletter_title != blank %}
+            <h2 id="kcf-newsletter-{{ section.id }}" class="kcf__heading">{{ section.settings.newsletter_title }}</h2>
+          {% endif %}
+          {% if section.settings.newsletter_text != blank %}
+            <div class="kcf__text">{{ section.settings.newsletter_text }}</div>
+          {% endif %}
+
+          {% form 'customer', class: 'kcf__form' %}
+            <input type="hidden" name="contact[tags]" value="newsletter">
+            <label class="visually-hidden" for="KCFEmail-{{ section.id }}">{{ section.settings.email_placeholder }}</label>
+            <input
+              id="KCFEmail-{{ section.id }}"
+              class="kcf__input"
+              type="email"
+              name="contact[email]"
+              value="{{ form.email }}"
+              placeholder="{{ section.settings.email_placeholder }}"
+              autocomplete="email"
+              required
+            >
+            <button class="kcf__button kcf__button--{{ section.settings.newsletter_button_style }}" type="submit">{{ section.settings.newsletter_button_label }}</button>
+            {% if form.errors %}
+              <div class="kcf__message" role="alert">{{ form.errors | default_errors }}</div>
+            {% endif %}
+            {% if form.posted_successfully? %}
+              <div class="kcf__message" role="status">{{ section.settings.success_message }}</div>
+            {% endif %}
+          {% endform %}
+        </section>
+      {% endif %}
+
+      <nav class="kcf__desktop-nav" aria-label="Footer navigation">
+        <div class="kcf__menu-column">
+          <h2 class="kcf__heading">{{ section.settings.catalogue_heading }}</h2>
+          <ul class="kcf__link-list" role="list">
+            {% if catalogue_menu != blank %}
+              {% for link in catalogue_menu.links %}<li><a href="{{ link.url }}">{{ link.title }}</a></li>{% endfor %}
+            {% else %}
+              <li><a href="{{ routes.collections_url }}">All items</a></li>
+              <li><a href="{{ routes.collections_url }}">New arrivals</a></li>
+              <li><a href="{{ routes.collections_url }}">iPhone cases</a></li>
+              <li><a href="{{ routes.collections_url }}">MacBook cases</a></li>
+              <li><a href="{{ routes.collections_url }}">T-shirts</a></li>
+              <li><a href="{{ routes.collections_url }}">Hoodies</a></li>
+            {% endif %}
+          </ul>
+        </div>
+
+        <div class="kcf__menu-column">
+          <h2 class="kcf__heading">{{ section.settings.help_heading }}</h2>
+          <ul class="kcf__link-list" role="list">
+            {% if help_menu != blank %}
+              {% for link in help_menu.links %}<li><a href="{{ link.url }}">{{ link.title }}</a></li>{% endfor %}
+            {% else %}
+              <li><a href="/pages/shipping-delivery">Shipping / Delivery</a></li>
+              <li><a href="/pages/returns-exchanges">Return & Exchange</a></li>
+              <li><a href="/pages/customer-support">Customer Support</a></li>
+              <li><a href="/pages/faqs">FAQs</a></li>
+              <li><a href="/pages/payment-methods">Payment Methods</a></li>
+              <li><a href="/pages/care-guide">Care guide</a></li>
+            {% endif %}
+          </ul>
+        </div>
+
+        <div class="kcf__menu-column">
+          <h2 class="kcf__heading">{{ section.settings.company_heading }}</h2>
+          <ul class="kcf__link-list" role="list">
+            {% if company_menu != blank %}
+              {% for link in company_menu.links %}<li><a href="{{ link.url }}">{{ link.title }}</a></li>{% endfor %}
+            {% else %}
+              <li><a href="/pages/about-us">About us</a></li>
+              <li><a href="/pages/contact">Contacts</a></li>
+              <li><a href="/pages/care-guide">Care guide</a></li>
+              <li><a href="/blogs/journal">Journal</a></li>
+            {% endif %}
+          </ul>
+        </div>
+
+        <div class="kcf__menu-column">
+          <h2 class="kcf__heading">{{ section.settings.legal_heading }}</h2>
+          <ul class="kcf__link-list" role="list">
+            {% if legal_menu != blank %}
+              {% for link in legal_menu.links %}<li><a href="{{ link.url }}">{{ link.title }}</a></li>{% endfor %}
+            {% else %}
+              <li><a href="/pages/terms-conditions">Terms & Conditions</a></li>
+              <li><a href="/pages/privacy-policy">Privacy Policy</a></li>
+              <li><a href="/pages/cookie-policy">Cookie Policy</a></li>
+              <li><a href="/pages/return-policy">Return Policy</a></li>
+              <li><a href="/pages/shipping-policy">Shipping Policy</a></li>
+              <li><a href="/pages/warranty-guarantee">Warranty / Guarantee</a></li>
+            {% endif %}
+          </ul>
+        </div>
+      </nav>
+    </div>
+
+    <div class="kcf__mobile-layout">
+      {% if section.settings.show_newsletter %}
+        <section class="kcf__newsletter kcf__newsletter--mobile" aria-labelledby="kcf-newsletter-mobile-{{ section.id }}">
+          {% if section.settings.newsletter_title != blank %}
+            <h2 id="kcf-newsletter-mobile-{{ section.id }}" class="kcf__heading">{{ section.settings.newsletter_title }}</h2>
+          {% endif %}
+          {% if section.settings.newsletter_text != blank %}
+            <div class="kcf__text">{{ section.settings.newsletter_text }}</div>
+          {% endif %}
+
+          {% form 'customer', class: 'kcf__form' %}
+            <input type="hidden" name="contact[tags]" value="newsletter">
+            <label class="visually-hidden" for="KCFEmailMobile-{{ section.id }}">{{ section.settings.email_placeholder }}</label>
+            <input
+              id="KCFEmailMobile-{{ section.id }}"
+              class="kcf__input"
+              type="email"
+              name="contact[email]"
+              value="{{ form.email }}"
+              placeholder="{{ section.settings.email_placeholder }}"
+              autocomplete="email"
+              required
+            >
+            <button class="kcf__button kcf__button--{{ section.settings.newsletter_button_style }}" type="submit">{{ section.settings.newsletter_button_label }}</button>
+            {% if form.errors %}<div class="kcf__message" role="alert">{{ form.errors | default_errors }}</div>{% endif %}
+            {% if form.posted_successfully? %}<div class="kcf__message" role="status">{{ section.settings.success_message }}</div>{% endif %}
+          {% endform %}
+        </section>
+      {% endif %}
+
+      <nav class="kcf__mobile-nav" aria-label="Footer navigation">
+        <details class="kcf__accordion">
+          <summary class="kcf__summary">
+            <span>{{ section.settings.shop_delivery_mobile_heading }}</span>
+            <span class="kcf__plus" aria-hidden="true"></span>
+          </summary>
+          <div class="kcf__accordion-content">
+            <div class="kcf__mobile-subcolumn">
+              <h3 class="kcf__subheading">{{ section.settings.catalogue_heading }}</h3>
+              <ul class="kcf__link-list" role="list">
+                {% if catalogue_menu != blank %}
+                  {% for link in catalogue_menu.links %}<li><a href="{{ link.url }}">{{ link.title }}</a></li>{% endfor %}
+                {% else %}
+                  <li><a href="{{ routes.collections_url }}">All items</a></li>
+                  <li><a href="{{ routes.collections_url }}">New arrivals</a></li>
+                  <li><a href="{{ routes.collections_url }}">iPhone cases</a></li>
+                  <li><a href="{{ routes.collections_url }}">MacBook cases</a></li>
+                  <li><a href="{{ routes.collections_url }}">T-shirts</a></li>
+                  <li><a href="{{ routes.collections_url }}">Hoodies</a></li>
+                {% endif %}
+              </ul>
+            </div>
+            <div class="kcf__mobile-subcolumn">
+              <h3 class="kcf__subheading">{{ section.settings.help_heading }}</h3>
+              <ul class="kcf__link-list" role="list">
+                {% if help_menu != blank %}
+                  {% for link in help_menu.links %}<li><a href="{{ link.url }}">{{ link.title }}</a></li>{% endfor %}
+                {% else %}
+                  <li><a href="/pages/shipping-delivery">Shipping / Delivery</a></li>
+                  <li><a href="/pages/returns-exchanges">Return & Exchange</a></li>
+                  <li><a href="/pages/customer-support">Customer Support</a></li>
+                  <li><a href="/pages/faqs">FAQs</a></li>
+                  <li><a href="/pages/payment-methods">Payment Methods</a></li>
+                {% endif %}
+              </ul>
+            </div>
+          </div>
+        </details>
+
+        <details class="kcf__accordion">
+          <summary class="kcf__summary">
+            <span>{{ section.settings.legal_info_mobile_heading }}</span>
+            <span class="kcf__plus" aria-hidden="true"></span>
+          </summary>
+          <div class="kcf__accordion-content">
+            <div class="kcf__mobile-subcolumn">
+              <h3 class="kcf__subheading">{{ section.settings.company_heading }}</h3>
+              <ul class="kcf__link-list" role="list">
+                {% if company_menu != blank %}
+                  {% for link in company_menu.links %}<li><a href="{{ link.url }}">{{ link.title }}</a></li>{% endfor %}
+                {% else %}
+                  <li><a href="/pages/about-us">About us</a></li>
+                  <li><a href="/pages/contact">Contacts</a></li>
+                  <li><a href="/pages/care-guide">Care guide</a></li>
+                  <li><a href="/blogs/journal">Journal</a></li>
+                {% endif %}
+              </ul>
+            </div>
+            <div class="kcf__mobile-subcolumn">
+              <h3 class="kcf__subheading">{{ section.settings.legal_heading }}</h3>
+              <ul class="kcf__link-list" role="list">
+                {% if legal_menu != blank %}
+                  {% for link in legal_menu.links %}<li><a href="{{ link.url }}">{{ link.title }}</a></li>{% endfor %}
+                {% else %}
+                  <li><a href="/pages/terms-conditions">Terms & Conditions</a></li>
+                  <li><a href="/pages/privacy-policy">Privacy Policy</a></li>
+                  <li><a href="/pages/cookie-policy">Cookie Policy</a></li>
+                  <li><a href="/pages/return-policy">Return Policy</a></li>
+                  <li><a href="/pages/warranty-guarantee">Warranty / Guarantee</a></li>
+                {% endif %}
+              </ul>
+            </div>
+          </div>
+        </details>
+      </nav>
+    </div>
+
+    {% if has_localization_tools %}
+      <div class="kcf__utility-row">
+        {% if section.settings.show_language_selector and localization.available_languages.size > 1 %}
+          <div class="kcf__language kcf__language--{{ section.settings.language_selector_style }}" aria-label="Language selector">
+            {% form 'localization', class: 'kcf__language-form' %}
+              {% if section.settings.language_selector_style == 'dropdown' %}
+                {% capture current_language_flag %}
+                  {% case localization.language.iso_code %}
+                    {% when 'ro' %}🇷🇴
+                    {% when 'en' %}🇬🇧
+                    {% when 'de' %}🇩🇪
+                    {% when 'fr' %}🇫🇷
+                    {% when 'it' %}🇮🇹
+                    {% when 'es' %}🇪🇸
+                    {% when 'pt' %}🇵🇹
+                    {% when 'nl' %}🇳🇱
+                    {% when 'pl' %}🇵🇱
+                    {% when 'bg' %}🇧🇬
+                    {% when 'hu' %}🇭🇺
+                    {% when 'cs' %}🇨🇿
+                    {% when 'sk' %}🇸🇰
+                    {% when 'sl' %}🇸🇮
+                    {% when 'hr' %}🇭🇷
+                    {% when 'el' %}🇬🇷
+                    {% when 'sv' %}🇸🇪
+                    {% when 'da' %}🇩🇰
+                    {% when 'fi' %}🇫🇮
+                    {% when 'et' %}🇪🇪
+                    {% when 'lv' %}🇱🇻
+                    {% when 'lt' %}🇱🇹
+                    {% else %}🌐
+                  {% endcase %}
+                {% endcapture %}
+                <details class="kcf__language-dropdown">
+                  <summary class="kcf__language-summary">
+                    {% if section.settings.show_language_flags %}<span class="kcf__language-flag" aria-hidden="true">{{ current_language_flag | strip }}</span>{% endif %}
+                    <span class="kcf__language-current">{{ localization.language.iso_code | upcase }}</span>
+                    <span class="kcf__language-chevron" aria-hidden="true">⌄</span>
+                  </summary>
+                  <div class="kcf__language-panel">
+                    {% for language in localization.available_languages %}
+                      {% capture language_flag %}
+                        {% case language.iso_code %}
+                          {% when 'ro' %}🇷🇴
+                          {% when 'en' %}🇬🇧
+                          {% when 'de' %}🇩🇪
+                          {% when 'fr' %}🇫🇷
+                          {% when 'it' %}🇮🇹
+                          {% when 'es' %}🇪🇸
+                          {% when 'pt' %}🇵🇹
+                          {% when 'nl' %}🇳🇱
+                          {% when 'pl' %}🇵🇱
+                          {% when 'bg' %}🇧🇬
+                          {% when 'hu' %}🇭🇺
+                          {% when 'cs' %}🇨🇿
+                          {% when 'sk' %}🇸🇰
+                          {% when 'sl' %}🇸🇮
+                          {% when 'hr' %}🇭🇷
+                          {% when 'el' %}🇬🇷
+                          {% when 'sv' %}🇸🇪
+                          {% when 'da' %}🇩🇰
+                          {% when 'fi' %}🇫🇮
+                          {% when 'et' %}🇪🇪
+                          {% when 'lv' %}🇱🇻
+                          {% when 'lt' %}🇱🇹
+                          {% else %}🌐
+                        {% endcase %}
+                      {% endcapture %}
+                      <button
+                        type="submit"
+                        name="locale_code"
+                        value="{{ language.iso_code }}"
+                        class="kcf__language-option{% if language.iso_code == localization.language.iso_code %} is-active{% endif %}"
+                        {% if language.iso_code == localization.language.iso_code %}aria-current="true"{% endif %}
+                      >
+                        {% if section.settings.show_language_flags %}<span class="kcf__language-flag" aria-hidden="true">{{ language_flag | strip }}</span>{% endif %}
+                        <span class="kcf__language-code">{{ language.iso_code | upcase }}</span>
+                        <span class="kcf__language-name">{{ language.endonym_name | default: language.name }}</span>
+                      </button>
+                    {% endfor %}
+                  </div>
+                </details>
+              {% else %}
+                {% for language in localization.available_languages %}
+                  {% capture language_flag %}
+                    {% case language.iso_code %}
+                      {% when 'ro' %}🇷🇴
+                      {% when 'en' %}🇬🇧
+                      {% when 'de' %}🇩🇪
+                      {% when 'fr' %}🇫🇷
+                      {% when 'it' %}🇮🇹
+                      {% when 'es' %}🇪🇸
+                      {% when 'pt' %}🇵🇹
+                      {% when 'nl' %}🇳🇱
+                      {% when 'pl' %}🇵🇱
+                      {% when 'bg' %}🇧🇬
+                      {% when 'hu' %}🇭🇺
+                      {% when 'cs' %}🇨🇿
+                      {% when 'sk' %}🇸🇰
+                      {% when 'sl' %}🇸🇮
+                      {% when 'hr' %}🇭🇷
+                      {% when 'el' %}🇬🇷
+                      {% when 'sv' %}🇸🇪
+                      {% when 'da' %}🇩🇰
+                      {% when 'fi' %}🇫🇮
+                      {% when 'et' %}🇪🇪
+                      {% when 'lv' %}🇱🇻
+                      {% when 'lt' %}🇱🇹
+                      {% else %}🌐
+                    {% endcase %}
+                  {% endcapture %}
+                  <button
+                    type="submit"
+                    name="locale_code"
+                    value="{{ language.iso_code }}"
+                    class="kcf__language-button{% if language.iso_code == localization.language.iso_code %} is-active{% endif %}"
+                    {% if language.iso_code == localization.language.iso_code %}aria-current="true"{% endif %}
+                  >
+                    {% if section.settings.show_language_flags %}<span class="kcf__language-flag" aria-hidden="true">{{ language_flag | strip }}</span>{% endif %}
+                    <span>{{ language.iso_code | upcase }}</span>
+                  </button>
+                {% endfor %}
+              {% endif %}
+            {% endform %}
+          </div>
+        {% endif %}
+
+        {% if section.settings.show_country_selector and localization.available_countries.size > 1 %}
+          <div class="kcf__country-wrap">
+            {% form 'localization', class: 'kcf__country-form' %}
+              <label class="visually-hidden" for="KCFCountry-{{ section.id }}">Country</label>
+              <select id="KCFCountry-{{ section.id }}" class="kcf__country" name="country_code" onchange="this.form.submit()">
+                {% for country in localization.available_countries %}
+                  <option value="{{ country.iso_code }}" {% if country.iso_code == localization.country.iso_code %}selected{% endif %}>{{ country.name }} ({{ country.iso_code }})</option>
+                {% endfor %}
+              </select>
+            {% endform %}
+          </div>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="kcf__trust-payment-row">
+      <div class="kcf__trust" aria-label="Trust badges">
+        {% if section.settings.show_anpc_sal and section.settings.anpc_sal_logo != blank %}
+          <a class="kcf__trust-item kcf__trust-item--anpc" href="{{ section.settings.anpc_sal_url | default: 'https://anpc.ro/ce-este-sal/' }}" target="_blank" rel="noopener noreferrer" aria-label="{{ section.settings.anpc_sal_label | escape }}">
+            {{ section.settings.anpc_sal_logo | image_url: width: 600 | image_tag: loading: 'lazy', class: 'kcf__trust-image kcf__trust-image--anpc kcf__mono-target', alt: section.settings.anpc_sal_label, style: '--badge-width: var(--kcf-anpc-width);' }}
+          </a>
+        {% endif %}
+
+        {% if section.settings.show_odr and section.settings.odr_logo != blank %}
+          <a class="kcf__trust-item kcf__trust-item--odr" href="{{ section.settings.odr_url | default: 'https://ec.europa.eu/consumers/odr' }}" target="_blank" rel="noopener noreferrer" aria-label="{{ section.settings.odr_label | escape }}">
+            {{ section.settings.odr_logo | image_url: width: 600 | image_tag: loading: 'lazy', class: 'kcf__trust-image kcf__trust-image--odr kcf__mono-target', alt: section.settings.odr_label, style: '--badge-width: var(--kcf-odr-width);' }}
+          </a>
+        {% endif %}
+
+        {% for block in section.blocks %}
+          {% if block.type == 'trust_badge' %}
+            {% if block.settings.url != blank %}<a href="{{ block.settings.url }}" target="_blank" rel="noopener noreferrer" aria-label="{{ block.settings.label | escape }}" {{ block.shopify_attributes }}>{% else %}<span class="kcf__trust-static" {{ block.shopify_attributes }}>{% endif %}
+              {% if block.settings.image != blank %}
+                {{ block.settings.image | image_url: width: 500 | image_tag: loading: 'lazy', class: 'kcf__trust-image kcf__mono-target', alt: block.settings.label, style: '--badge-width:' | append: block.settings.width | append: 'px;' }}
+              {% else %}
+                <span class="kcf__trust-text">{{ block.settings.label }}</span>
+              {% endif %}
+            {% if block.settings.url != blank %}</a>{% else %}</span>{% endif %}
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      {% if section.settings.show_payment_icons %}
+        <ul class="kcf__payments" role="list" aria-label="Payment methods">
+          {% for type in enabled_payment_types %}
+            {% if type != blank %}<li>{{ type | payment_type_svg_tag: class: 'kcf__payment-icon kcf__mono-target' }}</li>{% endif %}
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+
+
+    {% if has_social_links %}
+      <div class="kcf__social-row" aria-label="Social links">
+        {% if section.settings.social_label != blank %}
+          <p class="kcf__social-label">{{ section.settings.social_label }}</p>
+        {% endif %}
+        <div class="kcf__socials">
+          {% for block in section.blocks %}
+            {% if block.type == 'social_link' and block.settings.url != blank %}
+              <a href="{{ block.settings.url }}" target="_blank" rel="noopener noreferrer" aria-label="{{ block.settings.label | escape }}" {{ block.shopify_attributes }}>
+                {% if block.settings.custom_icon != blank %}
+                  {{ block.settings.custom_icon | image_url: width: 80 | image_tag: loading: 'lazy', class: 'kcf__social-icon', alt: block.settings.label }}
+                {% else %}
+                  <span>{{ block.settings.label | default: block.settings.social_type }}</span>
+                {% endif %}
+              </a>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+    <div class="kcf__bottom-row">
+      {% if section.settings.brand_text != blank %}
+        <p class="kcf__brand-text">{{ section.settings.brand_text }}</p>
+      {% endif %}
+
+      <div class="kcf__copyright">
+        <span>{{ section.settings.copyright_text }}</span>
+        {% if legal_menu != blank %}
+          <nav class="kcf__mini-legal" aria-label="Legal links">
+            {% for link in legal_menu.links limit: 4 %}<a href="{{ link.url }}">{{ link.title }}</a>{% endfor %}
+          </nav>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .kauffman-compact-footer {
+    --kcf-text: currentColor;
+    --kcf-heading: currentColor;
+    --kcf-muted: color-mix(in srgb, currentColor 68%, transparent);
+    --kcf-border: color-mix(in srgb, currentColor 18%, transparent);
+    --kcf-soft-border: color-mix(in srgb, currentColor 10%, transparent);
+    font-family: Inter, var(--font-body--family), var(--font-body-family), sans-serif;
+  }
+
+  .kauffman-compact-footer *,
+  .kauffman-compact-footer *::before,
+  .kauffman-compact-footer *::after { box-sizing: border-box; }
+
+  .kauffman-compact-footer a { color: inherit; text-decoration: none; }
+  .kauffman-compact-footer h1,
+  .kauffman-compact-footer h2,
+  .kauffman-compact-footer h3,
+  .kauffman-compact-footer p { font-family: inherit; }
+  .kauffman-compact-footer ul { margin-block: 0; }
+
+  .kcf__inner {
+    max-width: var(--page-width, 1440px);
+    margin: 0 auto;
+    padding: var(--kcf-padding-top-desktop, 48px) clamp(20px, 4vw, 64px) var(--kcf-padding-bottom-desktop, 24px);
+  }
+
+  .kcf__brand-row {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 34px;
+  }
+
+  .kcf__brand-lockup {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    max-width: 100%;
+  }
+
+  .kcf__logo { display: inline-flex; align-items: center; justify-content: center; color: var(--kcf-heading); text-decoration: none; }
+  .kcf__logo-image { display: block; width: var(--kcf-logo-width-desktop, 124px); max-width: 100%; height: auto; }
+  .kcf__logo-svg { display: inline-flex; width: var(--kcf-logo-width-desktop, 124px); max-width: 100%; color: var(--kcf-heading); line-height: 0; }
+  .kcf__logo-svg svg { display: block; width: 100%; height: auto; color: currentColor; }
+  .kcf__logo-svg svg, .kcf__logo-svg svg * { fill: currentColor; stroke: currentColor; }
+  .kcf__logo-text { color: var(--kcf-heading); font-size: 18px; line-height: 1; letter-spacing: .18em; text-transform: uppercase; }
+  .kcf__logo-compact-text {
+    margin: 0;
+    color: var(--kcf-accent, var(--kcf-heading));
+    font-size: 11px;
+    line-height: 1.1;
+    font-weight: 500;
+    letter-spacing: .32em;
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  .kcf__desktop-grid {
+    display: grid;
+    grid-template-columns: minmax(260px, .92fr) minmax(620px, 1.75fr);
+    gap: clamp(34px, 6vw, 96px);
+    align-items: start;
+  }
+
+  .kcf__desktop-nav {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(120px, 1fr));
+    gap: clamp(24px, 3vw, 44px);
+  }
+
+  .kcf__heading,
+  .kcf__subheading {
+    margin: 0 0 16px;
+    font-size: 11px;
+    line-height: 1.25;
+    font-weight: 500;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+  }
+
+  .kcf__subheading {
+    margin-bottom: 13px;
+    color: var(--kcf-muted);
+    font-size: 10px;
+    letter-spacing: .16em;
+  }
+
+  .kcf__text,
+  .kcf__brand-text {
+    margin: 0;
+    color: var(--kcf-muted);
+    font-size: 13px;
+    line-height: 1.55;
+    font-weight: 400;
+  }
+
+  .kcf__form {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .kcf__input,
+  .kcf__button,
+  .kcf__country {
+    height: 42px;
+    border: 1px solid var(--kcf-border);
+    background: transparent;
+    color: var(--kcf-text);
+    border-radius: 0;
+    font: inherit;
+  }
+
+  .kcf__input {
+    width: 100%;
+    min-width: 0;
+    padding: 0 14px;
+    font-size: 13px;
+  }
+
+  .kcf__input::placeholder { color: var(--kcf-muted); opacity: 1; }
+
+  .kcf__button {
+    padding: 0 18px;
+    cursor: pointer;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    transition: background-color .25s ease, border-color .25s ease, color .25s ease, opacity .25s ease;
+  }
+
+  .kcf__button--secondary {
+    background: transparent;
+    color: var(--kcf-text);
+    border-color: var(--kcf-border);
+  }
+
+  .kcf__button--secondary:hover {
+    border-color: currentColor;
+  }
+
+  .kcf__button--primary {
+    background: var(--kcf-text);
+    color: var(--kcf-bg);
+    border-color: var(--kcf-text);
+  }
+
+  .kcf__button--primary:hover {
+    background: transparent;
+    color: var(--kcf-text);
+    border-color: currentColor;
+  }
+
+  .kcf__message {
+    grid-column: 1 / -1;
+    color: var(--kcf-muted);
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .kcf__link-list {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .kcf__link-list a {
+    color: var(--kcf-muted);
+    font-size: 13px;
+    line-height: 1.38;
+    transition: color .25s ease, opacity .25s ease;
+  }
+
+  .kcf__link-list a:hover { color: var(--kcf-text); }
+
+  .kcf__mobile-layout { display: none; }
+
+  .kcf__utility-row,
+  .kcf__trust-payment-row,
+  .kcf__social-row,
+  .kcf__bottom-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 22px;
+    border-top: 1px solid var(--kcf-soft-border);
+  }
+
+  .kcf__utility-row { margin-top: 36px; padding-top: 20px; }
+  .kcf__trust-payment-row { margin-top: 18px; padding-top: 18px; }
+  .kcf__social-row { margin-top: 18px; padding-top: 18px; }
+  .kcf__bottom-row { margin-top: 18px; padding-top: 18px; }
+
+  .kcf__social-row,
+  .kcf__socials,
+  .kcf__language-form,
+  .kcf__trust,
+  .kcf__payments,
+  .kcf__mini-legal,
+  .kcf__copyright {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px 16px;
+  }
+
+  .kcf__social-label,
+  .kcf__socials a,
+  .kcf__language-button,
+  .kcf__mini-legal a,
+  .kcf__copyright,
+  .kcf__country {
+    color: var(--kcf-muted);
+    font-size: 11px;
+    line-height: 1.2;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+  }
+
+  .kcf__socials a:hover,
+  .kcf__language-button:hover,
+  .kcf__language-button.is-active,
+  .kcf__mini-legal a:hover { color: var(--kcf-text); }
+
+  .kcf__social-row {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .kcf__social-label {
+    margin: 0;
+    color: var(--kcf-muted);
+  }
+
+  .kcf__socials { justify-content: center; }
+
+  @media screen and (min-width: 821px) {
+    .kcf--logo-desktop-left .kcf__brand-row { justify-content: flex-start; }
+    .kcf--logo-desktop-center .kcf__brand-row { justify-content: center; }
+    .kcf--logo-desktop-right .kcf__brand-row { justify-content: flex-end; }
+    .kcf--logo-desktop-left .kcf__brand-lockup { align-items: flex-start; }
+    .kcf--logo-desktop-center .kcf__brand-lockup { align-items: center; }
+    .kcf--logo-desktop-right .kcf__brand-lockup { align-items: flex-end; }
+    .kcf--logo-desktop-left .kcf__logo-compact-text { text-align: left; }
+    .kcf--logo-desktop-center .kcf__logo-compact-text { text-align: center; }
+    .kcf--logo-desktop-right .kcf__logo-compact-text { text-align: right; }
+  }
+
+  @media screen and (max-width: 820px) {
+    .kcf--logo-mobile-left .kcf__brand-row { justify-content: flex-start; }
+    .kcf--logo-mobile-center .kcf__brand-row { justify-content: center; }
+    .kcf--logo-mobile-right .kcf__brand-row { justify-content: flex-end; }
+    .kcf--logo-mobile-left .kcf__brand-lockup { align-items: flex-start; }
+    .kcf--logo-mobile-center .kcf__brand-lockup { align-items: center; }
+    .kcf--logo-mobile-right .kcf__brand-lockup { align-items: flex-end; }
+    .kcf--logo-mobile-left .kcf__logo-compact-text { text-align: left; }
+    .kcf--logo-mobile-center .kcf__logo-compact-text { text-align: center; }
+    .kcf--logo-mobile-right .kcf__logo-compact-text { text-align: right; }
+  }
+
+  .kcf--brand-left .kcf__bottom-row { text-align: left; }
+  .kcf--brand-center .kcf__bottom-row { text-align: center; }
+  .kcf--brand-right .kcf__bottom-row { text-align: right; }
+  .kcf--brand-left .kcf__brand-text { margin-right: auto; }
+  .kcf--brand-center .kcf__brand-text { margin-inline: auto; }
+  .kcf--brand-right .kcf__brand-text { margin-left: auto; }
+
+  .kcf--trust-left .kcf__trust-payment-row { justify-content: flex-start; }
+  .kcf--trust-center .kcf__trust-payment-row { justify-content: center; }
+  .kcf--trust-right .kcf__trust-payment-row { justify-content: flex-end; }
+
+  .kcf--social-left .kcf__social-row { justify-content: flex-start; text-align: left; }
+  .kcf--social-center .kcf__social-row { justify-content: center; text-align: center; }
+  .kcf--social-right .kcf__social-row { justify-content: flex-end; text-align: right; }
+
+  .kcf--utility-left .kcf__utility-row { justify-content: flex-start; }
+  .kcf--utility-center .kcf__utility-row { justify-content: center; }
+  .kcf--utility-right .kcf__utility-row { justify-content: flex-end; }
+
+  .kcf__language-button {
+    appearance: none;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    font: inherit;
+  }
+
+  .kcf__language-button:not(:last-child)::after {
+    content: '/';
+    display: inline-block;
+    margin-left: 10px;
+    color: var(--kcf-muted);
+    opacity: .55;
+  }
+
+  .kcf__language--buttons .kcf__language-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .kcf__language-dropdown {
+    position: relative;
+    display: inline-block;
+  }
+
+  .kcf__language-dropdown summary {
+    list-style: none;
+  }
+
+  .kcf__language-dropdown summary::-webkit-details-marker { display: none; }
+
+  .kcf__language-summary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 38px;
+    min-width: 112px;
+    padding: 8px 14px;
+    border: 1px solid var(--kcf-soft-border);
+    background: color-mix(in srgb, currentColor 8%, transparent);
+    color: inherit;
+    cursor: pointer;
+    font-size: 11px;
+    line-height: 1;
+    letter-spacing: .10em;
+    text-transform: uppercase;
+    transition: color .25s ease, border-color .25s ease, background .25s ease;
+  }
+
+  .kcf__language-summary:hover,
+  .kcf__language-dropdown[open] .kcf__language-summary {
+    color: inherit;
+    border-color: var(--kcf-border);
+    background: color-mix(in srgb, currentColor 12%, transparent);
+  }
+
+  .kcf__language-chevron {
+    font-size: 12px;
+    line-height: 1;
+    transform: translateY(-1px);
+    transition: transform .2s ease;
+  }
+
+  .kcf__language-dropdown[open] .kcf__language-chevron {
+    transform: rotate(180deg) translateY(1px);
+  }
+
+  .kcf__language-panel {
+    position: absolute;
+    z-index: 9999;
+    inset-block-start: calc(100% + 8px);
+    inset-inline-start: 50%;
+    inset-block-start: auto;
+    inset-block-end: calc(100% + 8px);
+    inset-inline-end: auto;
+    transform: translateX(-50%);
+    width: max-content;
+    min-width: 220px;
+    max-width: min(280px, calc(100vw - 32px));
+    padding: 6px;
+    border: 1px solid rgba(0, 0, 0, .12);
+    border-radius: 10px;
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #111111 !important;
+    opacity: 1 !important;
+    box-shadow: 0 14px 34px rgba(0, 0, 0, .16);
+    overflow: hidden;
+    isolation: isolate;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .kcf__language-option {
+    appearance: none;
+    width: 100%;
+    display: grid;
+    grid-template-columns: auto auto 1fr;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 10px;
+    border: 0;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #111111 !important;
+    cursor: pointer;
+    text-align: left;
+    font: inherit;
+    font-size: 13px;
+    line-height: 1.15;
+    letter-spacing: .02em;
+    text-transform: none;
+  }
+
+  .kcf__language-option:hover,
+  .kcf__language-option.is-active {
+    color: #111111;
+    background: rgba(0,0,0,.06);
+  }
+
+  .kcf__language-code {
+    min-width: 28px;
+    font-size: 12px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .kcf__language-name {
+    justify-self: start;
+    opacity: .72;
+    letter-spacing: .01em;
+    text-transform: none;
+  }
+
+  .kcf__language-flag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    font-size: 16px;
+    line-height: 1;
+    letter-spacing: 0;
+  }
+
+  @media screen and (max-width: 820px) {
+    .kcf__language-panel {
+      min-width: 220px;
+      max-width: calc(100vw - 36px);
+    }
+
+    .kcf__language-summary {
+      min-width: 108px;
+    }
+  }
+
+  .kcf__country {
+    height: auto;
+    min-height: 0;
+    padding: 0;
+    border: 0;
+    cursor: pointer;
+  }
+
+  .kcf__social-icon { width: 18px; height: 18px; object-fit: contain; display: block; }
+
+  .kcf__trust { justify-content: flex-start; }
+  .kcf__trust a,
+  .kcf__trust-static {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 28px;
+  }
+
+  .kcf__trust-image {
+    width: var(--badge-width, 96px);
+    max-width: 160px;
+    height: auto;
+    max-height: 34px;
+    object-fit: contain;
+    display: block;
+  }
+
+  .kcf__trust-text {
+    padding: 7px 10px;
+    border: 1px solid var(--kcf-border);
+    color: var(--kcf-muted);
+    font-size: 10px;
+    line-height: 1;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+
+  .kcf__payments {
+    justify-content: flex-end;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    gap: 6px;
+  }
+
+  .kcf__payments li { display: inline-flex; }
+  .kcf__payment-icon { width: 34px; height: 22px; display: block; }
+
+  .kcf__mono-target {
+    transition: filter .28s ease, opacity .28s ease;
+  }
+
+  .kcf--mono-logos .kcf__mono-target {
+    filter: grayscale(1) saturate(0) contrast(1.05);
+    opacity: var(--kcf-mono-opacity, .72);
+  }
+
+  .kcf--mono-logos .kcf__trust a:hover .kcf__mono-target,
+  .kcf--mono-logos .kcf__trust-static:hover .kcf__mono-target,
+  .kcf--mono-logos .kcf__payments li:hover .kcf__mono-target {
+    filter: none;
+    opacity: 1;
+  }
+
+  .kcf__bottom-row { align-items: flex-start; }
+  .kcf__brand-text { max-width: 520px; }
+  .kcf__copyright { justify-content: flex-end; color: var(--kcf-muted); }
+
+  @media screen and (max-width: 820px) {
+    .kcf__inner {
+      padding: var(--kcf-padding-top-mobile, 30px) 18px var(--kcf-padding-bottom-mobile, 20px);
+    }
+
+    .kcf__brand-row { margin-bottom: 24px; }
+    .kcf__logo-image, .kcf__logo-svg { width: var(--kcf-logo-width-mobile, 96px); }
+
+    .kcf__desktop-grid { display: none; }
+    .kcf__mobile-layout { display: block; }
+
+    .kcf__newsletter--mobile { margin-bottom: 20px; }
+    .kcf__newsletter--mobile .kcf__text { max-width: 340px; }
+    .kcf__form { margin-top: 16px; grid-template-columns: minmax(0, 1fr) auto; }
+    .kcf__input, .kcf__button { height: 40px; }
+    .kcf__button { padding: 0 15px; }
+
+    .kcf__mobile-nav {
+      border-top: 1px solid var(--kcf-soft-border);
+      border-bottom: 1px solid var(--kcf-soft-border);
+    }
+
+    .kcf__accordion + .kcf__accordion { border-top: 1px solid var(--kcf-soft-border); }
+    .kcf__summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      min-height: 54px;
+      cursor: pointer;
+      list-style: none;
+      font-size: 12px;
+      line-height: 1.2;
+      font-weight: 500;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+
+    .kcf__summary::-webkit-details-marker { display: none; }
+
+    .kcf__plus {
+      position: relative;
+      width: 12px;
+      height: 12px;
+      flex: 0 0 auto;
+    }
+
+    .kcf__plus::before,
+    .kcf__plus::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: currentColor;
+      transition: transform .25s ease;
+    }
+
+    .kcf__plus::after { transform: rotate(90deg); }
+    .kcf__accordion[open] .kcf__plus::after { transform: rotate(0deg); }
+
+    .kcf__accordion-content {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 18px;
+      padding: 2px 0 18px;
+    }
+
+    .kcf__link-list { gap: 9px; }
+    .kcf__link-list a { font-size: 13px; line-height: 1.34; }
+
+    .kcf__utility-row,
+    .kcf__trust-payment-row,
+    .kcf__social-row,
+    .kcf__bottom-row {
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      gap: 16px;
+    }
+
+    .kcf__utility-row { margin-top: 20px; padding-top: 18px; border-top: 0; }
+    .kcf__trust-payment-row { margin-top: 16px; padding-top: 16px; }
+    .kcf__social-row { margin-top: 14px; padding-top: 14px; }
+    .kcf__bottom-row { margin-top: 16px; padding-top: 16px; }
+
+    .kcf__social-row,
+    .kcf__socials,
+    .kcf__language-form,
+    .kcf__trust,
+    .kcf__payments,
+    .kcf__mini-legal,
+    .kcf__copyright {
+      justify-content: center;
+    }
+
+    .kcf__trust-payment-row { gap: 14px; }
+    .kcf__payments { max-width: 270px; }
+    .kcf__payment-icon { width: 32px; height: 20px; }
+    .kcf__trust-image { max-height: 30px; }
+    .kcf__brand-text { max-width: 310px; }
+    .kcf__copyright { flex-direction: column; gap: 10px; }
+
+    .kcf--social-left .kcf__social-row,
+    .kcf--trust-left .kcf__trust-payment-row,
+    .kcf--utility-left .kcf__utility-row { align-items: flex-start; text-align: left; }
+
+    .kcf--social-center .kcf__social-row,
+    .kcf--trust-center .kcf__trust-payment-row,
+    .kcf--utility-center .kcf__utility-row { align-items: center; text-align: center; }
+
+    .kcf--social-right .kcf__social-row,
+    .kcf--trust-right .kcf__trust-payment-row,
+    .kcf--utility-right .kcf__utility-row { align-items: flex-end; text-align: right; }
+
+    .kcf--brand-left .kcf__bottom-row { align-items: flex-start; text-align: left; }
+    .kcf--brand-center .kcf__bottom-row { align-items: center; text-align: center; }
+    .kcf--brand-right .kcf__bottom-row { align-items: flex-end; text-align: right; }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Kauffman compact footer",
+  "tag": "section",
+  "class": "section-kauffman-compact-footer",
+  "settings": [
+    { "type": "color_scheme", "id": "color_scheme", "label": "Color scheme", "default": "scheme-1" },
+    { "type": "header", "content": "Brand" },
+    { "type": "image_picker", "id": "footer_logo", "label": "Footer logo" },
+    { "type": "text", "id": "logo_alt", "label": "Logo alt text", "default": "KAUFFMAN" },
+    { "type": "text", "id": "logo_text", "label": "Fallback logo text", "default": "KAUFFMAN" },
+    { "type": "range", "id": "logo_width_desktop", "label": "Logo width desktop", "min": 100, "max": 400, "step": 5, "unit": "px", "default": 140 },
+    { "type": "range", "id": "logo_width_mobile", "label": "Logo width mobile", "min": 200, "max": 300, "step": 1, "unit": "px", "default": 260 },
+    { "type": "text", "id": "logo_compact_text", "label": "Compact text under logo", "default": "Premium Accessories & Tech" },
+    { "type": "text", "id": "brand_text", "label": "Brand text", "default": "Designed and printed in Romania using imported components." },
+    { "type": "select", "id": "logo_alignment_desktop", "label": "Logo alignment desktop", "options": [ { "value": "left", "label": "Left" }, { "value": "center", "label": "Center" }, { "value": "right", "label": "Right" } ], "default": "center" },
+    { "type": "select", "id": "logo_alignment_mobile", "label": "Logo alignment mobile", "options": [ { "value": "left", "label": "Left" }, { "value": "center", "label": "Center" }, { "value": "right", "label": "Right" } ], "default": "center" },
+    { "type": "select", "id": "brand_text_alignment", "label": "Brand text alignment", "options": [ { "value": "left", "label": "Left" }, { "value": "center", "label": "Center" }, { "value": "right", "label": "Right" } ], "default": "center" },
+
+    { "type": "header", "content": "Newsletter" },
+    { "type": "checkbox", "id": "show_newsletter", "label": "Show newsletter", "default": true },
+    { "type": "text", "id": "newsletter_title", "label": "Newsletter title", "default": "Private Sale" },
+    { "type": "textarea", "id": "newsletter_text", "label": "Newsletter text", "default": "Sign up to receive access to private drops and member benefits." },
+    { "type": "text", "id": "email_placeholder", "label": "Email placeholder", "default": "E-mail address" },
+    { "type": "text", "id": "newsletter_button_label", "label": "Button label", "default": "Join" },
+    { "type": "select", "id": "newsletter_button_style", "label": "Button style", "options": [ { "value": "primary", "label": "Primary" }, { "value": "secondary", "label": "Secondary" } ], "default": "secondary" },
+    { "type": "text", "id": "success_message", "label": "Success message", "default": "Thank you for subscribing." },
+
+    { "type": "header", "content": "Navigation" },
+    { "type": "text", "id": "catalogue_heading", "label": "Catalogue heading", "default": "Catalogue" },
+    { "type": "link_list", "id": "catalogue_menu", "label": "Catalogue menu" },
+    { "type": "text", "id": "help_heading", "label": "Help heading", "default": "Help" },
+    { "type": "link_list", "id": "help_menu", "label": "Help menu" },
+    { "type": "text", "id": "company_heading", "label": "Company heading", "default": "Company" },
+    { "type": "link_list", "id": "company_menu", "label": "Company menu" },
+    { "type": "text", "id": "legal_heading", "label": "Legal heading", "default": "Legal" },
+    { "type": "link_list", "id": "legal_menu", "label": "Legal menu" },
+    { "type": "text", "id": "shop_delivery_mobile_heading", "label": "Mobile Shop & Delivery heading", "default": "Shop & Delivery" },
+    { "type": "text", "id": "legal_info_mobile_heading", "label": "Mobile Legal Info heading", "default": "Legal Info" },
+
+    { "type": "header", "content": "Localization" },
+    { "type": "checkbox", "id": "show_language_selector", "label": "Show language selector", "default": true },
+    { "type": "select", "id": "language_selector_style", "label": "Language selector style", "options": [ { "value": "buttons", "label": "Buttons" }, { "value": "dropdown", "label": "Dropdown" } ], "default": "buttons" },
+    { "type": "checkbox", "id": "show_language_flags", "label": "Show language flags", "default": true },
+    { "type": "checkbox", "id": "show_country_selector", "label": "Show country selector", "default": false },
+    { "type": "select", "id": "utility_alignment", "label": "Language / country alignment", "options": [ { "value": "left", "label": "Left" }, { "value": "center", "label": "Center" }, { "value": "right", "label": "Right" } ], "default": "center" },
+
+    { "type": "header", "content": "Social links" },
+    { "type": "text", "id": "social_label", "label": "Social label", "default": "Follow us" },
+    { "type": "select", "id": "social_alignment", "label": "Social section alignment", "options": [ { "value": "left", "label": "Left" }, { "value": "center", "label": "Center" }, { "value": "right", "label": "Right" } ], "default": "center" },
+
+    { "type": "header", "content": "Compliance badges" },
+    { "type": "checkbox", "id": "show_anpc_sal", "label": "Show ANPC SAL badge", "default": true },
+    { "type": "image_picker", "id": "anpc_sal_logo", "label": "ANPC SAL logo" },
+    { "type": "text", "id": "anpc_sal_label", "label": "ANPC SAL accessible label", "default": "ANPC SAL" },
+    { "type": "url", "id": "anpc_sal_url", "label": "ANPC SAL URL" },
+    { "type": "range", "id": "anpc_sal_width", "label": "ANPC SAL logo width", "min": 40, "max": 260, "step": 4, "unit": "px", "default": 112 },
+    { "type": "checkbox", "id": "show_odr", "label": "Show ODR badge", "default": true },
+    { "type": "image_picker", "id": "odr_logo", "label": "ODR logo" },
+    { "type": "text", "id": "odr_label", "label": "ODR accessible label", "default": "ODR" },
+    { "type": "url", "id": "odr_url", "label": "ODR URL" },
+    { "type": "range", "id": "odr_width", "label": "ODR logo width", "min": 40, "max": 260, "step": 4, "unit": "px", "default": 88 },
+    { "type": "select", "id": "trust_payment_alignment", "label": "Trust and payment alignment", "options": [ { "value": "left", "label": "Left" }, { "value": "center", "label": "Center" }, { "value": "right", "label": "Right" } ], "default": "center" },
+
+    { "type": "header", "content": "Logo color treatment" },
+    { "type": "checkbox", "id": "enable_monochrome_logos", "label": "Show trust and payment logos in monochrome until hover", "default": true },
+    { "type": "range", "id": "monochrome_opacity", "label": "Monochrome logo opacity", "min": 30, "max": 100, "step": 1, "unit": "%", "default": 72 },
+
+    { "type": "header", "content": "Payments" },
+    { "type": "checkbox", "id": "show_payment_icons", "label": "Show payment icons", "default": true },
+    { "type": "text", "id": "payment_icons", "label": "Payment icons", "default": "visa,master,maestro,apple_pay,google_pay,paypal", "info": "Comma-separated Shopify payment types. Example: visa,master,maestro,apple_pay,google_pay,paypal,shopify_pay" },
+
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding_top_desktop", "label": "Top padding desktop", "min": 24, "max": 100, "step": 4, "unit": "px", "default": 48 },
+    { "type": "range", "id": "padding_bottom_desktop", "label": "Bottom padding desktop", "min": 16, "max": 80, "step": 4, "unit": "px", "default": 24 },
+    { "type": "range", "id": "padding_top_mobile", "label": "Top padding mobile", "min": 20, "max": 80, "step": 4, "unit": "px", "default": 32 },
+    { "type": "range", "id": "padding_bottom_mobile", "label": "Bottom padding mobile", "min": 16, "max": 64, "step": 4, "unit": "px", "default": 20 }
+  ],
+  "blocks": [
+    {
+      "type": "social_link",
+      "name": "Social link",
+      "settings": [
+        {
+          "type": "select",
+          "id": "social_type",
+          "label": "Social type",
+          "options": [
+            { "value": "instagram", "label": "Instagram" },
+            { "value": "tiktok", "label": "TikTok" },
+            { "value": "facebook", "label": "Facebook" },
+            { "value": "youtube", "label": "YouTube" },
+            { "value": "pinterest", "label": "Pinterest" },
+            { "value": "custom", "label": "Custom" }
+          ],
+          "default": "instagram"
+        },
+        { "type": "text", "id": "label", "label": "Label", "default": "Instagram" },
+        { "type": "url", "id": "url", "label": "URL" },
+        { "type": "image_picker", "id": "custom_icon", "label": "Custom icon" }
+      ]
+    },
+    {
+      "type": "trust_badge",
+      "name": "Trust badge",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Badge image" },
+        { "type": "text", "id": "label", "label": "Accessible label", "default": "Trust badge" },
+        { "type": "url", "id": "url", "label": "URL" },
+        { "type": "range", "id": "width", "label": "Badge width", "min": 40, "max": 300, "step": 4, "unit": "px", "default": 96 }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Kauffman compact footer",
+      "blocks": [
+        { "type": "social_link", "settings": { "social_type": "instagram", "label": "Instagram" } },
+        { "type": "social_link", "settings": { "social_type": "tiktok", "label": "TikTok" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

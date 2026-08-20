@@ -1,0 +1,1771 @@
+{% liquid
+  assign section_id = 'KauffmanBrandStory-' | append: section.id
+  assign section_anchor_id = section.settings.anchor_id | strip | handleize
+  assign has_story_blocks = false
+
+  for block in section.blocks
+    if block.type == 'heading' or block.type == 'intro' or block.type == 'manifesto' or block.type == 'lifestyle' or block.type == 'closing'
+      assign has_story_blocks = true
+      break
+    endif
+  endfor
+%}
+
+{% if section_anchor_id != blank %}
+  <span id="{{ section_anchor_id }}" class="kf-brand-story__anchor" aria-hidden="true"></span>
+{% endif %}
+
+<section
+  id="{{ section_id }}"
+  class="
+    kf-brand-story
+    kf-brand-story--layout-{{ section.settings.section_width }}
+    {% if section.settings.show_top_border %}kf-brand-story--top-border{% endif %}
+    {% if section.settings.show_bottom_border %}kf-brand-story--bottom-border{% endif %}
+    {% if section.settings.enable_reveal %}kf-brand-story--reveal{% endif %}
+  "
+>
+  <div class="kf-brand-story__inner">
+    {% if has_story_blocks %}
+      {% for block in section.blocks %}
+        {% case block.type %}
+          {% when 'heading' %}
+            {% if block.settings.heading != blank %}
+              <h2 class="kf-brand-story__section-heading" {% if section.settings.enable_reveal %}data-kf-reveal{% endif %} {{ block.shopify_attributes }}>
+                {{ block.settings.heading }}
+              </h2>
+            {% endif %}
+
+          {% when 'intro' %}
+            <div class="kf-brand-story__intro" {% if section.settings.enable_reveal %}data-kf-reveal{% endif %} {{ block.shopify_attributes }}>
+              {% if block.settings.eyebrow != blank %}
+                <p class="kf-brand-story__eyebrow">
+                  {{ block.settings.eyebrow }}
+                </p>
+              {% endif %}
+
+              {% if block.settings.headline_line_1 != blank or block.settings.headline_line_2 != blank or block.settings.headline_accent != blank %}
+                <h2 class="kf-brand-story__headline">
+                  {% if block.settings.headline_line_1 != blank %}
+                    <span>{{ block.settings.headline_line_1 }}</span>
+                  {% endif %}
+
+                  {% if block.settings.headline_line_2 != blank %}
+                    <span>{{ block.settings.headline_line_2 }}</span>
+                  {% endif %}
+
+                  {% if block.settings.headline_accent != blank %}
+                    <span><em>{{ block.settings.headline_accent }}</em></span>
+                  {% endif %}
+                </h2>
+              {% endif %}
+
+              {% if block.settings.intro_text != blank %}
+                <div class="kf-brand-story__intro-text rte">
+                  {{ block.settings.intro_text }}
+                </div>
+              {% endif %}
+            </div>
+
+          {% when 'manifesto' %}
+            <div class="kf-brand-story__manifesto" {% if section.settings.enable_reveal %}data-kf-reveal{% endif %} {{ block.shopify_attributes }}>
+              <div class="kf-brand-story__manifesto-lines">
+                {% for line_block in section.blocks %}
+                  {% if line_block.type == 'manifesto_line' %}
+                    {% if line_block.settings.line_text != blank or line_block.settings.line_style == 'spacer' %}
+                      {% if line_block.settings.line_style == 'spacer' %}
+                        <span class="kf-brand-story__manifesto-line kf-brand-story__manifesto-line--spacer" {{ line_block.shopify_attributes }}></span>
+                      {% else %}
+                        <span
+                          class="
+                            kf-brand-story__manifesto-line
+                            kf-brand-story__manifesto-line--{{ line_block.settings.line_style }}
+                          "
+                          {{ line_block.shopify_attributes }}
+                        >
+                          {{ line_block.settings.line_text }}
+                        </span>
+                      {% endif %}
+                    {% endif %}
+                  {% endif %}
+                {% endfor %}
+              </div>
+            </div>
+
+          {% when 'lifestyle' %}
+            {% if block.settings.text != blank %}
+              <div class="kf-brand-story__lifestyle" {% if section.settings.enable_reveal %}data-kf-reveal{% endif %} {{ block.shopify_attributes }}>
+                <div class="kf-brand-story__lifestyle-text rte">
+                  {{ block.settings.text }}
+                </div>
+              </div>
+            {% endif %}
+
+          {% when 'closing' %}
+            <div class="kf-brand-story__closing" {% if section.settings.enable_reveal %}data-kf-reveal{% endif %} {{ block.shopify_attributes }}>
+              <div class="kf-brand-story__closing-copy">
+                {% if block.settings.tag != blank %}
+                  <p class="kf-brand-story__closing-tag">
+                    {{ block.settings.tag }}
+                  </p>
+                {% endif %}
+
+                {% if block.settings.line_1 != blank or block.settings.accent_1 != blank or block.settings.accent_2 != blank %}
+                  <h3 class="kf-brand-story__closing-headline">
+                    {% if block.settings.line_1 != blank %}
+                      <span>{{ block.settings.line_1 }}</span>
+                    {% endif %}
+
+                    {% if block.settings.accent_1 != blank %}
+                      <span><em>{{ block.settings.accent_1 }}</em></span>
+                    {% endif %}
+
+                    {% if block.settings.accent_2 != blank %}
+                      <span class="kf-brand-story__closing-accent-2"><em>{{ block.settings.accent_2 }}</em></span>
+                    {% endif %}
+                  </h3>
+                {% endif %}
+
+                {% if block.settings.cta_label != blank and block.settings.cta_link != blank %}
+                  <a class="kf-brand-story__cta" href="{{ block.settings.cta_link }}">
+                    {{ block.settings.cta_label }}
+                  </a>
+                {% endif %}
+              </div>
+
+              {% if block.settings.show_mark and block.settings.mark != blank %}
+                <div
+                  class="
+                    kf-brand-story__closing-mark
+                    {% if block.settings.hide_mark_mobile %}kf-brand-story__closing-mark--hide-mobile{% endif %}
+                  "
+                  aria-hidden="true"
+                >
+                  {{ block.settings.mark }}
+                </div>
+              {% endif %}
+            </div>
+        {% endcase %}
+      {% endfor %}
+    {% else %}
+      {% if section.settings.section_heading != blank %}
+        <h2 class="kf-brand-story__section-heading" {% if section.settings.enable_reveal %}data-kf-reveal{% endif %}>
+          {{ section.settings.section_heading }}
+        </h2>
+      {% endif %}
+
+      <div class="kf-brand-story__intro" {% if section.settings.enable_reveal %}data-kf-reveal{% endif %}>
+        {% if section.settings.eyebrow != blank %}
+          <p class="kf-brand-story__eyebrow">
+            {{ section.settings.eyebrow }}
+          </p>
+        {% endif %}
+
+        {% if section.settings.headline_line_1 != blank or section.settings.headline_line_2 != blank or section.settings.headline_accent != blank %}
+          <h2 class="kf-brand-story__headline">
+            {% if section.settings.headline_line_1 != blank %}
+              <span>{{ section.settings.headline_line_1 }}</span>
+            {% endif %}
+
+            {% if section.settings.headline_line_2 != blank %}
+              <span>{{ section.settings.headline_line_2 }}</span>
+            {% endif %}
+
+            {% if section.settings.headline_accent != blank %}
+              <span><em>{{ section.settings.headline_accent }}</em></span>
+            {% endif %}
+          </h2>
+        {% endif %}
+
+        {% if section.settings.intro_text != blank %}
+          <div class="kf-brand-story__intro-text rte">
+            {{ section.settings.intro_text }}
+          </div>
+        {% endif %}
+      </div>
+
+      {% if section.settings.show_manifesto %}
+        <div class="kf-brand-story__manifesto" {% if section.settings.enable_reveal %}data-kf-reveal{% endif %}>
+          <div class="kf-brand-story__manifesto-lines">
+            {% for block in section.blocks %}
+              {% if block.type == 'manifesto_line' %}
+                {% if block.settings.line_text != blank or block.settings.line_style == 'spacer' %}
+                  {% if block.settings.line_style == 'spacer' %}
+                    <span class="kf-brand-story__manifesto-line kf-brand-story__manifesto-line--spacer" {{ block.shopify_attributes }}></span>
+                  {% else %}
+                    <span
+                      class="
+                        kf-brand-story__manifesto-line
+                        kf-brand-story__manifesto-line--{{ block.settings.line_style }}
+                      "
+                      {{ block.shopify_attributes }}
+                    >
+                      {{ block.settings.line_text }}
+                    </span>
+                  {% endif %}
+                {% endif %}
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+
+      {% if section.settings.show_lifestyle and section.settings.lifestyle_text != blank %}
+        <div class="kf-brand-story__lifestyle" {% if section.settings.enable_reveal %}data-kf-reveal{% endif %}>
+          <div class="kf-brand-story__lifestyle-text rte">
+            {{ section.settings.lifestyle_text }}
+          </div>
+        </div>
+      {% endif %}
+
+      {% if section.settings.show_closing %}
+        <div class="kf-brand-story__closing" {% if section.settings.enable_reveal %}data-kf-reveal{% endif %}>
+          <div class="kf-brand-story__closing-copy">
+            {% if section.settings.closing_tag != blank %}
+              <p class="kf-brand-story__closing-tag">
+                {{ section.settings.closing_tag }}
+              </p>
+            {% endif %}
+
+            {% if section.settings.closing_line_1 != blank or section.settings.closing_accent_1 != blank or section.settings.closing_accent_2 != blank %}
+              <h3 class="kf-brand-story__closing-headline">
+                {% if section.settings.closing_line_1 != blank %}
+                  <span>{{ section.settings.closing_line_1 }}</span>
+                {% endif %}
+
+                {% if section.settings.closing_accent_1 != blank %}
+                  <span><em>{{ section.settings.closing_accent_1 }}</em></span>
+                {% endif %}
+
+                {% if section.settings.closing_accent_2 != blank %}
+                  <span class="kf-brand-story__closing-accent-2"><em>{{ section.settings.closing_accent_2 }}</em></span>
+                {% endif %}
+              </h3>
+            {% endif %}
+
+            {% if section.settings.cta_label != blank and section.settings.cta_link != blank %}
+              <a class="kf-brand-story__cta" href="{{ section.settings.cta_link }}">
+                {{ section.settings.cta_label }}
+              </a>
+            {% endif %}
+          </div>
+
+          {% if section.settings.show_closing_mark and section.settings.closing_mark != blank %}
+            <div
+              class="
+                kf-brand-story__closing-mark
+                {% if section.settings.hide_closing_mark_mobile %}kf-brand-story__closing-mark--hide-mobile{% endif %}
+              "
+              aria-hidden="true"
+            >
+              {{ section.settings.closing_mark }}
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+    {% endif %}
+
+    {% if section.settings.right_logo != blank %}
+      <div
+        class="kf-brand-story__side-logo {% if section.settings.hide_right_logo_mobile %}kf-brand-story__side-logo--hide-mobile{% endif %}"
+        {% if section.settings.enable_reveal %}data-kf-reveal{% endif %}
+        aria-hidden="true"
+      >
+        {{
+          section.settings.right_logo
+          | image_url: width: 900
+          | image_tag:
+            class: 'kf-brand-story__side-logo-image',
+            loading: 'lazy',
+            widths: '160, 240, 320, 480, 640, 900',
+            sizes: '(min-width: 990px) 24vw, 220px'
+        }}
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% style %}
+  #shopify-section-{{ section.id }},
+  #{{ section_id }}.kf-brand-story {
+    background-color: #fff !important;
+    background-image: none !important;
+  }
+
+  .kf-brand-story__anchor {
+    display: block;
+    height: 0;
+    scroll-margin-top: calc(var(--header-group-height, var(--header-height, 80px)) + 16px);
+  }
+
+  #{{ section_id }} {
+    --kf-brand-story-accent: {{ section.settings.accent_color }};
+    --kf-brand-story-border: {{ section.settings.border_color }};
+    --kf-brand-story-max-width: {{ section.settings.max_width }}px;
+    --kf-brand-story-main-column-width: {{ section.settings.main_column_width }}px;
+    --kf-brand-story-grid-gap: {{ section.settings.desktop_column_gap }}px;
+    --kf-brand-story-right-logo-width: {{ section.settings.right_logo_width }}px;
+    --kf-brand-story-right-logo-opacity: {{ section.settings.right_logo_opacity | divided_by: 100.0 }};
+
+
+    --kf-brand-story-desktop-padding-top: {{ section.settings.desktop_padding_top }}px;
+    --kf-brand-story-desktop-padding-bottom: {{ section.settings.desktop_padding_bottom }}px;
+    --kf-brand-story-mobile-padding-top: {{ section.settings.mobile_padding_top }}px;
+    --kf-brand-story-mobile-padding-bottom: {{ section.settings.mobile_padding_bottom }}px;
+
+    --kf-brand-story-gap-intro-manifesto-desktop: {{ section.settings.gap_intro_manifesto_desktop }}px;
+    --kf-brand-story-gap-manifesto-lifestyle-desktop: {{ section.settings.gap_manifesto_lifestyle_desktop }}px;
+    --kf-brand-story-gap-lifestyle-closing-desktop: {{ section.settings.gap_lifestyle_closing_desktop }}px;
+
+    --kf-brand-story-gap-intro-manifesto-mobile: {{ section.settings.gap_intro_manifesto_mobile }}px;
+    --kf-brand-story-gap-manifesto-lifestyle-mobile: {{ section.settings.gap_manifesto_lifestyle_mobile }}px;
+    --kf-brand-story-gap-lifestyle-closing-mobile: {{ section.settings.gap_lifestyle_closing_mobile }}px;
+
+    --kf-brand-story-eyebrow-desktop: {{ section.settings.eyebrow_size_desktop | times: 0.8 }}px;
+    --kf-brand-story-eyebrow-mobile: {{ section.settings.eyebrow_size_mobile | times: 0.8 }}px;
+    --kf-brand-story-headline-desktop: {{ section.settings.headline_size_desktop | times: 0.8 }}px;
+    --kf-brand-story-headline-mobile: {{ section.settings.headline_size_mobile | times: 0.8 }}px;
+    --kf-brand-story-body-desktop: {{ section.settings.body_size_desktop | times: 0.8 }}px;
+    --kf-brand-story-body-mobile: {{ section.settings.body_size_mobile | times: 0.8 }}px;
+    --kf-brand-story-manifesto-desktop: {{ section.settings.manifesto_size_desktop | times: 0.8 }}px;
+    --kf-brand-story-manifesto-mobile: {{ section.settings.manifesto_size_mobile | times: 0.8 }}px;
+    --kf-brand-story-lifestyle-desktop: {{ section.settings.lifestyle_size_desktop | times: 0.8 }}px;
+    --kf-brand-story-lifestyle-mobile: {{ section.settings.lifestyle_size_mobile | times: 0.8 }}px;
+    --kf-brand-story-closing-desktop: {{ section.settings.closing_size_desktop | times: 0.8 }}px;
+    --kf-brand-story-closing-mobile: {{ section.settings.closing_size_mobile | times: 0.8 }}px;
+    --kf-brand-story-cta-desktop: {{ section.settings.cta_size_desktop | times: 0.8 }}px;
+    --kf-brand-story-cta-mobile: {{ section.settings.cta_size_mobile | times: 0.8 }}px;
+    --kf-brand-story-mark-opacity: {{ section.settings.mark_opacity | divided_by: 100.0 }};
+
+    position: relative;
+    overflow: hidden;
+    background: rgb(var(--color-background, 247, 245, 241));
+    color: rgb(var(--color-foreground, 17, 17, 17));
+    font-family: 'Inter', sans-serif;
+  }
+
+  #{{ section_id }}.kf-brand-story--top-border {
+    border-top: 1px solid var(--kf-brand-story-border);
+  }
+
+  #{{ section_id }}.kf-brand-story--bottom-border {
+    border-bottom: 1px solid var(--kf-brand-story-border);
+  }
+
+  #{{ section_id }} .kf-brand-story__inner {
+    position: relative;
+    margin: 0 auto;
+    padding-top: var(--kf-brand-story-desktop-padding-top);
+    padding-bottom: var(--kf-brand-story-desktop-padding-bottom);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(320px, var(--kf-brand-story-main-column-width)) minmax(0, 1fr);
+    column-gap: var(--kf-brand-story-grid-gap);
+    align-items: start;
+  }
+
+  #{{ section_id }} .kf-brand-story__inner > :not(.kf-brand-story__side-logo) {
+    grid-column: 2;
+  }
+
+  @media (min-width: 821px) {
+    #{{ section_id }} .kf-brand-story__inner > :not(.kf-brand-story__side-logo) {
+      justify-self: center;
+      width: 100%;
+    }
+
+    #{{ section_id }} .kf-brand-story__manifesto-lines {
+      margin-left: auto;
+      margin-right: auto;
+      width: 100%;
+    }
+  }
+
+  #{{ section_id }} .kf-brand-story__side-logo {
+    grid-column: 3;
+    grid-row: 1 / span 6;
+    align-self: {{ section.settings.right_logo_vertical_position }};
+    justify-self: {{ section.settings.right_logo_horizontal_position }};
+    width: min(100%, var(--kf-brand-story-right-logo-width));
+    opacity: var(--kf-brand-story-right-logo-opacity);
+    pointer-events: none;
+    user-select: none;
+  }
+
+  #{{ section_id }} .kf-brand-story__side-logo-image {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  #{{ section_id }}.kf-brand-story--layout-page-width .kf-brand-story__inner {
+    width: min(100% - 40px, var(--kf-brand-story-max-width));
+  }
+
+  #{{ section_id }}.kf-brand-story--layout-full-width .kf-brand-story__inner {
+    width: 100%;
+    max-width: none;
+    padding-left: clamp(20px, 6vw, 96px);
+    padding-right: clamp(20px, 6vw, 96px);
+  }
+
+  #{{ section_id }} .kf-brand-story__intro + .kf-brand-story__manifesto {
+    margin-top: var(--kf-brand-story-gap-intro-manifesto-desktop);
+  }
+
+  #{{ section_id }} .kf-brand-story__manifesto + .kf-brand-story__lifestyle {
+    margin-top: var(--kf-brand-story-gap-manifesto-lifestyle-desktop);
+  }
+
+  #{{ section_id }} .kf-brand-story__lifestyle + .kf-brand-story__closing {
+    margin-top: var(--kf-brand-story-gap-lifestyle-closing-desktop);
+  }
+
+  #{{ section_id }} .kf-brand-story__intro + .kf-brand-story__lifestyle {
+    margin-top: var(--kf-brand-story-gap-intro-manifesto-desktop);
+  }
+
+  #{{ section_id }} .kf-brand-story__manifesto + .kf-brand-story__closing {
+    margin-top: var(--kf-brand-story-gap-manifesto-lifestyle-desktop);
+  }
+
+  #{{ section_id }} .kf-brand-story__intro + .kf-brand-story__closing {
+    margin-top: var(--kf-brand-story-gap-intro-manifesto-desktop);
+  }
+
+  #{{ section_id }} .kf-brand-story__intro {
+    position: relative;
+    z-index: 2;
+    max-width: 860px;
+  }
+
+  #{{ section_id }} .kf-brand-story__section-heading {
+    position: relative;
+    z-index: 2;
+    margin: 0 0 28px;
+    font-family: 'Inter', sans-serif;
+    font-size: calc(var(--kf-brand-story-body-desktop) + 5px);
+    text-align: center;
+    line-height: 2.5;
+    font-weight: 400;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--kf-brand-story-accent);
+  }
+
+  #{{ section_id }} .kf-brand-story__eyebrow,
+  #{{ section_id }} .kf-brand-story__closing-tag {
+    margin: 0 0 22px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: var(--kf-brand-story-eyebrow-desktop);
+    line-height: 1.4;
+    font-weight: 400;
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    color: var(--kf-brand-story-accent);
+  }
+
+  #{{ section_id }} .kf-brand-story__eyebrow {
+    justify-content: center;
+    text-align: center;
+  }
+
+  #{{ section_id }} .kf-brand-story__eyebrow::before,
+  #{{ section_id }} .kf-brand-story__closing-tag::before {
+    content: '';
+    display: block;
+    width: 32px;
+    height: 1px;
+    flex: 0 0 32px;
+    background: currentColor;
+  }
+
+  #{{ section_id }} .kf-brand-story__headline {
+    margin: 0;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(
+      var(--kf-brand-story-headline-mobile),
+      7.4vw,
+      var(--kf-brand-story-headline-desktop)
+    );
+    font-weight: 300;
+    line-height: 0.9;
+    text-align: center;
+    letter-spacing: -0.035em;
+    color: rgb(var(--color-foreground, 17, 17, 17));
+  }
+
+  #{{ section_id }} .kf-brand-story__headline span {
+    display: block;
+  }
+
+  #{{ section_id }} .kf-brand-story__headline em,
+  #{{ section_id }} .kf-brand-story__closing-headline em {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 300;
+    color: var(--kf-brand-story-accent);
+  }
+
+  #{{ section_id }} .kf-brand-story__intro-text {
+    max-width: {{ section.settings.intro_text_max_width }}px;
+    margin-top: 30px;
+    font-family: 'Inter', sans-serif;
+    font-size: var(--kf-brand-story-body-desktop);
+    line-height: 1.8;
+    font-weight: 300;
+    letter-spacing: 0.01em;
+    color: rgba(var(--color-foreground, 17, 17, 17), 0.74);
+  }
+
+  #{{ section_id }} .kf-brand-story__intro-text p,
+  #{{ section_id }} .kf-brand-story__lifestyle-text p {
+    margin: 0;
+  }
+
+  #{{ section_id }} .kf-brand-story__intro-text p + p,
+  #{{ section_id }} .kf-brand-story__lifestyle-text p + p {
+    margin-top: 12px;
+  }
+
+  #{{ section_id }} .kf-brand-story__manifesto {
+    position: relative;
+    z-index: 2;
+    border-top: 1px solid var(--kf-brand-story-border);
+    border-bottom: 1px solid var(--kf-brand-story-border);
+    overflow: hidden;
+  }
+
+  #{{ section_id }} .kf-brand-story__manifesto-lines {
+    position: relative;
+    z-index: 2;
+    max-width: {{ section.settings.manifesto_max_width }}px;
+  }
+
+  #{{ section_id }} .kf-brand-story__manifesto-line {
+    display: block;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(
+      var(--kf-brand-story-manifesto-mobile),
+      3.1vw,
+      var(--kf-brand-story-manifesto-desktop)
+    );
+    font-weight: 300;
+    line-height: 1.42;
+    letter-spacing: -0.015em;
+    color: rgba(var(--color-foreground, 17, 17, 17), 0.72);
+  }
+
+  #{{ section_id }} .kf-brand-story__manifesto-line--strong {
+    color: rgb(var(--color-foreground, 17, 17, 17));
+  }
+
+  #{{ section_id }} .kf-brand-story__manifesto-line--accent {
+    color: var(--kf-brand-story-accent);
+    font-style: italic;
+  }
+
+  #{{ section_id }} .kf-brand-story__manifesto-line--muted {
+    color: rgba(var(--color-foreground, 17, 17, 17), 0.58);
+  }
+
+  #{{ section_id }} .kf-brand-story__manifesto-line--spacer {
+    height: 18px;
+  }
+
+  #{{ section_id }} .kf-brand-story__lifestyle {
+    position: relative;
+    z-index: 2;
+    max-width: {{ section.settings.lifestyle_max_width }}px;
+  }
+
+  #{{ section_id }} .kf-brand-story__lifestyle-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(
+      var(--kf-brand-story-lifestyle-mobile),
+      2.4vw,
+      var(--kf-brand-story-lifestyle-desktop)
+    );
+    font-weight: 300;
+    line-height: 1.55;
+    letter-spacing: -0.01em;
+    color: rgba(var(--color-foreground, 17, 17, 17), 0.74);
+  }
+
+  #{{ section_id }} .kf-brand-story__lifestyle-text em {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    color: var(--kf-brand-story-accent);
+  }
+
+  #{{ section_id }} .kf-brand-story__closing {
+    position: relative;
+    z-index: 2;
+    min-height: {{ section.settings.closing_min_height }}px;
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    padding-top: clamp(24px, 4vw, 64px);
+  }
+
+  #{{ section_id }} .kf-brand-story__closing-copy {
+    position: relative;
+    z-index: 2;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+  }
+
+  #{{ section_id }} .kf-brand-story__closing-tag {
+    justify-content: center;
+  }
+
+  #{{ section_id }} .kf-brand-story__closing-headline {
+    margin: 0;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(
+      var(--kf-brand-story-closing-mobile),
+      5vw,
+      var(--kf-brand-story-closing-desktop)
+    );
+    font-weight: 300;
+    line-height: 1.04;
+    letter-spacing: -0.025em;
+    color: rgb(var(--color-foreground, 17, 17, 17));
+  }
+
+  #{{ section_id }} .kf-brand-story__closing-headline span {
+    display: block;
+  }
+
+  #{{ section_id }} .kf-brand-story__closing-accent-2 {
+    text-align: center;
+  }
+
+  #{{ section_id }} .kf-brand-story__cta {
+    position: relative;
+    display: inline-flex;
+    width: fit-content;
+    margin-top: 34px;
+    margin-left: auto;
+    margin-right: auto;
+    text-decoration: none;
+  }
+
+  #{{ section_id }} .kf-brand-story__cta::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(1);
+    transform-origin: left;
+    transition: transform 320ms ease;
+  }
+
+  #{{ section_id }} .kf-brand-story__cta:hover::after {
+    transform: scaleX(0);
+    transform-origin: right;
+  }
+
+  #{{ section_id }} .kf-brand-story__closing-mark {
+    position: relative;
+    z-index: 1;
+    pointer-events: none;
+    user-select: none;
+    flex: 0 0 auto;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(120px, 18vw, 260px);
+    line-height: 0.75;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--kf-brand-story-accent);
+    opacity: var(--kf-brand-story-mark-opacity);
+  }
+
+  #{{ section_id }}.kf-brand-story--reveal [data-kf-reveal] {
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+      opacity 780ms ease,
+      transform 780ms ease;
+  }
+
+  #{{ section_id }}.kf-brand-story--reveal [data-kf-reveal].is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (max-width: 820px) {
+    #{{ section_id }} .kf-brand-story__inner {
+      padding-top: var(--kf-brand-story-mobile-padding-top);
+      padding-bottom: var(--kf-brand-story-mobile-padding-bottom);
+      display: block;
+    }
+
+    #{{ section_id }} .kf-brand-story__side-logo {
+      width: min(100%, {{ section.settings.right_logo_width_mobile }}px);
+      margin-top: {{ section.settings.right_logo_mobile_gap }}px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    #{{ section_id }} .kf-brand-story__side-logo--hide-mobile {
+      display: none;
+    }
+
+    #{{ section_id }}.kf-brand-story--layout-page-width .kf-brand-story__inner {
+      width: min(100% - 32px, var(--kf-brand-story-max-width));
+    }
+
+    #{{ section_id }}.kf-brand-story--layout-full-width .kf-brand-story__inner {
+      width: 100%;
+      padding-left: 16px;
+      padding-right: 16px;
+    }
+
+    #{{ section_id }} .kf-brand-story__intro + .kf-brand-story__manifesto {
+      margin-top: var(--kf-brand-story-gap-intro-manifesto-mobile);
+    }
+
+    #{{ section_id }} .kf-brand-story__manifesto + .kf-brand-story__lifestyle {
+      margin-top: var(--kf-brand-story-gap-manifesto-lifestyle-mobile);
+    }
+
+    #{{ section_id }} .kf-brand-story__lifestyle + .kf-brand-story__closing {
+      margin-top: var(--kf-brand-story-gap-lifestyle-closing-mobile);
+    }
+
+    #{{ section_id }} .kf-brand-story__intro + .kf-brand-story__lifestyle {
+      margin-top: var(--kf-brand-story-gap-intro-manifesto-mobile);
+    }
+
+    #{{ section_id }} .kf-brand-story__manifesto + .kf-brand-story__closing {
+      margin-top: var(--kf-brand-story-gap-manifesto-lifestyle-mobile);
+    }
+
+    #{{ section_id }} .kf-brand-story__intro + .kf-brand-story__closing {
+      margin-top: var(--kf-brand-story-gap-intro-manifesto-mobile);
+    }
+
+    #{{ section_id }} .kf-brand-story__section-heading {
+      margin-bottom: 22px;
+      font-size: var(--kf-brand-story-body-mobile);
+      letter-spacing: 0.18em;
+    }
+
+    #{{ section_id }} .kf-brand-story__eyebrow,
+    #{{ section_id }} .kf-brand-story__closing-tag {
+      margin-bottom: 18px;
+      gap: 12px;
+      font-size: var(--kf-brand-story-eyebrow-mobile);
+      letter-spacing: 0.28em;
+    }
+
+    #{{ section_id }} .kf-brand-story__eyebrow::before,
+    #{{ section_id }} .kf-brand-story__closing-tag::before {
+      width: 24px;
+      flex-basis: 24px;
+    }
+
+    #{{ section_id }} .kf-brand-story__headline {
+      font-size: var(--kf-brand-story-headline-mobile);
+      line-height: 0.96;
+      letter-spacing: -0.025em;
+    }
+
+    #{{ section_id }} .kf-brand-story__intro-text {
+      margin-top: 24px;
+      font-size: var(--kf-brand-story-body-mobile);
+      line-height: 1.75;
+    }
+
+    #{{ section_id }} .kf-brand-story__manifesto-line {
+      font-size: var(--kf-brand-story-manifesto-mobile);
+      line-height: 1.46;
+    }
+
+    #{{ section_id }} .kf-brand-story__closing {
+      min-height: auto;
+      display: block;
+      padding-top: 0;
+    }
+
+    #{{ section_id }} .kf-brand-story__closing-mark {
+      margin-top: 28px;
+      font-size: 150px;
+    }
+
+    #{{ section_id }} .kf-brand-story__closing-mark--hide-mobile {
+      display: none;
+    }
+
+    #{{ section_id }} .kf-brand-story__cta {
+      margin-top: 28px;
+      font-size: var(--kf-brand-story-cta-mobile);
+      letter-spacing: 0.2em;
+    }
+  }
+
+  @media (max-width: 430px) {
+    #{{ section_id }}.kf-brand-story--layout-page-width .kf-brand-story__inner {
+      width: calc(100% - 28px);
+    }
+
+    #{{ section_id }}.kf-brand-story--layout-full-width .kf-brand-story__inner {
+      width: 100%;
+      padding-left: 14px;
+      padding-right: 14px;
+    }
+
+    #{{ section_id }} .kf-brand-story__headline {
+      font-size: min(var(--kf-brand-story-headline-mobile), 56px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #{{ section_id }}.kf-brand-story--reveal [data-kf-reveal] {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+
+    #{{ section_id }} .kf-brand-story__cta::after {
+      transition: none;
+    }
+  }
+{% endstyle %}
+
+{% if section.settings.enable_reveal %}
+  <script>
+    (() => {
+      const initKauffmanBrandStory = () => {
+        const section = document.getElementById({{ section_id | json }});
+
+        if (!section || section.dataset.kfBrandStoryReady === 'true') {
+          return;
+        }
+
+        section.dataset.kfBrandStoryReady = 'true';
+
+        const revealItems = section.querySelectorAll('[data-kf-reveal]');
+
+        if (!revealItems.length) {
+          return;
+        }
+
+        if (!('IntersectionObserver' in window)) {
+          revealItems.forEach((item) => item.classList.add('is-visible'));
+          return;
+        }
+
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, {
+          threshold: 0.12
+        });
+
+        revealItems.forEach((item) => observer.observe(item));
+      };
+
+      initKauffmanBrandStory();
+
+      document.addEventListener('shopify:section:load', initKauffmanBrandStory);
+    })();
+  </script>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Kauffman brand story",
+  "tag": "section",
+  "class": "section-kauffman-brand-story",
+  "settings": [
+    {
+      "type": "header",
+      "content": "General"
+    },
+    {
+      "type": "text",
+      "id": "anchor_id",
+      "label": "Anchor ID",
+      "info": "Use this in links as /#about-us.",
+      "default": "about-us"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "t:settings.width",
+      "options": [
+        {
+          "value": "page-width",
+          "label": "t:options.page"
+        },
+        {
+          "value": "full-width",
+          "label": "t:options.full"
+        }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent color",
+      "default": "#DE5219"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border color",
+      "default": "#E5E0D8"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_top_border",
+      "label": "Show top border",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_bottom_border",
+      "label": "Show bottom border",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "Content max width",
+      "min": 960,
+      "max": 1600,
+      "step": 20,
+      "unit": "px",
+      "default": 1280
+    },
+    {
+      "type": "header",
+      "content": "Desktop grid"
+    },
+    {
+      "type": "range",
+      "id": "main_column_width",
+      "label": "Main column width desktop",
+      "min": 520,
+      "max": 980,
+      "step": 20,
+      "unit": "px",
+      "default": 760
+    },
+    {
+      "type": "range",
+      "id": "desktop_column_gap",
+      "label": "Desktop column gap",
+      "min": 5,
+      "max": 120,
+      "step": 5,
+      "unit": "px",
+      "default": 55
+    },
+    {
+      "type": "header",
+      "content": "Right logo column"
+    },
+    {
+      "type": "image_picker",
+      "id": "right_logo",
+      "label": "Right column logo"
+    },
+    {
+      "type": "range",
+      "id": "right_logo_width",
+      "label": "Right logo width desktop",
+      "min": 80,
+      "max": 420,
+      "step": 10,
+      "unit": "px",
+      "default": 220
+    },
+    {
+      "type": "range",
+      "id": "right_logo_width_mobile",
+      "label": "Right logo width mobile",
+      "min": 80,
+      "max": 280,
+      "step": 10,
+      "unit": "px",
+      "default": 160
+    },
+    {
+      "type": "range",
+      "id": "right_logo_mobile_gap",
+      "label": "Right logo mobile gap",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "right_logo_opacity",
+      "label": "Right logo opacity",
+      "min": 5,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 35
+    },
+    {
+      "type": "select",
+      "id": "right_logo_vertical_position",
+      "label": "Right logo vertical position desktop",
+      "options": [
+        {
+          "value": "start",
+          "label": "Top"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "end",
+          "label": "Bottom"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "right_logo_horizontal_position",
+      "label": "Right logo horizontal position desktop",
+      "options": [
+        {
+          "value": "start",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "end",
+          "label": "Right"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_right_logo_mobile",
+      "label": "Hide right logo on mobile",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "desktop_padding_top",
+      "label": "Desktop padding top",
+      "min": 40,
+      "max": 180,
+      "step": 4,
+      "unit": "px",
+      "default": 96
+    },
+    {
+      "type": "range",
+      "id": "desktop_padding_bottom",
+      "label": "Desktop padding bottom",
+      "min": 40,
+      "max": 180,
+      "step": 4,
+      "unit": "px",
+      "default": 96
+    },
+    {
+      "type": "range",
+      "id": "mobile_padding_top",
+      "label": "Mobile padding top",
+      "min": 32,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "mobile_padding_bottom",
+      "label": "Mobile padding bottom",
+      "min": 32,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 64
+    },
+    {
+      "type": "header",
+      "content": "Block spacing"
+    },
+    {
+      "type": "range",
+      "id": "gap_intro_manifesto_desktop",
+      "label": "Desktop gap: intro to manifesto",
+      "min": 5,
+      "max": 160,
+      "step": 5,
+      "unit": "px",
+      "default": 70
+    },
+    {
+      "type": "range",
+      "id": "gap_manifesto_lifestyle_desktop",
+      "label": "Desktop gap: manifesto to lifestyle",
+      "min": 5,
+      "max": 160,
+      "step": 5,
+      "unit": "px",
+      "default": 70
+    },
+    {
+      "type": "range",
+      "id": "gap_lifestyle_closing_desktop",
+      "label": "Desktop gap: lifestyle to closing",
+      "min": 5,
+      "max": 160,
+      "step": 5,
+      "unit": "px",
+      "default": 70
+    },
+    {
+      "type": "range",
+      "id": "gap_intro_manifesto_mobile",
+      "label": "Mobile gap: intro to manifesto",
+      "min": 5,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "gap_manifesto_lifestyle_mobile",
+      "label": "Mobile gap: manifesto to lifestyle",
+      "min": 5,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 50
+    },
+    {
+      "type": "range",
+      "id": "gap_lifestyle_closing_mobile",
+      "label": "Mobile gap: lifestyle to closing",
+      "min": 5,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "default": 50
+    },
+    {
+      "type": "header",
+      "content": "Intro"
+    },
+    {
+      "type": "text",
+      "id": "section_heading",
+      "label": "Section heading",
+      "default": "About Us"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Born Digital. Built for Europe."
+    },
+    {
+      "type": "text",
+      "id": "headline_line_1",
+      "label": "Headline line 1",
+      "default": "We define"
+    },
+    {
+      "type": "text",
+      "id": "headline_line_2",
+      "label": "Headline line 2",
+      "default": "a visual"
+    },
+    {
+      "type": "text",
+      "id": "headline_accent",
+      "label": "Headline accent line",
+      "default": "language."
+    },
+    {
+      "type": "richtext",
+      "id": "intro_text",
+      "label": "Intro text",
+      "default": "<p>A concept brand built on identity and inner style. Designed around who you are — not what is trending.</p>"
+    },
+    {
+      "type": "range",
+      "id": "intro_text_max_width",
+      "label": "Intro text max width",
+      "min": 320,
+      "max": 760,
+      "step": 20,
+      "unit": "px",
+      "default": 520
+    },
+    {
+      "type": "header",
+      "content": "Manifesto"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_manifesto",
+      "label": "Show manifesto",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "manifesto_max_width",
+      "label": "Manifesto max width",
+      "min": 520,
+      "max": 1100,
+      "step": 20,
+      "unit": "px",
+      "default": 860
+    },
+    {
+      "type": "header",
+      "content": "Lifestyle"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_lifestyle",
+      "label": "Show lifestyle",
+      "default": true
+    },
+    {
+      "type": "richtext",
+      "id": "lifestyle_text",
+      "label": "Lifestyle text",
+      "default": "<p>The Kauffman Concept isn't just about cases — it's about <em>lifestyle.</em></p><p>Comfortable and free. Everyday things for daily comfort become elements of style.</p>"
+    },
+    {
+      "type": "range",
+      "id": "lifestyle_max_width",
+      "label": "Lifestyle max width",
+      "min": 520,
+      "max": 1100,
+      "step": 20,
+      "unit": "px",
+      "default": 820
+    },
+    {
+      "type": "header",
+      "content": "Closing"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_closing",
+      "label": "Show closing",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "closing_tag",
+      "label": "Closing tag",
+      "default": "Every detail, on purpose."
+    },
+    {
+      "type": "text",
+      "id": "closing_line_1",
+      "label": "Closing line 1",
+      "default": "This is only"
+    },
+    {
+      "type": "text",
+      "id": "closing_accent_1",
+      "label": "Closing accent 1",
+      "default": "the beginning."
+    },
+    {
+      "type": "text",
+      "id": "closing_accent_2",
+      "label": "Closing accent 2",
+      "default": "–K"
+    },
+    {
+      "type": "range",
+      "id": "closing_min_height",
+      "label": "Closing minimum height desktop",
+      "min": 120,
+      "max": 420,
+      "step": 20,
+      "unit": "px",
+      "default": 220
+    },
+    {
+      "type": "checkbox",
+      "id": "show_closing_mark",
+      "label": "Show closing mark",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "closing_mark",
+      "label": "Closing mark",
+      "default": "K"
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_closing_mark_mobile",
+      "label": "Hide closing mark on mobile",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "CTA label",
+      "default": "Explore the collection"
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "CTA link"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "eyebrow_size_desktop",
+      "label": "Eyebrow / tag size desktop",
+      "min": 8,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "eyebrow_size_mobile",
+      "label": "Eyebrow / tag size mobile",
+      "min": 8,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "default": 9
+    },
+    {
+      "type": "range",
+      "id": "headline_size_desktop",
+      "label": "Intro heading size desktop",
+      "min": 64,
+      "max": 150,
+      "step": 2,
+      "unit": "px",
+      "default": 118
+    },
+    {
+      "type": "range",
+      "id": "headline_size_mobile",
+      "label": "Intro heading size mobile",
+      "min": 38,
+      "max": 72,
+      "step": 1,
+      "unit": "px",
+      "default": 58
+    },
+    {
+      "type": "range",
+      "id": "body_size_desktop",
+      "label": "Body size desktop",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "body_size_mobile",
+      "label": "Body size mobile",
+      "min": 12,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "manifesto_size_desktop",
+      "label": "Manifesto heading size desktop",
+      "min": 28,
+      "max": 68,
+      "step": 2,
+      "unit": "px",
+      "default": 46
+    },
+    {
+      "type": "range",
+      "id": "manifesto_size_mobile",
+      "label": "Manifesto heading size mobile",
+      "min": 22,
+      "max": 42,
+      "step": 1,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "lifestyle_size_desktop",
+      "label": "Lifestyle heading size desktop",
+      "min": 24,
+      "max": 56,
+      "step": 2,
+      "unit": "px",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "lifestyle_size_mobile",
+      "label": "Lifestyle heading size mobile",
+      "min": 20,
+      "max": 36,
+      "step": 1,
+      "unit": "px",
+      "default": 26
+    },
+    {
+      "type": "range",
+      "id": "closing_size_desktop",
+      "label": "Closing heading size desktop",
+      "min": 40,
+      "max": 110,
+      "step": 2,
+      "unit": "px",
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "closing_size_mobile",
+      "label": "Closing heading size mobile",
+      "min": 32,
+      "max": 70,
+      "step": 1,
+      "unit": "px",
+      "default": 46
+    },
+    {
+      "type": "range",
+      "id": "cta_size_desktop",
+      "label": "CTA size desktop",
+      "min": 9,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 11
+    },
+    {
+      "type": "range",
+      "id": "cta_size_mobile",
+      "label": "CTA size mobile",
+      "min": 9,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "mark_opacity",
+      "label": "Closing mark opacity",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "%",
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "Animation"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_reveal",
+      "label": "Enable reveal animation",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "heading",
+      "name": "Heading",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "About Us"
+        }
+      ]
+    },
+    {
+      "type": "intro",
+      "name": "Intro",
+      "settings": [
+        {
+          "type": "text",
+          "id": "eyebrow",
+          "label": "Eyebrow",
+          "default": "Born Digital. Built for Europe."
+        },
+        {
+          "type": "text",
+          "id": "headline_line_1",
+          "label": "Headline line 1",
+          "default": "We define"
+        },
+        {
+          "type": "text",
+          "id": "headline_line_2",
+          "label": "Headline line 2",
+          "default": "a visual"
+        },
+        {
+          "type": "text",
+          "id": "headline_accent",
+          "label": "Headline accent line",
+          "default": "language."
+        },
+        {
+          "type": "richtext",
+          "id": "intro_text",
+          "label": "Intro text",
+          "default": "<p>A concept brand built on identity and inner style. Designed around who you are — not what is trending.</p>"
+        }
+      ]
+    },
+    {
+      "type": "manifesto",
+      "name": "Manifesto",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Add Manifesto line blocks after this block. Shopify does not support nested blocks, so the line blocks are still listed beside this wrapper."
+        }
+      ]
+    },
+    {
+      "type": "lifestyle",
+      "name": "Lifestyle",
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>The Kauffman Concept isn't just about cases — it's about <em>lifestyle.</em></p><p>Comfortable and free. Everyday things for daily comfort become elements of style.</p>"
+        }
+      ]
+    },
+    {
+      "type": "closing",
+      "name": "Closing",
+      "settings": [
+        {
+          "type": "text",
+          "id": "tag",
+          "label": "Tag",
+          "default": "Every detail, on purpose."
+        },
+        {
+          "type": "text",
+          "id": "line_1",
+          "label": "Headline line",
+          "default": "This is only"
+        },
+        {
+          "type": "text",
+          "id": "accent_1",
+          "label": "Accent 1",
+          "default": "the beginning."
+        },
+        {
+          "type": "text",
+          "id": "accent_2",
+          "label": "Accent 2",
+          "default": "–K"
+        },
+        {
+          "type": "text",
+          "id": "cta_label",
+          "label": "CTA label",
+          "default": "Explore the collection"
+        },
+        {
+          "type": "url",
+          "id": "cta_link",
+          "label": "CTA link"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_mark",
+          "label": "Show mark",
+          "default": true
+        },
+        {
+          "type": "text",
+          "id": "mark",
+          "label": "Mark",
+          "default": "K"
+        },
+        {
+          "type": "checkbox",
+          "id": "hide_mark_mobile",
+          "label": "Hide mark on mobile",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "manifesto_line",
+      "name": "Manifesto line",
+      "settings": [
+        {
+          "type": "text",
+          "id": "line_text",
+          "label": "Text",
+          "default": "The objects you carry."
+        },
+        {
+          "type": "select",
+          "id": "line_style",
+          "label": "Style",
+          "options": [
+            {
+              "value": "normal",
+              "label": "Normal"
+            },
+            {
+              "value": "strong",
+              "label": "Strong"
+            },
+            {
+              "value": "accent",
+              "label": "Accent italic"
+            },
+            {
+              "value": "muted",
+              "label": "Muted"
+            },
+            {
+              "value": "spacer",
+              "label": "Spacer"
+            }
+          ],
+          "default": "strong"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Kauffman brand story",
+      "blocks": [
+        {
+          "type": "heading",
+          "settings": {
+            "heading": "About Us"
+          }
+        },
+        {
+          "type": "intro",
+          "settings": {
+            "eyebrow": "Born Digital. Built for Europe.",
+            "headline_line_1": "We define",
+            "headline_line_2": "a visual",
+            "headline_accent": "language.",
+            "intro_text": "<p>A concept brand built on identity and inner style. Designed around who you are — not what is trending.</p>"
+          }
+        },
+        {
+          "type": "manifesto"
+        },
+        {
+          "type": "manifesto_line",
+          "settings": {
+            "line_text": "The objects you carry.",
+            "line_style": "strong"
+          }
+        },
+        {
+          "type": "manifesto_line",
+          "settings": {
+            "line_text": "The clothes you wear.",
+            "line_style": "strong"
+          }
+        },
+        {
+          "type": "manifesto_line",
+          "settings": {
+            "line_text": "They say something about who you are.",
+            "line_style": "accent"
+          }
+        },
+        {
+          "type": "manifesto_line",
+          "settings": {
+            "line_text": "",
+            "line_style": "spacer"
+          }
+        },
+        {
+          "type": "manifesto_line",
+          "settings": {
+            "line_text": "Details that can speak for you.",
+            "line_style": "normal"
+          }
+        },
+        {
+          "type": "manifesto_line",
+          "settings": {
+            "line_text": "So let them say it.",
+            "line_style": "strong"
+          }
+        },
+        {
+          "type": "lifestyle",
+          "settings": {
+            "text": "<p>The Kauffman Concept isn't just about cases — it's about <em>lifestyle.</em></p><p>Comfortable and free. Everyday things for daily comfort become elements of style.</p>"
+          }
+        },
+        {
+          "type": "closing",
+          "settings": {
+            "tag": "Every detail, on purpose.",
+            "line_1": "This is only",
+            "accent_1": "the beginning.",
+            "accent_2": "–K",
+            "cta_label": "Explore the collection",
+            "cta_link": "",
+            "show_mark": true,
+            "mark": "K",
+            "hide_mark_mobile": false
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

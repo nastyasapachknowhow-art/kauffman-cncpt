@@ -1,0 +1,564 @@
+{%- liquid
+  assign block_settings = block.settings
+  assign country_code = localization.country.iso_code | default: 'EU'
+-%}
+
+<div
+  class="kauffman-delivery spacing-style"
+  style="
+    {% render 'spacing-style', settings: block_settings %}
+    --kauffman-delivery-width: {{ block_settings.block_width }}px;
+    --kauffman-delivery-height: {{ block_settings.block_height }}px;
+    --kauffman-delivery-padding-top: {{ block_settings.padding_top }}px;
+    --kauffman-delivery-padding-right: {{ block_settings.padding_right }}px;
+    --kauffman-delivery-padding-bottom: {{ block_settings.padding_bottom }}px;
+    --kauffman-delivery-padding-left: {{ block_settings.padding_left }}px;
+    --kauffman-delivery-background: {{ block_settings.background_color }};
+    --kauffman-delivery-border: {{ block_settings.border_color }};
+    --kauffman-delivery-title-size: {{ block_settings.title_font_size }}px;
+    --kauffman-delivery-title-line-height: {{ block_settings.title_line_height }}px;
+    --kauffman-delivery-title-weight: {{ block_settings.title_font_weight }};
+    --kauffman-delivery-title-color: {{ block_settings.title_color }};
+    --kauffman-delivery-text-size: {{ block_settings.text_font_size }}px;
+    --kauffman-delivery-text-line-height: {{ block_settings.text_line_height }}px;
+    --kauffman-delivery-text-weight: {{ block_settings.text_font_weight }};
+    --kauffman-delivery-text-color: {{ block_settings.text_color }};
+    --kauffman-delivery-link-size: {{ block_settings.link_font_size }}px;
+    --kauffman-delivery-link-line-height: {{ block_settings.link_line_height }}px;
+    --kauffman-delivery-link-weight: {{ block_settings.link_font_weight }};
+    --kauffman-delivery-link-color: {{ block_settings.link_color }};
+    --kauffman-delivery-title-spacing: {{ block_settings.title_spacing }}px;
+    --kauffman-delivery-text-spacing: {{ block_settings.text_spacing }}px;
+  "
+  data-country="{{ country_code }}"
+  data-eu-min="{{ block_settings.eu_days_min }}"
+  data-eu-max="{{ block_settings.eu_days_max }}"
+  data-uk-min="{{ block_settings.uk_days_min }}"
+  data-uk-max="{{ block_settings.uk_days_max }}"
+  data-us-min="{{ block_settings.us_days_min }}"
+  data-us-max="{{ block_settings.us_days_max }}"
+  data-rest-min="{{ block_settings.rest_days_min }}"
+  data-rest-max="{{ block_settings.rest_days_max }}"
+  {{ block.shopify_attributes }}
+>
+  {%- if block_settings.title != blank -%}
+    <div class="kauffman-delivery__title">
+      {{ block_settings.title | escape }}
+    </div>
+  {%- endif -%}
+
+  <div class="kauffman-delivery__text">
+    {%- if block_settings.text_prefix != blank -%}
+      <span>{{ block_settings.text_prefix | escape }}</span>
+    {%- endif -%}
+    <span class="kauffman-delivery__date" data-delivery-date>
+      {{ block_settings.fallback_text | escape }}
+    </span>
+  </div>
+
+  {%- if block_settings.link_label != blank -%}
+    <a class="kauffman-delivery__link" href="{{ block_settings.link_url | default: routes.root_url }}">
+      {{ block_settings.link_label | escape }}
+    </a>
+  {%- endif -%}
+</div>
+
+<script>
+  (() => {
+    const block = document.currentScript.previousElementSibling;
+    if (!block || !block.classList.contains('kauffman-delivery')) return;
+
+    const target = block.querySelector('[data-delivery-date]');
+    if (!target) return;
+
+    const country = block.dataset.country || 'EU';
+    const euCountries = [
+      'AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK', 'EE', 'FI', 'FR',
+      'DE', 'GR', 'HU', 'IE', 'IT', 'LV', 'LT', 'LU', 'MT', 'NL',
+      'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE'
+    ];
+
+    const getDays = () => {
+      if (euCountries.includes(country)) {
+        return [Number(block.dataset.euMin), Number(block.dataset.euMax)];
+      }
+
+      if (country === 'GB') {
+        return [Number(block.dataset.ukMin), Number(block.dataset.ukMax)];
+      }
+
+      if (country === 'US') {
+        return [Number(block.dataset.usMin), Number(block.dataset.usMax)];
+      }
+
+      return [Number(block.dataset.restMin), Number(block.dataset.restMax)];
+    };
+
+    const addBusinessDays = (date, days) => {
+      const result = new Date(date);
+      let addedDays = 0;
+
+      while (addedDays < days) {
+        result.setDate(result.getDate() + 1);
+        const day = result.getDay();
+
+        if (day !== 0 && day !== 6) {
+          addedDays += 1;
+        }
+      }
+
+      return result;
+    };
+
+    const formatDate = (date) => {
+      return new Intl.DateTimeFormat(document.documentElement.lang || undefined, {
+        month: 'short',
+        day: 'numeric'
+      }).format(date);
+    };
+
+    const [minDays, maxDays] = getDays();
+    const today = new Date();
+    const minDate = addBusinessDays(today, minDays || 1);
+    const maxDate = addBusinessDays(today, maxDays || minDays || 1);
+
+    target.textContent = `${formatDate(minDate)} – ${formatDate(maxDate)}`;
+  })();
+</script>
+
+{% stylesheet %}
+  .kauffman-delivery {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: var(--kauffman-delivery-width);
+    min-height: var(--kauffman-delivery-height);
+    padding: var(--kauffman-delivery-padding-top) var(--kauffman-delivery-padding-right) var(--kauffman-delivery-padding-bottom) var(--kauffman-delivery-padding-left);
+    background: var(--kauffman-delivery-background);
+    border: 1px solid var(--kauffman-delivery-border);
+  }
+
+  .kauffman-delivery__title {
+    max-width: 260px;
+    margin: 0 0 var(--kauffman-delivery-title-spacing);
+    font-family: Inter, sans-serif;
+    font-size: var(--kauffman-delivery-title-size);
+    font-weight: var(--kauffman-delivery-title-weight);
+    line-height: var(--kauffman-delivery-title-line-height);
+    color: var(--kauffman-delivery-title-color);
+  }
+
+  .kauffman-delivery__text {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 4px;
+    max-width: 260px;
+    margin: 0 0 var(--kauffman-delivery-text-spacing);
+    font-family: Inter, sans-serif;
+    font-size: var(--kauffman-delivery-text-size);
+    font-weight: var(--kauffman-delivery-text-weight);
+    line-height: var(--kauffman-delivery-text-line-height);
+    color: var(--kauffman-delivery-text-color);
+  }
+
+  .kauffman-delivery__date {
+    white-space: nowrap;
+  }
+
+  .kauffman-delivery__link {
+    display: inline-block;
+    font-family: Inter, sans-serif;
+    font-size: var(--kauffman-delivery-link-size);
+    font-weight: var(--kauffman-delivery-link-weight);
+    line-height: var(--kauffman-delivery-link-line-height);
+    color: var(--kauffman-delivery-link-color);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .kauffman-delivery__link:hover {
+    opacity: 0.72;
+  }
+
+  @media screen and (max-width: 820px) {
+    .kauffman-delivery {
+      max-width: 100%;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Estimated delivery",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Estimated delivery"
+    },
+    {
+      "type": "text",
+      "id": "text_prefix",
+      "label": "Text prefix",
+      "default": "Arrives between"
+    },
+    {
+      "type": "text",
+      "id": "fallback_text",
+      "label": "Fallback text before date calculation",
+      "default": "Calculating delivery date"
+    },
+    {
+      "type": "text",
+      "id": "link_label",
+      "label": "Link label",
+      "default": "Shipping & returns"
+    },
+    {
+      "type": "url",
+      "id": "link_url",
+      "label": "Link URL"
+    },
+    {
+      "type": "header",
+      "content": "Delivery estimates"
+    },
+    {
+      "type": "range",
+      "id": "eu_days_min",
+      "label": "EU minimum business days",
+      "min": 1,
+      "max": 20,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "eu_days_max",
+      "label": "EU maximum business days",
+      "min": 1,
+      "max": 20,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "range",
+      "id": "uk_days_min",
+      "label": "UK minimum business days",
+      "min": 1,
+      "max": 20,
+      "step": 1,
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "uk_days_max",
+      "label": "UK maximum business days",
+      "min": 1,
+      "max": 20,
+      "step": 1,
+      "default": 7
+    },
+    {
+      "type": "range",
+      "id": "us_days_min",
+      "label": "US minimum business days",
+      "min": 1,
+      "max": 25,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "range",
+      "id": "us_days_max",
+      "label": "US maximum business days",
+      "min": 1,
+      "max": 25,
+      "step": 1,
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "rest_days_min",
+      "label": "Rest of world minimum business days",
+      "min": 1,
+      "max": 30,
+      "step": 1,
+      "default": 7
+    },
+    {
+      "type": "range",
+      "id": "rest_days_max",
+      "label": "Rest of world maximum business days",
+      "min": 1,
+      "max": 30,
+      "step": 1,
+      "default": 14
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "block_width",
+      "label": "Block width",
+      "min": 300,
+      "max": 600,
+      "step": 10,
+      "unit": "px",
+      "default": 400
+    },
+    {
+      "type": "range",
+      "id": "block_height",
+      "label": "Minimum height",
+      "min": 80,
+      "max": 180,
+      "step": 2,
+      "unit": "px",
+      "default": 116
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "label": "Padding right",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "label": "Padding left",
+      "min": 0,
+      "max": 60,
+      "step": 1,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "title_spacing",
+      "label": "Title bottom spacing",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "text_spacing",
+      "label": "Text bottom spacing",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_font_size",
+      "label": "Title font size",
+      "min": 10,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "title_line_height",
+      "label": "Title line height",
+      "min": 12,
+      "max": 36,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "select",
+      "id": "title_font_weight",
+      "label": "Title font weight",
+      "options": [
+        { "value": "400", "label": "Regular" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semi bold" }
+      ],
+      "default": "500"
+    },
+    {
+      "type": "range",
+      "id": "text_font_size",
+      "label": "Text font size",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "text_line_height",
+      "label": "Text line height",
+      "min": 12,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 18
+    },
+    {
+      "type": "select",
+      "id": "text_font_weight",
+      "label": "Text font weight",
+      "options": [
+        { "value": "300", "label": "Light" },
+        { "value": "400", "label": "Regular" },
+        { "value": "500", "label": "Medium" }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "range",
+      "id": "link_font_size",
+      "label": "Link font size",
+      "min": 10,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "link_line_height",
+      "label": "Link line height",
+      "min": 12,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "select",
+      "id": "link_font_weight",
+      "label": "Link font weight",
+      "options": [
+        { "value": "400", "label": "Regular" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semi bold" }
+      ],
+      "default": "500"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border",
+      "default": "#E6E0D8"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Title color",
+      "default": "#1E1A17"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#6D665F"
+    },
+    {
+      "type": "color",
+      "id": "link_color",
+      "label": "Link color",
+      "default": "#1E1A17"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "Left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "Right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Estimated delivery"
+    }
+  ]
+}
+{% endschema %}

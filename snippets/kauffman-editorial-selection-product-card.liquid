@@ -1,0 +1,98 @@
+{%- doc -%}
+  Renders a minimal product card for Kauffman product carousels.
+
+  @param {product} card_product - Product to render.
+  @param {object} card_settings - Parent section settings for display controls.
+{%- enddoc -%}
+
+{% liquid
+  assign display_settings = card_settings
+  assign carousel_columns = display_settings.carousel_columns_desktop | default: 2
+  assign desktop_image_width = 100.0 | divided_by: carousel_columns
+  assign mobile_image_width = display_settings.mobile_card_size | default: '78cqw' | replace: 'cqw', 'vw'
+  assign image_sizes = '(max-width: 820px) [mobile], [desktop]vw'
+  assign image_sizes = image_sizes | replace: '[mobile]', mobile_image_width | replace: '[desktop]', desktop_image_width
+  assign product_url = card_product.url | default: '#'
+  assign product_family = card_product.metafields.custom.product_family.value
+  assign primary_collection = card_product.metafields.custom.collection.value
+  assign primary_collection_handle = primary_collection | handleize
+  assign primary_collection_resource = collections[primary_collection_handle]
+
+  if primary_collection != blank and primary_collection_resource == blank
+    assign primary_collection_handle_with_suffix = primary_collection_handle | append: '-collection'
+    assign primary_collection_resource = collections[primary_collection_handle_with_suffix]
+  endif
+
+  if primary_collection != blank and primary_collection_resource == blank
+    for product_collection in card_product.collections
+      if product_collection.handle == primary_collection_handle or product_collection.handle contains primary_collection_handle
+        assign primary_collection_resource = product_collection
+        break
+      endif
+    endfor
+  endif
+%}
+
+<div class="kauffman-editorial-selection-v2-product-card">
+  <a class="kauffman-editorial-selection-v2-product-card__media-link" href="{{ product_url }}">
+    <div class="kauffman-editorial-selection-v2-product-card__media">
+      {% if card_product.featured_media != blank %}
+        {{
+          card_product.featured_media
+          | image_url: width: 1200
+          | image_tag:
+            class: 'kauffman-editorial-selection-v2-product-card__image',
+            loading: 'lazy',
+            sizes: image_sizes,
+            widths: '300, 450, 600, 800, 1000, 1200'
+        }}
+      {% else %}
+        {{ 'product-1' | placeholder_svg_tag: 'kauffman-editorial-selection-v2-product-card__placeholder' }}
+      {% endif %}
+    </div>
+  </a>
+
+  <div class="kauffman-editorial-selection-v2-product-card__content">
+    <a class="kauffman-editorial-selection-v2-product-card__title-link" href="{{ product_url }}">
+      <h3 class="kauffman-editorial-selection-v2-product-card__title">
+        {{ card_product.title | default: 'Product title' }}
+      </h3>
+    </a>
+
+    {% if product_family != blank %}
+      <p class="kauffman-editorial-selection-v2-product-card__family">
+        {{ product_family }}
+      </p>
+    {% endif %}
+
+    {% if primary_collection != blank and primary_collection_resource != blank %}
+      <a
+        class="kauffman-editorial-selection-v2-product-card__collection"
+        href="{{ primary_collection_resource.url }}"
+        title="{{ primary_collection | escape }}"
+      >
+        {{ primary_collection }}
+      </a>
+    {% elsif primary_collection != blank %}
+      <span class="kauffman-editorial-selection-v2-product-card__collection">
+        {{ primary_collection }}
+      </span>
+    {% endif %}
+
+    {% if display_settings.show_vendor and card_product.vendor != blank %}
+      <p class="kauffman-editorial-selection-v2-product-card__vendor">
+        {{ card_product.vendor }}
+      </p>
+    {% endif %}
+
+    {% if display_settings.show_price %}
+      <p class="kauffman-editorial-selection-v2-product-card__price">
+        {% if card_product != blank %}
+          {{ card_product.price | money }}
+        {% else %}
+          {{ 1999 | money }}
+        {% endif %}
+      </p>
+    {% endif %}
+  </div>
+</div>

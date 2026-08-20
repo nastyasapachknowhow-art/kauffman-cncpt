@@ -1,0 +1,101 @@
+{% doc %}
+  Renders the sticky bar notify-me form for unavailable variants.
+
+  @param {object} product - Product resource
+  @param {object} variant - Selected variant
+  @param {object} settings - Product information section settings
+  @param {string} section_id - Product information section id
+{% enddoc %}
+
+{% liquid
+  assign notify_form_id = 'StickyNotifyMe-' | append: section_id
+  assign notify_tags = 'notify-me, product-' | append: product.handle
+  if variant
+    assign notify_tags = notify_tags | append: ', variant-' | append: variant.id
+  endif
+
+  assign notify_success_message = settings.sticky_notify_success_message | default: 'Thanks. We will let you know when it is back.'
+%}
+
+<div
+  class="sticky-add-to-cart__notify-panel color-{{ settings.color_scheme }}"
+  id="StickyNotifyPanel-{{ section_id }}"
+  ref="notifyPanel"
+  hidden
+>
+  {% form 'customer', id: notify_form_id, class: 'sticky-add-to-cart__notify-form' %}
+    <input
+      type="hidden"
+      name="contact[tags]"
+      value="{{ notify_tags | escape }}"
+    >
+    <input
+      type="hidden"
+      name="contact[product]"
+      value="{{ product.title | escape }}"
+    >
+    <input
+      type="hidden"
+      name="contact[variant]"
+      value="{{ variant.title | escape }}"
+    >
+    <input
+      type="hidden"
+      name="contact[variant_id]"
+      value="{{ variant.id }}"
+    >
+
+    <label
+      class="visually-hidden"
+      for="StickyNotifyEmail-{{ section_id }}"
+    >
+      {{ settings.sticky_notify_email_placeholder | default: 'Email address' }}
+    </label>
+    <input
+      id="StickyNotifyEmail-{{ section_id }}"
+      class="sticky-add-to-cart__notify-input"
+      type="email"
+      name="contact[email]"
+      value="{{ form.email }}"
+      autocomplete="email"
+      autocorrect="off"
+      autocapitalize="off"
+      placeholder="{{ settings.sticky_notify_email_placeholder | default: 'Email address' }}"
+      required
+      ref="notifyEmail"
+    >
+    <button
+      type="submit"
+      class="sticky-add-to-cart__notify-submit button"
+    >
+      {{ settings.sticky_notify_submit_label | default: 'Notify me' }}
+    </button>
+    <button
+      type="button"
+      class="sticky-add-to-cart__notify-close button-unstyled"
+      aria-label="{{ 'actions.close' | t }}"
+      on:click="/closeNotifyPanel"
+    >
+      <span class="svg-wrapper">
+        {{- 'icon-close.svg' | inline_asset_content -}}
+      </span>
+    </button>
+
+    {% if form.errors %}
+      <div
+        class="sticky-add-to-cart__notify-message"
+        role="alert"
+      >
+        {{ form.errors | default_errors }}
+      </div>
+    {% endif %}
+    {% if form.posted_successfully? %}
+      <div
+        class="sticky-add-to-cart__notify-message"
+        role="status"
+      >
+        {{ notify_success_message }}
+      </div>
+    {% endif %}
+  {% endform %}
+</div>

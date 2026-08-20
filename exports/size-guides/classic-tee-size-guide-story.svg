@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920" viewBox="0 0 1080 1920">
+  <defs><style><![CDATA[.title { font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 400; }]]></style></defs>
+  <rect width="1080" height="1920" fill="#ffffff"/>
+  <g fill="#171717" font-family="Inter, Arial, Helvetica, sans-serif" font-weight="300">
+    <text class="title" x="70" y="210" font-size="104">T-Shirt Classic</text>
+    <text x="70" y="320" font-size="28" fill="#5f5f5f">Measurements are taken from the garment laid flat.</text>
+    <text x="70" y="360" font-size="28" fill="#5f5f5f">All measurements are in centimetres.</text>
+    <line x1="70" y1="440" x2="1010" y2="440" stroke="#171717" stroke-width="3"/>
+    <g font-size="26" letter-spacing="2"><text x="70" y="512">MEASUREMENT</text><text x="555" y="512" text-anchor="middle">S</text><text x="755" y="512" text-anchor="middle">M</text><text x="955" y="512" text-anchor="middle">L</text></g>
+    <g stroke="#bebebe" stroke-width="2"><line x1="70" y1="564" x2="1010" y2="564"/><line x1="70" y1="744" x2="1010" y2="744"/><line x1="70" y1="924" x2="1010" y2="924"/></g>
+    <g font-size="31"><text x="70" y="674">Body width <tspan font-size="20" letter-spacing="2">CM</tspan></text><text x="555" y="674" text-anchor="middle">47</text><text x="755" y="674" text-anchor="middle">52</text><text x="955" y="674" text-anchor="middle">56.5</text>
+      <text x="70" y="854">Body length <tspan font-size="20" letter-spacing="2">CM</tspan></text><text x="555" y="854" text-anchor="middle">70</text><text x="755" y="854" text-anchor="middle">74</text><text x="955" y="854" text-anchor="middle">77.5</text></g>
+    <text x="70" y="1120" font-size="24" fill="#666">Measurements may vary by up to 2.5 cm.</text>
+    <line x1="70" y1="1650" x2="1010" y2="1650" stroke="#bebebe" stroke-width="2"/>
+    <text x="70" y="1725" font-size="24" fill="#666">Size guide · Kauffman Concept</text>
+  </g>
+</svg>

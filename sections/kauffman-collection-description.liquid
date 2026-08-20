@@ -1,0 +1,409 @@
+{% liquid
+  assign section_id = 'KauffmanCollectionDescription-' | append: section.id
+
+  assign description_html = section.settings.custom_description
+  if section.settings.description_source == 'collection'
+    assign description_html = collection.description
+  elsif section.settings.description_source == 'none'
+    assign description_html = blank
+  endif
+%}
+
+{% if description_html != blank %}
+  <div class="section-background color-{{ section.settings.color_scheme }}"></div>
+
+  <section
+    id="{{ section_id }}"
+    class="kf-collection-description color-{{ section.settings.color_scheme }} kf-collection-description--width-{{ section.settings.section_width }}{% if section.settings.show_border_top %} kf-collection-description--border-top{% endif %}{% if section.settings.show_border_bottom %} kf-collection-description--border-bottom{% endif %}"
+  >
+    <div class="kf-collection-description__inner">
+      {% if section.settings.show_eyebrow and section.settings.eyebrow != blank %}
+        <p class="kf-collection-description__eyebrow">{{ section.settings.eyebrow }}</p>
+      {% endif %}
+
+      <div class="kf-collection-description__text rte">
+        {{ description_html }}
+      </div>
+    </div>
+  </section>
+
+  {% style %}
+    #{{ section_id }} {
+      --kcd-page-width: {{ section.settings.max_width }}px;
+      --kcd-text-width: {{ section.settings.text_width }}px;
+      --kcd-padding-top-desktop: {{ section.settings.padding_top_desktop }}px;
+      --kcd-padding-bottom-desktop: {{ section.settings.padding_bottom_desktop }}px;
+      --kcd-padding-top-mobile: {{ section.settings.padding_top_mobile }}px;
+      --kcd-padding-bottom-mobile: {{ section.settings.padding_bottom_mobile }}px;
+      --kcd-border-color: rgb(var(--color-foreground-rgb) / {{ section.settings.border_opacity | divided_by: 100.0 }});
+      --kcd-eyebrow-size-desktop: {{ section.settings.eyebrow_size_desktop }}px;
+      --kcd-eyebrow-size-mobile: {{ section.settings.eyebrow_size_mobile }}px;
+      --kcd-text-size-desktop: {{ section.settings.text_size_desktop }}px;
+      --kcd-text-size-mobile: {{ section.settings.text_size_mobile }}px;
+      --kcd-text-line-height: {{ section.settings.text_line_height | divided_by: 100.0 }};
+      --kcd-paragraph-gap: {{ section.settings.paragraph_gap }}px;
+      position: relative;
+      background: var(--color-background);
+      color: var(--color-foreground);
+      font-family: var(--font-body--family, 'Inter', sans-serif);
+    }
+
+    #{{ section_id }}.kf-collection-description--border-top { border-top: 1px solid var(--kcd-border-color); }
+    #{{ section_id }}.kf-collection-description--border-bottom { border-bottom: 1px solid var(--kcd-border-color); }
+
+    #{{ section_id }} .kf-collection-description__inner {
+      box-sizing: border-box;
+      padding-top: var(--kcd-padding-top-desktop);
+      padding-bottom: var(--kcd-padding-bottom-desktop);
+    }
+
+    #{{ section_id }}.kf-collection-description--width-page-width .kf-collection-description__inner {
+      width: min(100% - 40px, var(--kcd-page-width));
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    #{{ section_id }}.kf-collection-description--width-full-width .kf-collection-description__inner {
+      width: 100%;
+      padding-left: clamp(20px, 5vw, 72px);
+      padding-right: clamp(20px, 5vw, 72px);
+    }
+
+    #{{ section_id }} .kf-collection-description__eyebrow,
+    #{{ section_id }} .kf-collection-description__text {
+      width: min(100%, var(--kcd-text-width));
+      margin-left: {% if section.settings.content_alignment == 'left' %}0{% elsif section.settings.content_alignment == 'center' %}auto{% else %}auto{% endif %};
+      margin-right: {% if section.settings.content_alignment == 'right' %}0{% elsif section.settings.content_alignment == 'center' %}auto{% else %}auto{% endif %};
+      text-align: {{ section.settings.text_alignment_desktop }};
+    }
+
+    #{{ section_id }} .kf-collection-description__eyebrow {
+      margin-top: 0;
+      margin-bottom: {{ section.settings.eyebrow_margin_bottom }}px;
+      font-size: var(--kcd-eyebrow-size-desktop);
+      line-height: 1.2;
+      font-weight: 500;
+      letter-spacing: {{ section.settings.eyebrow_letter_spacing | divided_by: 100.0 }}em;
+      text-transform: uppercase;
+      opacity: {{ section.settings.eyebrow_opacity | divided_by: 100.0 }};
+    }
+
+    #{{ section_id }} .kf-collection-description__text {
+      font-size: var(--kcd-text-size-desktop);
+      line-height: var(--kcd-text-line-height);
+      opacity: {{ section.settings.text_opacity | divided_by: 100.0 }};
+    }
+
+    #{{ section_id }} .kf-collection-description__text > * {
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+
+    #{{ section_id }} .kf-collection-description__text > * + * {
+      margin-top: var(--kcd-paragraph-gap);
+    }
+
+    @media screen and (max-width: 820px) {
+      #{{ section_id }} .kf-collection-description__inner {
+        padding-top: var(--kcd-padding-top-mobile);
+        padding-bottom: var(--kcd-padding-bottom-mobile);
+      }
+
+      #{{ section_id }}.kf-collection-description--width-page-width .kf-collection-description__inner {
+        width: min(100% - 32px, var(--kcd-page-width));
+      }
+
+      #{{ section_id }}.kf-collection-description--width-full-width .kf-collection-description__inner {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+
+      #{{ section_id }} .kf-collection-description__eyebrow,
+      #{{ section_id }} .kf-collection-description__text {
+        width: 100%;
+        text-align: {{ section.settings.text_alignment_mobile }};
+      }
+
+      #{{ section_id }} .kf-collection-description__eyebrow { font-size: var(--kcd-eyebrow-size-mobile); }
+      #{{ section_id }} .kf-collection-description__text { font-size: var(--kcd-text-size-mobile); }
+    }
+  {% endstyle %}
+{% endif %}
+
+{% schema %}
+{
+  "name": "Kauffman collection desc",
+  "tag": "section",
+  "class": "section-wrapper",
+  "enabled_on": {
+    "templates": ["collection"]
+  },
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Width",
+      "options": [
+        { "value": "page-width", "label": "Page" },
+        { "value": "full-width", "label": "Full" }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "label": "Page max width",
+      "min": 900,
+      "max": 1800,
+      "step": 20,
+      "unit": "px",
+      "default": 1400
+    },
+    {
+      "type": "select",
+      "id": "content_alignment",
+      "label": "Content position",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "range",
+      "id": "text_width",
+      "label": "Text max width",
+      "min": 420,
+      "max": 1100,
+      "step": 20,
+      "unit": "px",
+      "default": 820
+    },
+    {
+      "type": "select",
+      "id": "description_source",
+      "label": "Description source",
+      "options": [
+        { "value": "custom", "label": "Custom rich text" },
+        { "value": "collection", "label": "Collection description" },
+        { "value": "none", "label": "Hidden" }
+      ],
+      "default": "collection"
+    },
+    {
+      "type": "richtext",
+      "id": "custom_description",
+      "label": "Custom full description",
+      "default": "<p>Add the full collection description here.</p>"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_eyebrow",
+      "label": "Show eyebrow",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "About the collection"
+    },
+    {
+      "type": "range",
+      "id": "eyebrow_size_desktop",
+      "label": "Eyebrow size desktop",
+      "min": 9,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 11
+    },
+    {
+      "type": "range",
+      "id": "eyebrow_size_mobile",
+      "label": "Eyebrow size mobile",
+      "min": 9,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "eyebrow_letter_spacing",
+      "label": "Eyebrow letter spacing",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "%",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "eyebrow_opacity",
+      "label": "Eyebrow opacity",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 70
+    },
+    {
+      "type": "range",
+      "id": "eyebrow_margin_bottom",
+      "label": "Eyebrow bottom spacing",
+      "min": 4,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "text_size_desktop",
+      "label": "Text size desktop",
+      "min": 12,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "text_size_mobile",
+      "label": "Text size mobile",
+      "min": 12,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "default": 13
+    },
+    {
+      "type": "range",
+      "id": "text_line_height",
+      "label": "Text line height",
+      "min": 120,
+      "max": 200,
+      "step": 5,
+      "unit": "%",
+      "default": 160
+    },
+    {
+      "type": "range",
+      "id": "text_opacity",
+      "label": "Text opacity",
+      "min": 40,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 75
+    },
+    {
+      "type": "range",
+      "id": "paragraph_gap",
+      "label": "Paragraph gap",
+      "min": 8,
+      "max": 36,
+      "step": 2,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "select",
+      "id": "text_alignment_desktop",
+      "label": "Text alignment desktop",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment_mobile",
+      "label": "Text alignment mobile",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "padding_top_desktop",
+      "label": "Padding top desktop",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_desktop",
+      "label": "Padding bottom desktop",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "label": "Padding top mobile",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "label": "Padding bottom mobile",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "default": 36
+    },
+    {
+      "type": "checkbox",
+      "id": "show_border_top",
+      "label": "Show border top",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_border_bottom",
+      "label": "Show border bottom",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "border_opacity",
+      "label": "Border opacity",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "%",
+      "default": 14
+    }
+  ],
+  "presets": [
+    {
+      "name": "Kauffman collection description"
+    }
+  ]
+}
+{% endschema %}

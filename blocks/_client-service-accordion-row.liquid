@@ -1,0 +1,82 @@
+{% liquid
+  assign accordion_title = block.settings.title
+  assign accordion_content = block.settings.content
+  assign accordion_icon = block.settings.icon
+%}
+
+{% if accordion_title != blank %}
+  <details
+    class="product-info-client-accordion__item"
+    {% if block.settings.open_by_default %}
+      open
+    {% endif %}
+    {{ block.shopify_attributes }}
+  >
+    <summary class="product-info-client-accordion__summary">
+      <span class="product-info-client-accordion__title-wrap">
+        {% if accordion_icon != blank %}
+          <img
+            class="product-info-client-accordion__item-icon"
+            src="{{ accordion_icon | image_url: width: 48 }}"
+            alt=""
+            width="48"
+            height="48"
+            loading="lazy"
+          >
+        {% endif %}
+
+        <span class="product-info-client-accordion__title">
+          {{ accordion_title }}
+        </span>
+      </span>
+
+      <span class="product-info-client-accordion__icon" aria-hidden="true">
+        <span class="product-info-client-accordion__icon-line product-info-client-accordion__icon-line--horizontal"></span>
+        <span class="product-info-client-accordion__icon-line product-info-client-accordion__icon-line--vertical"></span>
+      </span>
+    </summary>
+
+    {% if accordion_content != blank %}
+      <div class="product-info-client-accordion__content">
+        {{ accordion_content }}
+      </div>
+    {% endif %}
+  </details>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Client service row",
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Client Service"
+    },
+    {
+      "type": "image_picker",
+      "id": "icon",
+      "label": "Icon"
+    },
+    {
+      "type": "richtext",
+      "id": "content",
+      "label": "Content",
+      "default": "<p>Add your client service information here.</p>"
+    },
+    {
+      "type": "checkbox",
+      "id": "open_by_default",
+      "label": "Open by default",
+      "default": false
+    }
+  ],
+  "presets": [
+    {
+      "name": "Client service row"
+    }
+  ]
+}
+{% endschema %}

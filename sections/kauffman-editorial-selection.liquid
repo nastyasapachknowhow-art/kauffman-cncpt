@@ -1,0 +1,989 @@
+{% liquid
+  assign section_id = 'kauffman-editorial-selection-v2-' | append: section.id
+  assign section_width_mode = section.settings.section_width | default: 'full'
+
+  assign editorial_url = section.settings.custom_link
+
+  assign editorial_aria_label = section.settings.heading
+  if editorial_aria_label == blank
+    for block in section.blocks
+      if block.settings.text != blank
+        if block.type == 'heading' or block.type == 'kauffman-heading'
+          assign editorial_aria_label = block.settings.text | strip_html
+          break
+        endif
+      endif
+
+      if block.type == 'group'
+        for child_block in block.blocks
+          if child_block.settings.text != blank
+            if child_block.type == 'heading' or child_block.type == 'kauffman-heading'
+              assign editorial_aria_label = child_block.settings.text | strip_html
+              break
+            endif
+          endif
+        endfor
+        if editorial_aria_label != blank
+          break
+        endif
+      endif
+    endfor
+  endif
+  if editorial_aria_label == blank
+    assign editorial_aria_label = shop.name
+  endif
+%}
+
+<section
+  id="{{ section_id }}"
+  class="
+    kauffman-editorial-selection-v2
+    kauffman-editorial-selection-v2--{{ section_width_mode }}
+    color-{{ section.settings.color_scheme }}
+  "
+  style="
+    --kesv2-page-width: {{ section.settings.page_width }}px;
+    --kesv2-section-padding-top: {{ section.settings.padding_top }}px;
+    --kesv2-section-padding-bottom: {{ section.settings.padding_bottom }}px;
+    --kesv2-section-padding-top-mobile: {{ section.settings.padding_top_mobile }}px;
+    --kesv2-section-padding-bottom-mobile: {{ section.settings.padding_bottom_mobile }}px;
+    --kesv2-editorial-height-desktop: {{ section.settings.editorial_height_desktop_vh | default: 75 }}svh;
+    --kesv2-editorial-height-mobile: {{ section.settings.editorial_height_mobile_vh | default: 70 }}svh;
+    --kesv2-overlay-opacity: {{ section.settings.overlay_opacity | divided_by: 100.0 }};
+    --kesv2-overlay-color: {{ section.settings.overlay_color }};
+    --kesv2-content-max-width: {{ section.settings.content_max_width }}px;
+    --kesv2-heading-size-desktop: {{ section.settings.heading_size_desktop }}px;
+    --kesv2-heading-size-mobile: {{ section.settings.heading_size_mobile }}px;
+    --kesv2-heading-line-height: {{ section.settings.heading_line_height | divided_by: 100.0 }};
+    --kesv2-heading-letter-spacing: {{ section.settings.heading_letter_spacing | divided_by: 100.0 }}em;
+    --kesv2-body-size: {{ section.settings.body_size }}px;
+  "
+>
+  <div class="kauffman-editorial-selection-v2__inner">
+    <div class="kauffman-editorial-selection-v2__grid">
+      <div class="kauffman-editorial-selection-v2__editorial">
+        {% if editorial_url != blank and section.settings.editorial_click_area != 'cta_only' %}
+          <a class="kauffman-editorial-selection-v2__media-link" href="{{ editorial_url }}" aria-label="{{ editorial_aria_label | escape }}">
+        {% endif %}
+
+        <div class="kauffman-editorial-selection-v2__media">
+          {% if section.settings.media_type == 'video' %}
+            {% liquid
+              assign desktop_video = section.settings.desktop_video
+              assign mobile_video = section.settings.mobile_video
+            %}
+
+            {% if desktop_video != blank or mobile_video != blank %}
+              {% if desktop_video != blank %}
+                {{
+                  desktop_video
+                  | video_tag:
+                    class: 'kauffman-editorial-selection-v2__video kauffman-editorial-selection-v2__video--desktop',
+                    image_size: '1600x',
+                    autoplay: section.settings.video_autoplay,
+                    loop: section.settings.video_loop,
+                    muted: true,
+                    controls: false,
+                    playsinline: true
+                }}
+              {% endif %}
+
+              {% if mobile_video != blank %}
+                {{
+                  mobile_video
+                  | video_tag:
+                    class: 'kauffman-editorial-selection-v2__video kauffman-editorial-selection-v2__video--mobile',
+                    image_size: '1000x',
+                    autoplay: section.settings.video_autoplay,
+                    loop: section.settings.video_loop,
+                    muted: true,
+                    controls: false,
+                    playsinline: true
+                }}
+              {% elsif desktop_video != blank %}
+                {{
+                  desktop_video
+                  | video_tag:
+                    class: 'kauffman-editorial-selection-v2__video kauffman-editorial-selection-v2__video--mobile',
+                    image_size: '1000x',
+                    autoplay: section.settings.video_autoplay,
+                    loop: section.settings.video_loop,
+                    muted: true,
+                    controls: false,
+                    playsinline: true
+                }}
+              {% endif %}
+            {% elsif section.settings.desktop_image != blank %}
+              {{
+                section.settings.desktop_image
+                | image_url: width: 3200
+                | image_tag:
+                  class: 'kauffman-editorial-selection-v2__image',
+                  loading: 'lazy',
+                  sizes: '100vw',
+                  widths: '600, 800, 1000, 1200, 1500, 1800, 2200, 2600, 3200'
+              }}
+            {% else %}
+              {{ 'collection-1' | placeholder_svg_tag: 'kauffman-editorial-selection-v2__placeholder' }}
+            {% endif %}
+          {% else %}
+            {% if section.settings.desktop_image != blank %}
+              <picture>
+                {% if section.settings.mobile_image != blank %}
+                  <source
+                    media="(max-width: 820px)"
+                    srcset="
+                      {{ section.settings.mobile_image | image_url: width: 600 }} 600w,
+                      {{ section.settings.mobile_image | image_url: width: 900 }} 900w,
+                      {{ section.settings.mobile_image | image_url: width: 1200 }} 1200w
+                    "
+                  >
+                {% endif %}
+
+                {{
+                  section.settings.desktop_image
+                  | image_url: width: 3200
+                  | image_tag:
+                    class: 'kauffman-editorial-selection-v2__image',
+                    loading: 'lazy',
+                    sizes: '100vw',
+                    widths: '600, 800, 1000, 1200, 1500, 1800, 2200, 2600, 3200'
+                }}
+              </picture>
+            {% else %}
+              {{ 'collection-1' | placeholder_svg_tag: 'kauffman-editorial-selection-v2__placeholder' }}
+            {% endif %}
+          {% endif %}
+
+          {% if section.settings.overlay_opacity > 0 %}
+            <span class="kauffman-editorial-selection-v2__overlay" aria-hidden="true"></span>
+          {% endif %}
+
+          <div class="kauffman-editorial-selection-v2__content kauffman-editorial-selection-v2__content--{{ section.settings.content_position }}">
+            <div class="kauffman-editorial-selection-v2__content-inner layout-panel-flex layout-panel-flex--column mobile-column">
+              {% if section.blocks.size > 0 %}
+                {% content_for 'blocks' %}
+              {% else %}
+                {% if section.settings.eyebrow != blank %}
+                  <p class="kauffman-editorial-selection-v2__eyebrow">
+                    {{ section.settings.eyebrow }}
+                  </p>
+                {% endif %}
+
+                {% if section.settings.heading != blank %}
+                  <h2 class="kauffman-editorial-selection-v2__heading kauffman-editorial-selection-v2__heading--{{ section.settings.heading_font }}">
+                    {{ section.settings.heading }}
+                  </h2>
+                {% endif %}
+
+                {% if section.settings.text != blank %}
+                  <div class="kauffman-editorial-selection-v2__text rte">
+                    {{ section.settings.text }}
+                  </div>
+                {% endif %}
+
+                {% if section.settings.cta_label != blank and editorial_url != blank %}
+                  <a class="kauffman-editorial-selection-v2__cta" href="{{ editorial_url }}">
+                    {{ section.settings.cta_label }}
+                  </a>
+                {% endif %}
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        {% if editorial_url != blank and section.settings.editorial_click_area != 'cta_only' %}
+          </a>
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<style>
+  #{{ section_id }} {
+    padding-top: var(--kesv2-section-padding-top);
+    padding-bottom: var(--kesv2-section-padding-bottom);
+  }
+
+  #{{ section_id }} .kauffman-editorial-selection-v2__inner {
+    width: 100%;
+    max-width: none;
+    margin-inline: 0;
+  }
+
+  #{{ section_id }}.kauffman-editorial-selection-v2--page .kauffman-editorial-selection-v2__inner {
+    width: min(calc(100% - 32px), var(--kesv2-page-width));
+    max-width: var(--kesv2-page-width);
+    margin-inline: auto;
+  }
+
+  #{{ section_id }} .kauffman-editorial-selection-v2__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+  }
+
+  #{{ section_id }} .kauffman-editorial-selection-v2__editorial,
+  #{{ section_id }} .kauffman-editorial-selection-v2__media,
+  #{{ section_id }} .kauffman-editorial-selection-v2__media-link {
+    min-width: 0;
+  }
+
+  #{{ section_id }} .kauffman-editorial-selection-v2__media-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  #{{ section_id }} .kauffman-editorial-selection-v2__media {
+    position: relative;
+    overflow: hidden;
+    height: clamp(360px, var(--kesv2-editorial-height-desktop), 900px);
+    min-height: clamp(360px, var(--kesv2-editorial-height-desktop), 900px);
+    background: rgba(var(--color-foreground), 0.04);
+  }
+
+  #{{ section_id }} .kauffman-editorial-selection-v2__image,
+  #{{ section_id }} .kauffman-editorial-selection-v2__video,
+  #{{ section_id }} .kauffman-editorial-selection-v2__placeholder {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: {{ section.settings.media_object_position }};
+  }
+
+  #{{ section_id }} .kauffman-editorial-selection-v2__video--mobile {
+    display: none;
+  }
+
+  #{{ section_id }} .kauffman-editorial-selection-v2__overlay {
+    position: absolute;
+    inset: 0;
+    background: var(--kesv2-overlay-color);
+    opacity: var(--kesv2-overlay-opacity);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  #{{ section_id }} .kauffman-editorial-selection-v2__content {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    padding: {{ section.settings.content_padding }}px;
+    color: {{ section.settings.content_color }};
+    overflow: hidden;
+  }
+
+  #{{ section_id }} .kauffman-editorial-selection-v2__content--top-left,
+  #{{ section_id }} .kauffman-editorial-selection-v2__content--center-left,
+  #{{ section_id }} .kauffman-editorial-selection-v2__content--bottom-left {
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  #{{ section_id }} .kauffman-editorial-selection-v2__content--top-center,
+  #{{ section_id }} .kauffman-editorial-selection-v2__content--center,
+  #{{ section_id }} .kauffman-editorial-selection-v2__content--bottom-center {
+    justify-content: center;
+    text-align: center;
+  }
+
+  #{{ section_id }} .kauffman-editorial-selection-v2__content--top-right,
+  #{{ section_id }} .kauffman-editorial-selection-v2__content--center-right,
+  #{{ section_id }} .kauffman-editorial-selection-v2__content--bottom-right {
+    justify-content: flex-end;
+    text-align: right;
+  }
+
+  #{{ section_id }} .kauffman-editorial-selection-v2__content--top-left,
+  #{{ section_id }} .kauffman-editorial-selection-v2__content--top-center,
+  #{{ section_id }} .kauffman-editorial-selection-v2__content--top-right {
+    align-items: flex-start;
+  }
+
+  #{{ section_id }} .kauffman-editorial-selection-v2__content--center-left,
+  #{{ section_id }} .kauffman-editorial-selection-v2__content--center,
+  #{{ section_id }} .kauffman-editorial-selection-v2__content--center-right {
+    align-items: center;
+  }
+
+  #{{ section_id }} .kauffman-editorial-selection-v2__content--bottom-left,
+  #{{ section_id }} .kauffman-editorial-selection-v2__content--bottom-center,
+  #{{ section_id }} .kauffman-editorial-selection-v2__content--bottom-right {
+    align-items: flex-end;
+  }
+
+  #{{ section_id }} .kauffman-editorial-selection-v2__content-inner {
+    width: min(100%, var(--kesv2-content-max-width));
+    max-width: var(--kesv2-content-max-width);
+    height: auto;
+    max-height: 100%;
+    min-height: 0;
+    overflow-wrap: anywhere;
+  }
+
+  #{{ section_id }} .kauffman-editorial-selection-v2__content-inner > .group-block {
+    height: auto;
+    flex-basis: auto;
+  }
+
+  #{{ section_id }} .kauffman-editorial-selection-v2__content-inner > .group-block > .group-block-content {
+    height: auto;
+  }
+
+  #{{ section_id }} .kauffman-editorial-selection-v2__content--top-left .kauffman-editorial-selection-v2__content-inner,
+  #{{ section_id }} .kauffman-editorial-selection-v2__content--center-left .kauffman-editorial-selection-v2__content-inner,
+  #{{ section_id }} .kauffman-editorial-selection-v2__content--bottom-left .kauffman-editorial-selection-v2__content-inner {
+    margin-right: auto;
+  }
+
+  #{{ section_id }} .kauffman-editorial-selection-v2__content--top-center .kauffman-editorial-selection-v2__content-inner,
+  #{{ section_id }} .kauffman-editorial-selection-v2__content--bottom-center .kauffman-editorial-selection-v2__content-inner,
+  #{{ section_id }} .kauffman-editorial-selection-v2__content--center .kauffman-editorial-selection-v2__content-inner {
+    margin-inline: auto;
+  }
+
+  #{{ section_id }} .kauffman-editorial-selection-v2__content--top-right .kauffman-editorial-selection-v2__content-inner,
+  #{{ section_id }} .kauffman-editorial-selection-v2__content--center-right .kauffman-editorial-selection-v2__content-inner,
+  #{{ section_id }} .kauffman-editorial-selection-v2__content--bottom-right .kauffman-editorial-selection-v2__content-inner {
+    margin-left: auto;
+  }
+
+  #{{ section_id }} .kauffman-editorial-selection-v2__eyebrow {
+    margin: 0 0 12px;
+    font-family: var(--font-body-family, Inter, sans-serif);
+    font-size: 12px;
+    line-height: 1.2;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  #{{ section_id }} .kauffman-editorial-selection-v2__heading {
+    margin: 0;
+    font-size: var(--kesv2-heading-size-desktop);
+    line-height: var(--kesv2-heading-line-height);
+    font-weight: {{ section.settings.heading_weight }};
+    letter-spacing: var(--kesv2-heading-letter-spacing);
+    {% if section.settings.heading_uppercase %}
+      text-transform: uppercase;
+    {% endif %}
+  }
+
+  #{{ section_id }} .kauffman-editorial-selection-v2__heading--serif {
+    font-family: var(--font-heading-family, Garamond, serif);
+  }
+
+  #{{ section_id }} .kauffman-editorial-selection-v2__heading--sans {
+    font-family: var(--font-body-family, Inter, sans-serif);
+  }
+
+  #{{ section_id }} .kauffman-editorial-selection-v2__heading--theme {
+    font-family: inherit;
+  }
+
+  #{{ section_id }} .kauffman-editorial-selection-v2__text {
+    margin-top: 16px;
+    font-family: var(--font-body-family, Inter, sans-serif);
+    font-size: var(--kesv2-body-size);
+    line-height: 1.35;
+  }
+
+  #{{ section_id }} .kauffman-editorial-selection-v2__text > * {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  #{{ section_id }} .kauffman-editorial-selection-v2__cta {
+    display: inline-block;
+    margin-top: 24px;
+    color: inherit;
+    font-family: var(--font-body-family, Inter, sans-serif);
+    font-size: 12px;
+    line-height: 1.2;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-thickness: 1px;
+  }
+
+  #{{ section_id }} .kauffman-editorial-selection-v2__spacer {
+    height: var(--kesv2-spacer-height-desktop);
+  }
+
+  @media screen and (max-width: 820px) {
+    #{{ section_id }} {
+      padding-top: var(--kesv2-section-padding-top-mobile);
+      padding-bottom: var(--kesv2-section-padding-bottom-mobile);
+    }
+
+    #{{ section_id }}.kauffman-editorial-selection-v2--page .kauffman-editorial-selection-v2__inner {
+      width: min(calc(100% - 24px), var(--kesv2-page-width));
+    }
+
+    #{{ section_id }}.kauffman-editorial-selection-v2--full .kauffman-editorial-selection-v2__inner {
+      width: 100%;
+      max-width: none;
+      margin-inline: 0;
+    }
+
+    #{{ section_id }} .kauffman-editorial-selection-v2__grid {
+      grid-template-columns: 1fr;
+    }
+
+    #{{ section_id }} .kauffman-editorial-selection-v2__editorial,
+    #{{ section_id }} .kauffman-editorial-selection-v2__media-link {
+      height: auto;
+    }
+
+    #{{ section_id }} .kauffman-editorial-selection-v2__media {
+      height: clamp(320px, var(--kesv2-editorial-height-mobile), 760px);
+      min-height: clamp(320px, var(--kesv2-editorial-height-mobile), 760px);
+    }
+
+    #{{ section_id }} .kauffman-editorial-selection-v2__video--desktop {
+      display: none;
+    }
+
+    #{{ section_id }} .kauffman-editorial-selection-v2__video--mobile {
+      display: block;
+    }
+
+    #{{ section_id }} .kauffman-editorial-selection-v2__content {
+      padding: {{ section.settings.content_padding_mobile }}px;
+      justify-content: flex-start;
+      align-items: flex-end;
+      text-align: left;
+    }
+
+    #{{ section_id }} .kauffman-editorial-selection-v2__content .kauffman-editorial-selection-v2__content-inner {
+      margin-left: 0;
+      margin-right: auto;
+    }
+
+    #{{ section_id }} .kauffman-editorial-selection-v2__heading {
+      font-size: var(--kesv2-heading-size-mobile);
+    }
+
+    #{{ section_id }} .kauffman-editorial-selection-v2__spacer {
+      height: var(--kesv2-spacer-height-mobile);
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "KAUFFMAN Editorial v2",
+  "settings": [
+    {
+      "type": "url",
+      "id": "custom_link",
+      "label": "Custom CTA link",
+      "info": "Optional link for editorial media and CTA."
+    },
+    {
+      "type": "select",
+      "id": "editorial_click_area",
+      "label": "Editorial click area",
+      "options": [
+        {
+          "value": "cta_only",
+          "label": "CTA only"
+        },
+        {
+          "value": "media_and_cta",
+          "label": "Media and CTA"
+        }
+      ],
+      "default": "media_and_cta"
+    },
+    {
+      "type": "header",
+      "content": "Editorial media"
+    },
+    {
+      "type": "select",
+      "id": "media_type",
+      "label": "Media type",
+      "options": [
+        {
+          "value": "image",
+          "label": "Image"
+        },
+        {
+          "value": "video",
+          "label": "Video"
+        }
+      ],
+      "default": "image"
+    },
+    {
+      "type": "image_picker",
+      "id": "desktop_image",
+      "label": "Desktop image"
+    },
+    {
+      "type": "image_picker",
+      "id": "mobile_image",
+      "label": "Mobile image"
+    },
+    {
+      "type": "video",
+      "id": "desktop_video",
+      "label": "Desktop video"
+    },
+    {
+      "type": "video",
+      "id": "mobile_video",
+      "label": "Mobile video"
+    },
+    {
+      "type": "checkbox",
+      "id": "video_autoplay",
+      "label": "Autoplay video",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "video_loop",
+      "label": "Loop video",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "media_object_position",
+      "label": "Media object position",
+      "options": [
+        {
+          "value": "center center",
+          "label": "Center"
+        },
+        {
+          "value": "center top",
+          "label": "Top"
+        },
+        {
+          "value": "center bottom",
+          "label": "Bottom"
+        },
+        {
+          "value": "left center",
+          "label": "Left"
+        },
+        {
+          "value": "right center",
+          "label": "Right"
+        }
+      ],
+      "default": "center center"
+    },
+    {
+      "type": "range",
+      "id": "editorial_height_desktop_vh",
+      "label": "Editorial height desktop",
+      "min": 30,
+      "max": 100,
+      "step": 1,
+      "unit": "svh",
+      "default": 75
+    },
+    {
+      "type": "range",
+      "id": "editorial_height_mobile_vh",
+      "label": "Editorial height mobile",
+      "min": 30,
+      "max": 100,
+      "step": 1,
+      "unit": "svh",
+      "default": 70
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Overlay color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Overlay opacity",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "default": 20
+    },
+    {
+      "type": "color",
+      "id": "content_color",
+      "label": "Editorial text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "select",
+      "id": "content_position",
+      "label": "Content position",
+      "options": [
+        {
+          "value": "top-left",
+          "label": "Top left"
+        },
+        {
+          "value": "top-center",
+          "label": "Top center"
+        },
+        {
+          "value": "top-right",
+          "label": "Top right"
+        },
+        {
+          "value": "center-left",
+          "label": "Center left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "center-right",
+          "label": "Center right"
+        },
+        {
+          "value": "bottom-left",
+          "label": "Bottom left"
+        },
+        {
+          "value": "bottom-center",
+          "label": "Bottom center"
+        },
+        {
+          "value": "bottom-right",
+          "label": "Bottom right"
+        }
+      ],
+      "default": "bottom-left"
+    },
+    {
+      "type": "range",
+      "id": "content_max_width",
+      "label": "Content max width",
+      "min": 240,
+      "max": 720,
+      "step": 20,
+      "unit": "px",
+      "default": 420
+    },
+    {
+      "type": "range",
+      "id": "content_padding",
+      "label": "Content padding desktop",
+      "min": 16,
+      "max": 96,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "content_padding_mobile",
+      "label": "Content padding mobile",
+      "min": 16,
+      "max": 64,
+      "step": 4,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Section width",
+      "options": [
+        {
+          "value": "page",
+          "label": "Page"
+        },
+        {
+          "value": "full",
+          "label": "Full screen"
+        }
+      ],
+      "default": "full"
+    },
+    {
+      "type": "range",
+      "id": "page_width",
+      "label": "Page width",
+      "min": 960,
+      "max": 1800,
+      "step": 20,
+      "unit": "px",
+      "default": 1600,
+      "visible_if": "{{ section.settings.section_width == 'page' }}"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top desktop",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom desktop",
+      "min": 0,
+      "max": 160,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_top_mobile",
+      "label": "Padding top mobile",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom_mobile",
+      "label": "Padding bottom mobile",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Heading typography"
+    },
+    {
+      "type": "select",
+      "id": "heading_font",
+      "label": "Heading font",
+      "options": [
+        {
+          "value": "theme",
+          "label": "Theme default"
+        },
+        {
+          "value": "serif",
+          "label": "Serif / Garamond"
+        },
+        {
+          "value": "sans",
+          "label": "Sans / Inter"
+        }
+      ],
+      "default": "serif"
+    },
+    {
+      "type": "range",
+      "id": "heading_size_desktop",
+      "label": "Heading size desktop",
+      "min": 20,
+      "max": 96,
+      "step": 2,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "heading_size_mobile",
+      "label": "Heading size mobile",
+      "min": 20,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "default": 36
+    },
+    {
+      "type": "select",
+      "id": "heading_weight",
+      "label": "Heading weight",
+      "options": [
+        {
+          "value": "300",
+          "label": "300"
+        },
+        {
+          "value": "400",
+          "label": "400"
+        },
+        {
+          "value": "500",
+          "label": "500"
+        },
+        {
+          "value": "600",
+          "label": "600"
+        }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "range",
+      "id": "heading_line_height",
+      "label": "Heading line height",
+      "min": 80,
+      "max": 140,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "heading_letter_spacing",
+      "label": "Heading letter spacing",
+      "min": -5,
+      "max": 30,
+      "step": 1,
+      "unit": "%",
+      "default": 0
+    },
+    {
+      "type": "checkbox",
+      "id": "heading_uppercase",
+      "label": "Uppercase heading",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "body_size",
+      "label": "Body text size",
+      "min": 12,
+      "max": 22,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    }
+  ],
+  "blocks": [
+    {
+      "type": "group"
+    }
+  ],
+  "presets": [
+    {
+      "name": "KAUFFMAN Editorial selection v2",
+      "blocks": {
+        "editorial_group": {
+          "type": "group",
+          "name": "Editorial content",
+          "settings": {
+            "content_direction": "column",
+            "vertical_on_mobile": true,
+            "horizontal_alignment": "flex-start",
+            "vertical_alignment": "center",
+            "align_baseline": false,
+            "horizontal_alignment_flex_direction_column": "flex-start",
+            "vertical_alignment_flex_direction_column": "center",
+            "gap": 12,
+            "width": "fill",
+            "custom_width": 100,
+            "width_mobile": "fill",
+            "custom_width_mobile": 100,
+            "height": "fit",
+            "custom_height": 100,
+            "inherit_color_scheme": true,
+            "color_scheme": "",
+            "background_media": "none",
+            "video_position": "cover",
+            "background_image_position": "cover",
+            "border": "none",
+            "border_width": 1,
+            "border_opacity": 100,
+            "border_radius": 0,
+            "toggle_overlay": false,
+            "overlay_color": "#00000026",
+            "overlay_style": "solid",
+            "gradient_direction": "to top",
+            "link": "",
+            "open_in_new_tab": false,
+            "placeholder": "",
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {
+            "eyebrow": {
+              "type": "kauffman-text",
+              "settings": {
+                "text": "<p>Selected edit</p>",
+                "type_preset": "custom",
+                "font": "var(--font-body--family)",
+                "font_size": "0.75rem",
+                "line_height": "normal",
+                "letter_spacing": "loose",
+                "case": "uppercase",
+                "width": "100%",
+                "max_width": "normal",
+                "alignment": "left",
+                "padding-block-end": 12
+              }
+            },
+            "heading": {
+              "type": "kauffman-heading",
+              "settings": {
+                "text": "<p>iPhone cases</p>",
+                "type_preset": "custom",
+                "font": "var(--font-heading--family)",
+                "font_size": "3rem",
+                "line_height": "tight",
+                "letter_spacing": "normal",
+                "case": "none",
+                "width": "100%",
+                "max_width": "normal"
+              }
+            },
+            "text": {
+              "type": "kauffman-text",
+              "settings": {
+                "text": "<p>A curated selection of protective accessories with a clean editorial finish.</p>",
+                "type_preset": "paragraph",
+                "width": "100%",
+                "max_width": "normal",
+                "alignment": "left",
+                "padding-block-start": 16
+              }
+            },
+            "button": {
+              "type": "button",
+              "settings": {
+                "label": "Shop the selection",
+                "link": "shopify://collections/all",
+                "style_class": "link"
+              }
+            }
+          },
+          "block_order": ["eyebrow", "heading", "text", "button"]
+        }
+      },
+      "block_order": ["editorial_group"]
+    }
+  ]
+}
+{% endschema %}

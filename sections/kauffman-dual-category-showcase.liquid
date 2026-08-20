@@ -1,0 +1,851 @@
+{% comment %}
+  KAUFFMAN — Dual Category Showcase
+  50/50 split category section with desktop hover reveal and mobile stacked cards.
+
+  Install:
+  1. Add this file to /sections/kauffman-dual-category-showcase.liquid
+  2. Theme editor → Add section → KAUFFMAN — Dual category showcase
+{% endcomment %}
+
+{%- liquid
+  assign section_id = 'kauffman-dual-category-showcase-' | append: section.id
+-%}
+
+<section
+  id="{{ section_id }}"
+  class="kauffman-dual-showcase color-{{ section.settings.color_scheme }}{% if section.settings.lock_text_left_offset %} kds-lock-text-left-offset{% endif %}{% if section.settings.use_header_typography %} kds-use-header-typography{% endif %}"
+  style="
+    --kds-height-desktop: {{ section.settings.desktop_height }}px;
+    --kds-height-mobile: {{ section.settings.mobile_card_height }}px;
+    --kds-gap: {{ section.settings.column_gap }}px;
+    --kds-content-max-width: {{ section.settings.content_max_width }}px;
+    --kds-padding-x-desktop: {{ section.settings.desktop_padding_x }}px;
+    --kds-padding-y-desktop: {{ section.settings.desktop_padding_y }}px;
+    --kds-padding-x-mobile: {{ section.settings.mobile_padding_x }}px;
+    --kds-padding-y-mobile: {{ section.settings.mobile_padding_y }}px;
+    --kds-content-left-desktop: {{ section.settings.content_left_desktop }}px;
+    --kds-content-left-mobile: {{ section.settings.content_left_mobile }}px;
+    --kds-overlay-color: {{ section.settings.overlay_color }};
+    --kds-overlay-opacity: {{ section.settings.overlay_opacity | divided_by: 100.0 }};
+    --kds-hover-overlay-opacity: {{ section.settings.hover_overlay_opacity | divided_by: 100.0 }};
+    --kds-text-color: {{ section.settings.text_color }};
+    --kds-border-color: {{ section.settings.divider_color }};
+    --kds-heading-size-desktop: {{ section.settings.heading_size_desktop }}px;
+    --kds-heading-size-mobile: {{ section.settings.heading_size_mobile }}px;
+    --kds-text-size: {{ section.settings.text_size }}px;
+    --kds-link-size: {{ section.settings.link_size }}px;
+    --kds-letter-spacing: {{ section.settings.letter_spacing | divided_by: 100.0 }}em;
+  "
+>
+  <div class="kauffman-dual-showcase__inner{% if section.settings.full_width == false %} page-width{% endif %}">
+    {%- for block in section.blocks -%}
+      {%- liquid
+        assign image = block.settings.image
+        assign mobile_image = block.settings.mobile_image | default: image
+        assign video = block.settings.video
+        assign mobile_video = block.settings.mobile_video | default: video
+        assign has_video = false
+        if video != blank
+          assign has_video = true
+        endif
+      -%}
+
+      <article
+        class="kauffman-dual-showcase__panel kauffman-dual-showcase__panel--{{ forloop.index }}{% if section.settings.enable_hover_reveal %} has-hover-reveal{% endif %}"
+        {{ block.shopify_attributes }}
+      >
+        <a
+          class="kauffman-dual-showcase__main-link"
+          href="{{ block.settings.main_url | default: '#' }}"
+          aria-label="{{ block.settings.heading | escape }}"
+        >
+          <span class="visually-hidden">{{ block.settings.heading }}</span>
+        </a>
+
+        <div class="kauffman-dual-showcase__media" aria-hidden="true">
+          {%- if has_video -%}
+            {{ video | video_tag:
+              autoplay: false,
+              loop: true,
+              muted: true,
+              controls: false,
+              playsinline: true,
+              preload: 'metadata',
+              class: 'kauffman-dual-showcase__video kauffman-dual-showcase__video--desktop'
+            }}
+          {%- elsif image != blank -%}
+            {{ image | image_url: width: 2400 | image_tag:
+              loading: 'lazy',
+              widths: '720, 960, 1200, 1600, 2000, 2400',
+              sizes: '(min-width: 821px) 50vw, 100vw',
+              class: 'kauffman-dual-showcase__image kauffman-dual-showcase__image--desktop'
+            }}
+          {%- else -%}
+            {{ 'collection-1' | placeholder_svg_tag: 'kauffman-dual-showcase__placeholder' }}
+          {%- endif -%}
+
+          {%- if mobile_video != blank -%}
+            {{ mobile_video | video_tag:
+              autoplay: false,
+              loop: true,
+              muted: true,
+              controls: false,
+              playsinline: true,
+              preload: 'metadata',
+              class: 'kauffman-dual-showcase__video kauffman-dual-showcase__video--mobile'
+            }}
+          {%- elsif mobile_image != blank -%}
+            {{ mobile_image | image_url: width: 1200 | image_tag:
+              loading: 'lazy',
+              widths: '480, 720, 960, 1200',
+              sizes: '100vw',
+              class: 'kauffman-dual-showcase__image kauffman-dual-showcase__image--mobile'
+            }}
+          {%- endif -%}
+        </div>
+
+        <div class="kauffman-dual-showcase__overlay"></div>
+
+        <div class="kauffman-dual-showcase__content kauffman-dual-showcase__content--{{ block.settings.content_position }}">
+          <div class="kauffman-dual-showcase__content-inner">
+            {%- if block.settings.eyebrow != blank -%}
+              <p class="kauffman-dual-showcase__eyebrow">{{ block.settings.eyebrow }}</p>
+            {%- endif -%}
+
+            {%- if block.settings.heading != blank -%}
+              <h2 class="kauffman-dual-showcase__heading">{{ block.settings.heading }}</h2>
+            {%- endif -%}
+
+            {%- if block.settings.text != blank -%}
+              <div class="kauffman-dual-showcase__text rte">{{ block.settings.text }}</div>
+            {%- endif -%}
+
+            {%- if block.settings.main_label != blank -%}
+              <a class="kauffman-dual-showcase__cta" href="{{ block.settings.main_url | default: '#' }}">
+                {{ block.settings.main_label }}
+              </a>
+            {%- endif -%}
+
+            <nav class="kauffman-dual-showcase__subnav" aria-label="{{ block.settings.heading | escape }} categories">
+              {%- for i in (1..5) -%}
+                {%- liquid
+                  assign label_key = 'sub_label_' | append: i
+                  assign url_key = 'sub_url_' | append: i
+                  assign label = block.settings[label_key]
+                  assign url = block.settings[url_key]
+                -%}
+                {%- if label != blank -%}
+                  <a class="kauffman-dual-showcase__subnav-link" href="{{ url | default: '#' }}">
+                    {{ label }}
+                  </a>
+                {%- endif -%}
+              {%- endfor -%}
+            </nav>
+          </div>
+        </div>
+      </article>
+    {%- endfor -%}
+  </div>
+</section>
+
+<style>
+  #{{ section_id }} {
+    display: block;
+    width: 100%;
+    color: var(--kds-text-color);
+  }
+
+  #{{ section_id }} .kauffman-dual-showcase__inner {
+    display: grid;
+    grid-template-columns: repeat({{ section.blocks.size | at_least: 1 }}, minmax(0, 1fr));
+    gap: var(--kds-gap);
+    min-height: var(--kds-height-desktop);
+    background: var(--kds-border-color);
+  }
+
+  #{{ section_id }} .kauffman-dual-showcase__panel {
+    position: relative;
+    isolation: isolate;
+    min-height: var(--kds-height-desktop);
+    overflow: hidden;
+    background: #111;
+  }
+
+  #{{ section_id }} .kauffman-dual-showcase__main-link {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+  }
+
+  #{{ section_id }} .kauffman-dual-showcase__media,
+  #{{ section_id }} .kauffman-dual-showcase__overlay {
+    position: absolute;
+    inset: 0;
+  }
+
+  #{{ section_id }} .kauffman-dual-showcase__media {
+    z-index: 0;
+  }
+
+  #{{ section_id }} .kauffman-dual-showcase__image,
+  #{{ section_id }} .kauffman-dual-showcase__video,
+  #{{ section_id }} .kauffman-dual-showcase__placeholder {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    transform: scale(1);
+    transition: transform 700ms ease, filter 700ms ease;
+  }
+
+  #{{ section_id }} .kauffman-dual-showcase__video--mobile,
+  #{{ section_id }} .kauffman-dual-showcase__image--mobile {
+    display: none;
+  }
+
+  #{{ section_id }} .kauffman-dual-showcase__overlay {
+    z-index: 1;
+    background: var(--kds-overlay-color);
+    opacity: var(--kds-overlay-opacity);
+    transition: opacity 350ms ease;
+    pointer-events: none;
+  }
+
+  #{{ section_id }} .kauffman-dual-showcase__content {
+    position: relative;
+    z-index: 3;
+    min-height: var(--kds-height-desktop);
+    display: flex;
+    padding: var(--kds-padding-y-desktop) var(--kds-padding-x-desktop);
+    pointer-events: none;
+  }
+
+  #{{ section_id }} .kauffman-dual-showcase__content--top-left { align-items: flex-start; justify-content: flex-start; text-align: left; }
+  #{{ section_id }} .kauffman-dual-showcase__content--top-center { align-items: flex-start; justify-content: center; text-align: center; }
+  #{{ section_id }} .kauffman-dual-showcase__content--center-left { align-items: center; justify-content: flex-start; text-align: left; }
+  #{{ section_id }} .kauffman-dual-showcase__content--center { align-items: center; justify-content: center; text-align: center; }
+  #{{ section_id }} .kauffman-dual-showcase__content--bottom-left { align-items: flex-end; justify-content: flex-start; text-align: left; }
+  #{{ section_id }} .kauffman-dual-showcase__content--bottom-center { align-items: flex-end; justify-content: center; text-align: center; }
+
+  #{{ section_id }}.kds-lock-text-left-offset .kauffman-dual-showcase__content {
+    justify-content: flex-start !important;
+    text-align: left !important;
+    padding-left: var(--kds-content-left-desktop);
+    padding-right: var(--kds-padding-x-desktop);
+  }
+
+  #{{ section_id }} .kauffman-dual-showcase__content-inner {
+    width: min(100%, var(--kds-content-max-width));
+    transition: transform 350ms ease;
+  }
+
+  #{{ section_id }} .kauffman-dual-showcase__eyebrow {
+    margin: 0 0 12px;
+    font-size: 11px;
+    line-height: 1.2;
+    letter-spacing: var(--kds-letter-spacing);
+    text-transform: uppercase;
+    color: currentColor;
+  }
+
+  #{{ section_id }} .kauffman-dual-showcase__heading {
+    margin: 0;
+    font-size: var(--kds-heading-size-desktop);
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    color: currentColor;
+  }
+
+  #{{ section_id }} .kauffman-dual-showcase__text {
+    margin-top: 18px;
+    font-size: var(--kds-text-size);
+    line-height: 1.45;
+    color: currentColor;
+    opacity: 0.88;
+  }
+
+  #{{ section_id }} .kauffman-dual-showcase__text p {
+    margin: 0;
+  }
+
+  #{{ section_id }} .kauffman-dual-showcase__cta,
+  #{{ section_id }} .kauffman-dual-showcase__subnav-link {
+    position: relative;
+    z-index: 5;
+    display: inline-flex;
+    width: fit-content;
+    color: currentColor;
+    text-decoration: none;
+    pointer-events: auto;
+  }
+
+  #{{ section_id }} .kauffman-dual-showcase__cta {
+    margin-top: 22px;
+    font-size: var(--kds-link-size);
+    line-height: 1.2;
+    letter-spacing: var(--kds-letter-spacing);
+    text-transform: uppercase;
+  }
+
+  #{{ section_id }} .kauffman-dual-showcase__cta::after,
+  #{{ section_id }} .kauffman-dual-showcase__subnav-link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -4px;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(1);
+    transform-origin: left center;
+    transition: transform 280ms ease;
+  }
+
+  #{{ section_id }} .kauffman-dual-showcase__cta:hover::after,
+  #{{ section_id }} .kauffman-dual-showcase__subnav-link:hover::after {
+    transform: scaleX(0);
+    transform-origin: right center;
+  }
+
+  #{{ section_id }} .kauffman-dual-showcase__subnav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px 22px;
+    margin-top: 30px;
+  }
+
+  #{{ section_id }} .kauffman-dual-showcase__subnav-link {
+    font-size: var(--kds-link-size);
+    line-height: 1.2;
+    letter-spacing: var(--kds-letter-spacing);
+    text-transform: uppercase;
+  }
+
+  #{{ section_id }}.kds-use-header-typography .kauffman-dual-showcase__eyebrow,
+  #{{ section_id }}.kds-use-header-typography .kauffman-dual-showcase__cta,
+  #{{ section_id }}.kds-use-header-typography .kauffman-dual-showcase__subnav-link {
+    font-family: Inter, Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  #{{ section_id }}.kds-use-header-typography .kauffman-dual-showcase__heading {
+    font-family: Inter, Helvetica, Arial, sans-serif;
+    font-weight: 300;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+  }
+
+  {% if section.settings.enable_hover_reveal %}
+    @media (hover: hover) and (pointer: fine) {
+      #{{ section_id }} .kauffman-dual-showcase__subnav {
+        opacity: 0;
+        transform: translateY(14px);
+        transition: opacity 350ms ease, transform 350ms ease;
+      }
+
+      #{{ section_id }} .kauffman-dual-showcase__panel:hover .kauffman-dual-showcase__subnav,
+      #{{ section_id }} .kauffman-dual-showcase__panel:focus-within .kauffman-dual-showcase__subnav {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      #{{ section_id }} .kauffman-dual-showcase__panel:hover .kauffman-dual-showcase__overlay,
+      #{{ section_id }} .kauffman-dual-showcase__panel:focus-within .kauffman-dual-showcase__overlay {
+        opacity: var(--kds-hover-overlay-opacity);
+      }
+
+      #{{ section_id }} .kauffman-dual-showcase__panel:hover .kauffman-dual-showcase__image,
+      #{{ section_id }} .kauffman-dual-showcase__panel:hover .kauffman-dual-showcase__video,
+      #{{ section_id }} .kauffman-dual-showcase__panel:focus-within .kauffman-dual-showcase__image,
+      #{{ section_id }} .kauffman-dual-showcase__panel:focus-within .kauffman-dual-showcase__video {
+        transform: scale(1.02);
+      }
+
+      #{{ section_id }} .kauffman-dual-showcase__panel:hover .kauffman-dual-showcase__content-inner,
+      #{{ section_id }} .kauffman-dual-showcase__panel:focus-within .kauffman-dual-showcase__content-inner {
+        transform: translateY(-8px);
+      }
+    }
+  {% endif %}
+
+  @media screen and (max-width: 820px) {
+    #{{ section_id }} .kauffman-dual-showcase__inner {
+      grid-template-columns: 1fr;
+      min-height: auto;
+    }
+
+    #{{ section_id }} .kauffman-dual-showcase__panel,
+    #{{ section_id }} .kauffman-dual-showcase__content {
+      min-height: var(--kds-height-mobile);
+    }
+
+    #{{ section_id }} .kauffman-dual-showcase__content {
+      padding: var(--kds-padding-y-mobile) var(--kds-padding-x-mobile);
+    }
+
+    #{{ section_id }}.kds-lock-text-left-offset .kauffman-dual-showcase__content {
+      padding-left: var(--kds-content-left-mobile);
+      padding-right: var(--kds-padding-x-mobile);
+    }
+
+    #{{ section_id }} .kauffman-dual-showcase__heading {
+      font-size: var(--kds-heading-size-mobile);
+    }
+
+    #{{ section_id }} .kauffman-dual-showcase__text {
+      margin-top: 14px;
+    }
+
+    #{{ section_id }} .kauffman-dual-showcase__subnav {
+      margin-top: 24px;
+      gap: 12px 18px;
+      {% if section.settings.mobile_show_subcategories == false %}
+        display: none;
+      {% endif %}
+    }
+
+    #{{ section_id }} .kauffman-dual-showcase__video--mobile,
+    #{{ section_id }} .kauffman-dual-showcase__image--mobile {
+      display: block;
+    }
+
+    #{{ section_id }} .kauffman-dual-showcase__video--mobile + *,
+    #{{ section_id }} .kauffman-dual-showcase__image--mobile + * {
+      display: none;
+    }
+
+    #{{ section_id }} .kauffman-dual-showcase__video--desktop:has(+ .kauffman-dual-showcase__video--mobile),
+    #{{ section_id }} .kauffman-dual-showcase__image--desktop:has(+ .kauffman-dual-showcase__image--mobile),
+    #{{ section_id }} .kauffman-dual-showcase__image--desktop:has(+ .kauffman-dual-showcase__video--mobile),
+    #{{ section_id }} .kauffman-dual-showcase__video--desktop:has(+ .kauffman-dual-showcase__image--mobile) {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  (() => {
+    const root = document.getElementById({{ section_id | json }});
+    if (!root) return;
+
+    const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    if (!canHover) return;
+
+    root.querySelectorAll('.kauffman-dual-showcase__panel').forEach((panel) => {
+      const video = panel.querySelector('.kauffman-dual-showcase__video--desktop');
+      if (!video) return;
+
+      panel.addEventListener('mouseenter', () => {
+        root.querySelectorAll('.kauffman-dual-showcase__video').forEach((otherVideo) => {
+          if (otherVideo !== video) otherVideo.pause();
+        });
+        video.play().catch(() => {});
+      });
+
+      panel.addEventListener('mouseleave', () => {
+        video.pause();
+      });
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "KAUFFMAN — Dual showcase",
+  "tag": "section",
+  "class": "section-kauffman-dual-showcase",
+  "max_blocks": 2,
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Full width",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_hover_reveal",
+      "label": "Enable desktop hover reveal",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "mobile_show_subcategories",
+      "label": "Show subcategories on mobile",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "lock_text_left_offset",
+      "label": "Lock same horizontal text position",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "use_header_typography",
+      "label": "Use header typography style",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "desktop_height",
+      "label": "Desktop height",
+      "min": 420,
+      "max": 900,
+      "step": 20,
+      "unit": "px",
+      "default": 680
+    },
+    {
+      "type": "range",
+      "id": "mobile_card_height",
+      "label": "Mobile card height",
+      "min": 320,
+      "max": 720,
+      "step": 20,
+      "unit": "px",
+      "default": 520
+    },
+    {
+      "type": "range",
+      "id": "column_gap",
+      "label": "Column gap / divider width",
+      "min": 0,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "content_max_width",
+      "label": "Content max width",
+      "min": 240,
+      "max": 620,
+      "step": 20,
+      "unit": "px",
+      "default": 420
+    },
+    {
+      "type": "range",
+      "id": "desktop_padding_x",
+      "label": "Desktop horizontal padding",
+      "min": 20,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "content_left_desktop",
+      "label": "Fixed content left offset desktop",
+      "min": 20,
+      "max": 140,
+      "step": 4,
+      "unit": "px",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "desktop_padding_y",
+      "label": "Desktop vertical padding",
+      "min": 20,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "mobile_padding_x",
+      "label": "Mobile horizontal padding",
+      "min": 16,
+      "max": 56,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "content_left_mobile",
+      "label": "Fixed content left offset mobile",
+      "min": 16,
+      "max": 56,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "mobile_padding_y",
+      "label": "Mobile vertical padding",
+      "min": 20,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "default": 36
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Overlay color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Overlay opacity",
+      "min": 0,
+      "max": 80,
+      "step": 2,
+      "unit": "%",
+      "default": 28
+    },
+    {
+      "type": "range",
+      "id": "hover_overlay_opacity",
+      "label": "Hover overlay opacity",
+      "min": 0,
+      "max": 90,
+      "step": 2,
+      "unit": "%",
+      "default": 42
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "divider_color",
+      "label": "Divider color",
+      "default": "#E5E0D8"
+    },
+    {
+      "type": "range",
+      "id": "heading_size_desktop",
+      "label": "Heading size desktop",
+      "min": 28,
+      "max": 84,
+      "step": 2,
+      "unit": "px",
+      "default": 54
+    },
+    {
+      "type": "range",
+      "id": "heading_size_mobile",
+      "label": "Heading size mobile",
+      "min": 24,
+      "max": 56,
+      "step": 2,
+      "unit": "px",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "label": "Text size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "link_size",
+      "label": "Link size",
+      "min": 10,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "letter_spacing",
+      "label": "Letter spacing",
+      "min": 0,
+      "max": 24,
+      "step": 1,
+      "unit": "%",
+      "default": 12
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category_panel",
+      "name": "Category panel",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Desktop image"
+        },
+        {
+          "type": "image_picker",
+          "id": "mobile_image",
+          "label": "Mobile image"
+        },
+        {
+          "type": "video",
+          "id": "video",
+          "label": "Desktop video"
+        },
+        {
+          "type": "video",
+          "id": "mobile_video",
+          "label": "Mobile video"
+        },
+        {
+          "type": "select",
+          "id": "content_position",
+          "label": "Content position",
+          "default": "bottom-left",
+          "options": [
+            { "value": "top-left", "label": "Top left" },
+            { "value": "top-center", "label": "Top center" },
+            { "value": "center-left", "label": "Center left" },
+            { "value": "center", "label": "Center" },
+            { "value": "bottom-left", "label": "Bottom left" },
+            { "value": "bottom-center", "label": "Bottom center" }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "eyebrow",
+          "label": "Eyebrow",
+          "default": "KAUFFMAN"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "APPAREL"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>Wardrobe pieces with a clean, architectural presence.</p>"
+        },
+        {
+          "type": "text",
+          "id": "main_label",
+          "label": "Main link label",
+          "default": "Shop Apparel"
+        },
+        {
+          "type": "url",
+          "id": "main_url",
+          "label": "Main link URL"
+        },
+        {
+          "type": "header",
+          "content": "Subcategory links"
+        },
+        {
+          "type": "text",
+          "id": "sub_label_1",
+          "label": "Subcategory 1 label",
+          "default": "Hoodies"
+        },
+        {
+          "type": "url",
+          "id": "sub_url_1",
+          "label": "Subcategory 1 URL"
+        },
+        {
+          "type": "text",
+          "id": "sub_label_2",
+          "label": "Subcategory 2 label",
+          "default": "T-Shirts"
+        },
+        {
+          "type": "url",
+          "id": "sub_url_2",
+          "label": "Subcategory 2 URL"
+        },
+        {
+          "type": "text",
+          "id": "sub_label_3",
+          "label": "Subcategory 3 label",
+          "default": "New Arrivals"
+        },
+        {
+          "type": "url",
+          "id": "sub_url_3",
+          "label": "Subcategory 3 URL"
+        },
+        {
+          "type": "text",
+          "id": "sub_label_4",
+          "label": "Subcategory 4 label",
+          "default": "All Apparel"
+        },
+        {
+          "type": "url",
+          "id": "sub_url_4",
+          "label": "Subcategory 4 URL"
+        },
+        {
+          "type": "text",
+          "id": "sub_label_5",
+          "label": "Subcategory 5 label"
+        },
+        {
+          "type": "url",
+          "id": "sub_url_5",
+          "label": "Subcategory 5 URL"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "KAUFFMAN — Dual category showcase",
+      "blocks": [
+        {
+          "type": "category_panel",
+          "settings": {
+            "eyebrow": "KAUFFMAN",
+            "heading": "APPAREL",
+            "text": "<p>Wardrobe pieces with a clean, architectural presence.</p>",
+            "main_label": "Shop Apparel",
+            "sub_label_1": "Hoodies",
+            "sub_label_2": "T-Shirts",
+            "sub_label_3": "New Arrivals",
+            "sub_label_4": "All Apparel"
+          }
+        },
+        {
+          "type": "category_panel",
+          "settings": {
+            "eyebrow": "KAUFFMAN",
+            "heading": "<h2>TECH</h2>",
+            "text": "<p>Protection for the objects you carry every day.</p>",
+            "main_label": "Shop Tech",
+            "sub_label_1": "iPhone Cases",
+            "sub_label_2": "MacBook Cases",
+            "sub_label_3": "Gift Boxes",
+            "sub_label_4": "All Tech"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

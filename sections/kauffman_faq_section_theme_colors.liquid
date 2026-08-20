@@ -1,0 +1,312 @@
+<section class="kauffman-faq-section color-{{ section.settings.color_scheme }}">
+  <style>
+    .kauffman-faq-section {
+      color: inherit;
+      background: transparent;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .kauffman-faq-section * { box-sizing: border-box; }
+
+    .kauffman-faq {
+      max-width: var(--page-width, 980px);
+      margin: 0 auto;
+      padding: 48px 24px 96px;
+      background: transparent;
+      color: inherit;
+    }
+
+    .kauffman-faq__content h2 {
+      font-size: 20px;
+      font-weight: 500;
+      margin: 32px 0 8px;
+      padding-top: 24px;
+      border-top: 1px solid rgba(var(--color-foreground, 18, 18, 18), 0.12);
+      color: inherit;
+    }
+
+    .kauffman-faq__content h2:first-of-type {
+      border-top: none;
+      padding-top: 0;
+      margin-top: 0;
+    }
+
+    .kauffman-faq__content h3 {
+      font-size: 16px;
+      font-weight: 500;
+      margin: 24px 0 8px;
+      color: inherit;
+    }
+
+    .kauffman-faq__content p {
+      margin: 0 0 12px;
+      color: rgba(var(--color-foreground, 18, 18, 18), 0.72);
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .kauffman-faq__meta {
+      font-size: 13px;
+      color: rgba(var(--color-foreground, 18, 18, 18), 0.62);
+      margin-bottom: 24px;
+    }
+
+    .kauffman-faq__steps {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .kauffman-faq__step {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .kauffman-faq__step-num {
+      width: auto;
+      height: auto;
+      border: 0;
+      border-radius: 0;
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 1.6;
+      color: rgba(var(--color-foreground, 18, 18, 18), 0.62);
+    }
+
+    .kauffman-faq__step-num::after { content: "."; }
+
+    .kauffman-faq__step-body {
+      font-size: 13px;
+      line-height: 1.6;
+      color: rgba(var(--color-foreground, 18, 18, 18), 0.72);
+    }
+
+    .kauffman-faq__step-body div:first-child { color: inherit; }
+
+    .kauffman-faq__hint {
+      color: rgba(var(--color-foreground, 18, 18, 18), 0.52);
+      font-style: italic;
+      font-size: 12px;
+    }
+
+    .kauffman-faq__care-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 16px 0;
+    }
+
+    .kauffman-faq__care-card {
+      padding: 14px;
+      border: 1px solid rgba(var(--color-foreground, 18, 18, 18), 0.12);
+      background: transparent;
+    }
+
+    .kauffman-faq__care-icon {
+      width: auto;
+      height: auto;
+      border: 0;
+      border-radius: 0;
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: rgba(var(--color-foreground, 18, 18, 18), 0.72);
+      margin-bottom: 8px;
+    }
+
+    .kauffman-faq__care-label {
+      font-size: 12px;
+      font-weight: 500;
+      margin-bottom: 2px;
+      color: inherit;
+    }
+
+    .kauffman-faq__care-desc {
+      font-size: 11px;
+      color: rgba(var(--color-foreground, 18, 18, 18), 0.52);
+      line-height: 1.5;
+    }
+
+    .kauffman-faq__alert {
+      padding: 12px 14px;
+      background: rgba(var(--color-foreground, 18, 18, 18), 0.04);
+      border-left: 2px solid rgba(var(--color-foreground, 18, 18, 18), 0.35);
+      font-size: 12px;
+      color: rgba(var(--color-foreground, 18, 18, 18), 0.82);
+      line-height: 1.6;
+      margin: 12px 0 16px;
+    }
+
+    .kauffman-faq__alert b { font-weight: 500; color: inherit; }
+
+    .kauffman-faq__list {
+      margin: 8px 0 16px;
+      padding-left: 0;
+      list-style: none;
+      color: rgba(var(--color-foreground, 18, 18, 18), 0.72);
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .kauffman-faq__list li {
+      margin-bottom: 4px;
+      padding-left: 0;
+    }
+
+    .kauffman-faq__ship-table { margin-bottom: 18px; }
+
+    .kauffman-faq__ship-row {
+      display: grid;
+      grid-template-columns: 1fr 120px 100px;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(var(--color-foreground, 18, 18, 18), 0.12);
+      font-size: 13px;
+      align-items: center;
+      color: rgba(var(--color-foreground, 18, 18, 18), 0.72);
+    }
+
+    .kauffman-faq__ship-row--head {
+      border-bottom-color: rgba(var(--color-foreground, 18, 18, 18), 0.22);
+      padding-bottom: 8px;
+      color: rgba(var(--color-foreground, 18, 18, 18), 0.52);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .kauffman-faq__ship-name { font-weight: 500; color: inherit; }
+    .kauffman-faq__ship-sub { color: rgba(var(--color-foreground, 18, 18, 18), 0.52); font-size: 11px; }
+    .kauffman-faq__ship-time { color: inherit; }
+    .kauffman-faq__ship-cost { text-align: right; color: inherit; }
+
+    .kauffman-faq__link {
+      color: inherit;
+      text-decoration: underline;
+      text-underline-offset: 0.2em;
+    }
+
+    @media (max-width: 720px) {
+      .kauffman-faq { padding: 32px 16px 72px; }
+      .kauffman-faq__care-grid { grid-template-columns: 1fr; }
+      .kauffman-faq__ship-row { grid-template-columns: 1fr; gap: 4px; }
+      .kauffman-faq__ship-cost { text-align: left; }
+    }
+  </style>
+
+<div class="kauffman-faq">
+      <div class="kauffman-faq__content">
+        <h2 id="faq-identify-iphone">How to identify your iPhone model</h2>
+        <p>Not sure which iPhone you have? Here are three ways to check.</p>
+        <h3>Method 1 — from your iPhone</h3>
+        <div class="kauffman-faq__steps">
+          <div class="kauffman-faq__step"><div class="kauffman-faq__step-num">1</div><div class="kauffman-faq__step-body"><div>Open <b>Settings</b></div><div class="kauffman-faq__hint">Grey gear icon on your home screen</div></div></div>
+          <div class="kauffman-faq__step"><div class="kauffman-faq__step-num">2</div><div class="kauffman-faq__step-body"><div>Tap <b>General</b> → <b>About</b></div><div class="kauffman-faq__hint">First section in General menu</div></div></div>
+          <div class="kauffman-faq__step"><div class="kauffman-faq__step-num">3</div><div class="kauffman-faq__step-body"><div>Look for <b>Model Name</b></div><div class="kauffman-faq__hint">Will show e.g. “iPhone 17 Pro Max” directly</div></div></div>
+        </div>
+        <h3>Method 2 — from the box or back of the device</h3>
+        <p>The model number, starting with <b>A</b>, is printed on the back of older iPhones near the bottom edge and on the original packaging. Match it against Apple’s identification page if needed.</p>
+
+        <h2 id="faq-identify-macbook">How to identify your MacBook model</h2>
+        <p>Find your model in 30 seconds.</p>
+        <div class="kauffman-faq__steps">
+          <div class="kauffman-faq__step"><div class="kauffman-faq__step-num">1</div><div class="kauffman-faq__step-body"><div>Click the Apple logo in the top-left corner of your screen</div><div class="kauffman-faq__hint">The Apple menu will open</div></div></div>
+          <div class="kauffman-faq__step"><div class="kauffman-faq__step-num">2</div><div class="kauffman-faq__step-body"><div>Select <b>About This Mac</b></div><div class="kauffman-faq__hint">A window with your device information will appear</div></div></div>
+          <div class="kauffman-faq__step"><div class="kauffman-faq__step-num">3</div><div class="kauffman-faq__step-body"><div>Look for the line <b>Chip</b> or <b>Processor</b></div><div class="kauffman-faq__hint">It will show something like Apple M4 or Apple M2</div></div></div>
+          <div class="kauffman-faq__step"><div class="kauffman-faq__step-num">4</div><div class="kauffman-faq__step-body"><div>Alternatively, turn your laptop over — the model number is printed on the bottom</div><div class="kauffman-faq__hint">For example: A2681, A3113, A3240, A3449 — these are all MacBook Air 13″</div></div></div>
+        </div>
+        <p><b>Important:</b> If you have a MacBook Air 13″ released before 2022, M1 2020, it has a different body and is not compatible with our cases for Air 13″ 2022–2026.</p>
+
+        <h2 id="faq-care-apparel">Care · t-shirts &amp; hoodies</h2>
+        <p>To maintain the quality and appearance of your apparel, please follow these guidelines.</p>
+        <div class="kauffman-faq__care-grid">
+          <div class="kauffman-faq__care-card"><div class="kauffman-faq__care-icon">30°</div><div class="kauffman-faq__care-label">Machine wash</div><div class="kauffman-faq__care-desc">Maximum 30°C · gentle spin 600–800 rpm</div></div>
+          <div class="kauffman-faq__care-card"><div class="kauffman-faq__care-icon">⊘</div><div class="kauffman-faq__care-label">No tumble dry</div><div class="kauffman-faq__care-desc">Hang to dry naturally</div></div>
+          <div class="kauffman-faq__care-card"><div class="kauffman-faq__care-icon">↕</div><div class="kauffman-faq__care-label">Iron inside out</div><div class="kauffman-faq__care-desc">Cotton setting · never directly on print</div></div>
+        </div>
+        <div class="kauffman-faq__alert"><b>Crystal embellishments:</b> avoid direct ironing, harsh detergents and bleach. Wash inside out to protect both the print and the crystals.</div>
+        <ul class="kauffman-faq__list">
+          <li>Machine wash at a maximum of 30°C</li>
+          <li>Use a gentle spin cycle, 600–800 rpm</li>
+          <li>Do not tumble dry</li>
+          <li>Hang to dry naturally</li>
+          <li>Iron inside out at a cotton setting</li>
+          <li>Do not iron directly on the print or crystal embellishments</li>
+        </ul>
+
+        <h2 id="faq-care-cases">Care · phone &amp; laptop cases</h2>
+        <p>To preserve the look and quality of your case, please follow these guidelines.</p>
+        <ul class="kauffman-faq__list">
+          <li>Avoid prolonged exposure to direct sunlight — UV rays may cause discoloration over time</li>
+          <li>Handle with clean hands — contact with cosmetics, oils, sand or creams may affect the surface</li>
+          <li>Avoid storing your case with keys or other sharp objects</li>
+          <li>For MacBook cases: ensure ventilation slots remain unobstructed during use</li>
+          <li>Clean with a soft, slightly damp cloth — no solvents or abrasive cleaners</li>
+        </ul>
+
+        <h2 id="faq-size-guide">Size guide</h2>
+        <p>Measurements in centimetres. Our apparel has an oversized fit — if you are between sizes, choose the smaller one for a more relaxed look or the larger one for a more boxy silhouette.</p>
+        <p><i>Detailed size table per category will be added with finalized measurements: chest, length, shoulder and sleeve.</i></p>
+
+        <h2 id="faq-personalization">Personalization rules</h2>
+        <p>You can add a name, initials or symbol to your case for free.</p>
+        <ul class="kauffman-faq__list">
+          <li>Maximum 12 characters, Latin alphabet</li>
+          <li>Available metalware: Gold, Silver</li>
+          <li>Symbols available: ♡ / ★ / # / , / - / @</li>
+          <li>Optional zodiac symbol</li>
+        </ul>
+        <div class="kauffman-faq__alert"><b>Important:</b> personalized products with custom name, initials or symbols cannot be returned, regardless of payment method, according to OUG 34/2014, art. 16 lit. c. Defects in personalization, missing letters or misalignment, are covered under warranty and remediated free of charge in the first 12 months.</div>
+
+        <h2 id="faq-delivery">Delivery options</h2>
+        <p>We ship across Romania and the European Union. Delivery times exclude weekends and Romanian public holidays.</p>
+        <div class="kauffman-faq__ship-table">
+          <div class="kauffman-faq__ship-row kauffman-faq__ship-row--head"><div>Method</div><div>Delivery time</div><div class="kauffman-faq__ship-cost">Cost</div></div>
+          <div class="kauffman-faq__ship-row"><div><div class="kauffman-faq__ship-name">Standard courier (RO)</div><div class="kauffman-faq__ship-sub">Sameday · FAN · Cargus</div></div><div class="kauffman-faq__ship-time">1–3 business days</div><div class="kauffman-faq__ship-cost">€4,99 / free €50+</div></div>
+          <div class="kauffman-faq__ship-row"><div><div class="kauffman-faq__ship-name">Locker pickup (RO)</div><div class="kauffman-faq__ship-sub">EasyBox · FAN Box</div></div><div class="kauffman-faq__ship-time">2 business days</div><div class="kauffman-faq__ship-cost">€3,49 / free €50+</div></div>
+          <div class="kauffman-faq__ship-row"><div><div class="kauffman-faq__ship-name">EU standard</div><div class="kauffman-faq__ship-sub">DPD · GLS</div></div><div class="kauffman-faq__ship-time">3–7 business days</div><div class="kauffman-faq__ship-cost">€9,99 / free €150+</div></div>
+          <div class="kauffman-faq__ship-row"><div><div class="kauffman-faq__ship-name">Express EU</div><div class="kauffman-faq__ship-sub">DHL Express</div></div><div class="kauffman-faq__ship-time">1–3 business days</div><div class="kauffman-faq__ship-cost">€19,99</div></div>
+        </div>
+        <p>Personalized products require <b>1–2 additional business days</b> for production before shipping.</p>
+
+        <h2 id="faq-returns">Returns &amp; refunds</h2>
+        <p>According to OUG 34/2014, you have the right to return non-personalized products within <b>14 calendar days</b> of receipt without giving any reason.</p>
+        <ul class="kauffman-faq__list">
+          <li>Items must be in original condition with all labels and packaging</li>
+          <li>Return shipping from RO is free; EU returns: customer covers the shipping cost</li>
+          <li>Refunds are processed within 14 days of receiving the returned product</li>
+          <li>Original delivery cost is not refunded</li>
+        </ul>
+        <div class="kauffman-faq__alert"><b>Personalized products:</b> cannot be returned regardless of payment method, OUG 34/2014, art. 16 lit. c. This includes any case with custom name, initials, symbols or zodiac.</div>
+        <p>To initiate a return, email <a href="mailto:returns@kauffmanconcept.ro" class="kauffman-faq__link">returns@kauffmanconcept.ro</a> with your order number.</p>
+
+        <h2 id="faq-warranty">Warranty</h2>
+        <p>All Kauffman Concept products benefit from the <b>24-month legal warranty of conformity</b> from the date of delivery, in accordance with Legea 449/2003, modified by OUG 140/2021, transposing EU Directive 2019/771.</p>
+        <p>For full warranty conditions, exclusions and the claim process, see the dedicated <a href="/pages/warranty" class="kauffman-faq__link">Warranty page</a>.</p>
+      </div>
+    </div>
+</section>
+
+{% schema %}
+{
+  "name": "Kauffman FAQ",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Kauffman FAQ"
+    }
+  ]
+}
+{% endschema %}
