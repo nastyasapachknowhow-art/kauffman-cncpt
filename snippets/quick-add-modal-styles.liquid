@@ -477,10 +477,8 @@
       place-items: center;
       overflow: hidden;
       container-type: size;
-      /* The product imagery contains transparent space. This small optical
-       * offset aligns the visible product with the popup's left edge. */
-      margin-inline-start: calc(-1 * var(--quick-add-modal-padding));
-      transform: translateX(calc(-1 * var(--padding-sm)));
+      width: calc(100% + var(--quick-add-modal-padding));
+      margin-inline-start: calc(var(--quick-add-modal-padding) / -2);
     }
   }
 
@@ -549,12 +547,19 @@
 
     .quick-add-modal__content .product-information__media slideshow-component {
       display: grid;
+      grid-template-columns: minmax(0, 1fr);
       grid-template-rows: minmax(0, 1fr) auto;
       min-height: 0;
     }
 
     .quick-add-modal__content .product-information__media slideshow-container {
+      grid-column: 1 / -1;
       grid-row: 1;
+    }
+
+    .quick-add-modal__content .product-information__media .product-media__image {
+      transform: scale(1.08);
+      transform-origin: center;
     }
 
     .quick-add-modal__content .product-information__media .media-gallery__preview-strip--desktop {
