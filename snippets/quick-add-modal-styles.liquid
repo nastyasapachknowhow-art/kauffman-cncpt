@@ -572,13 +572,15 @@
     .quick-add-modal__content
       .product-information__media
       slideshow-controls.media-gallery__bullet-controls[class~='mobile:hidden'] {
-      position: static;
+      position: relative;
       grid-column: 1;
       grid-row: 2;
-      justify-self: stretch;
+      justify-self: start;
       z-index: var(--layer-raised);
       display: flex !important;
-      width: 100%;
+      width: fit-content;
+      left: 50%;
+      transform: translateX(-50%);
       justify-content: center;
       margin: var(--gap-xs) 0 0;
       padding: 0;
@@ -590,8 +592,11 @@
     .quick-add-modal__content
       .product-information__media
       slideshow-controls.media-gallery__bullet-controls[class~='desktop:hidden'] {
+      position: relative;
+      left: 50%;
       display: flex !important;
-      width: 100%;
+      width: fit-content;
+      transform: translateX(-50%);
       justify-content: center;
       margin: var(--gap-xs) 0 0;
       pointer-events: auto;
