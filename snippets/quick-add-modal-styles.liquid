@@ -572,15 +572,12 @@
     .quick-add-modal__content
       .product-information__media
       slideshow-controls.media-gallery__bullet-controls[class~='mobile:hidden'] {
-      position: relative;
-      grid-column: 1 / -1;
-      grid-row: 2;
-      justify-self: start;
+      position: absolute;
+      inset-inline: 0;
+      bottom: 0;
       z-index: var(--layer-raised);
       display: flex !important;
-      width: fit-content;
-      left: 50%;
-      transform: translateX(-50%);
+      width: auto;
       justify-content: center;
       margin: var(--gap-xs) 0 0;
       padding: 0;
