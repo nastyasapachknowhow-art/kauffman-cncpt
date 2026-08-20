@@ -12,8 +12,6 @@ import { PaginatedListAspectRatioHelper } from '@theme/paginated-list-aspect-rat
  * @property {HTMLSpanElement} [viewMorePrevious] - The view more previous button.
  * @property {HTMLSpanElement} [viewMoreNext] - The view more next button.
  * @property {HTMLElement[]} [cards] - The cards elements.
- * @property {HTMLAnchorElement} [loadMore] - The progressively enhanced load-more link.
- * @property {HTMLElement} [loadMoreStatus] - Live region for appended product announcements.
  *
  * @extends Component<Refs>
  */
@@ -106,51 +104,6 @@ export default class PaginatedList extends Component {
   }
 
   /**
-   * Appends the next page after an explicit user action. The control remains a
-   * normal link when JavaScript is unavailable.
-   *
-   * @param {MouseEvent} event
-   */
-  async loadNextPage(event) {
-    event.preventDefault();
-
-    const control = event.currentTarget;
-    if (!(control instanceof HTMLAnchorElement) || control.getAttribute('aria-busy') === 'true') return;
-
-    control.setAttribute('aria-busy', 'true');
-    control.setAttribute('aria-disabled', 'true');
-
-    try {
-      const appendedItems = await this.#renderNextPage();
-
-      if (appendedItems.length > 0) {
-        const firstAppendedItem = appendedItems[0];
-        const { loadMoreStatus } = this.refs;
-
-        if (loadMoreStatus) {
-          const countTemplate = loadMoreStatus.dataset.countTemplate || '__COUNT__ items';
-          loadMoreStatus.textContent = countTemplate.replace('__COUNT__', String(appendedItems.length));
-        }
-
-        // Keyboard activation should continue at the newly appended results.
-        if (event.detail === 0 && firstAppendedItem instanceof HTMLElement) {
-          firstAppendedItem.tabIndex = -1;
-          firstAppendedItem.focus({ preventScroll: true });
-        }
-      }
-    } catch (error) {
-      console.error('Unable to load the next product page.', error);
-      const { loadMoreStatus } = this.refs;
-      if (loadMoreStatus) loadMoreStatus.textContent = '';
-    } finally {
-      if (control.isConnected) {
-        control.removeAttribute('aria-busy');
-        control.removeAttribute('aria-disabled');
-      }
-    }
-  }
-
-  /**
    * @param {{ page: number, url?: URL } | undefined} pageInfo - The page info
    * @returns {boolean} Whether to use the page
    */
@@ -214,11 +167,11 @@ export default class PaginatedList extends Component {
   async #renderNextPage() {
     const { grid } = this.refs;
 
-    if (!grid) return [];
+    if (!grid) return;
 
     const nextPage = this.#getPage('next');
 
-    if (!nextPage || !this.#shouldUsePage(nextPage)) return [];
+    if (!nextPage || !this.#shouldUsePage(nextPage)) return;
     let nextPageItemElements = this.#getGridForPage(nextPage.page);
 
     if (!nextPageItemElements) {
@@ -231,45 +184,18 @@ export default class PaginatedList extends Component {
 
       await promise;
       nextPageItemElements = this.#getGridForPage(nextPage.page);
-      if (!nextPageItemElements) return [];
+      if (!nextPageItemElements) return;
     }
 
-    const appendedItems = Array.from(nextPageItemElements);
-    grid.append(...appendedItems);
+    grid.append(...nextPageItemElements);
 
     this.#aspectRatioHelper.processNewElements();
 
     history.pushState('', '', nextPage.url.toString());
 
-    this.#updateLoadMoreControl(nextPage.page);
-
     requestIdleCallback(() => {
       this.#fetchPage('next');
     });
-
-    return appendedItems;
-  }
-
-  /**
-   * Points the progressive-enhancement link at the following Shopify page, or
-   * removes it after the final page has been appended.
-   *
-   * @param {number} renderedPage
-   */
-  #updateLoadMoreControl(renderedPage) {
-    const { grid, loadMore } = this.refs;
-    if (!grid || !loadMore) return;
-
-    const lastPage = Number(grid.dataset.lastPage);
-    if (!lastPage || renderedPage >= lastPage) {
-      loadMore.closest('.product-grid__load-more-wrapper')?.remove();
-      return;
-    }
-
-    const nextUrl = new URL(window.location.href);
-    nextUrl.searchParams.set('page', String(renderedPage + 1));
-    nextUrl.hash = '';
-    loadMore.href = nextUrl.toString();
   }
 
   async #renderPreviousPage() {

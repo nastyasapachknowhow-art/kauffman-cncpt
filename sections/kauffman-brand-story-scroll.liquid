@@ -7,14 +7,13 @@
   id="{{ section_id }}"
   class="
     kf-story-scroll
-    color-{{ section.settings.color_scheme }}
-    gradient
     kf-story-scroll--width-{{ section.settings.section_width }}
     kf-story-scroll--desktop-{{ section.settings.desktop_layout }}
     {% if section.settings.show_top_border %}kf-story-scroll--top-border{% endif %}
     {% if section.settings.show_bottom_border %}kf-story-scroll--bottom-border{% endif %}
     {% if section.settings.hide_scrollbar %}kf-story-scroll--hide-scrollbar{% endif %}
   "
+  style="background-color: #fff !important; background-image: none !important;"
 >
   <div class="kf-story-scroll__inner">
     {% if section.settings.section_eyebrow != blank or section.settings.section_heading != blank or section.settings.section_text != blank %}
@@ -71,12 +70,6 @@
                 {% endif %}
 
                 <div class="kf-story-scroll__card-body">
-                  {% if section.settings.show_numbers %}
-                    <span class="kf-story-scroll__number" aria-hidden="true">
-                      {{ forloop.index | prepend: '0' | slice: -2, 2 }}
-                    </span>
-                  {% endif %}
-
                   {% if block.settings.eyebrow != blank %}
                     <p class="kf-story-scroll__eyebrow">
                       {{ block.settings.eyebrow }}
@@ -126,28 +119,34 @@
 </section>
 
 {% style %}
+  #shopify-section-{{ section.id }},
+  #{{ section_id }}.kf-story-scroll {
+    background-color: #fff !important;
+    background-image: none !important;
+  }
+
   #{{ section_id }} {
     --kf-story-padding-top: {{ section.settings.padding_top }}px;
     --kf-story-padding-bottom: {{ section.settings.padding_bottom }}px;
     --kf-story-padding-top-mobile: {{ section.settings.padding_top_mobile }}px;
     --kf-story-padding-bottom-mobile: {{ section.settings.padding_bottom_mobile }}px;
     --kf-story-gap: {{ section.settings.gap }}px;
-    --kf-story-gap-mobile: {{ section.settings.gap_mobile }}px;
+    --kf-story-gap-mobile: 12px;
     --kf-story-card-width: {{ section.settings.card_width }}px;
-    --kf-story-card-width-mobile: {{ section.settings.card_width_mobile }}vw;
+    --kf-story-card-width-mobile: 80vw;
     --kf-story-card-min-height: {{ section.settings.card_min_height }}px;
-    --kf-story-card-min-height-mobile: {{ section.settings.card_min_height_mobile }}px;
+    --kf-story-card-min-height-mobile: 260px;
     --kf-story-card-padding: {{ section.settings.card_padding }}px;
-    --kf-story-card-padding-mobile: {{ section.settings.card_padding_mobile }}px;
+    --kf-story-card-padding-mobile: 16px;
     --kf-story-text-size: {{ section.settings.text_size }}px;
-    --kf-story-text-size-mobile: {{ section.settings.text_size_mobile }}px;
-    --kf-story-eyebrow-size: {{ section.settings.eyebrow_size }}px;
+    --kf-story-text-size-mobile: 14px;
+    --kf-story-eyebrow-size: 11px;
     --kf-story-ending-size: {{ section.settings.ending_text_size }}px;
-    --kf-story-ending-size-mobile: {{ section.settings.ending_text_size_mobile }}px;
+    --kf-story-ending-size-mobile: 14px;
     --kf-story-accent: {{ section.settings.accent_color }};
-    --kf-story-border-opacity: {{ section.settings.border_opacity | divided_by: 100.0 }};
-    --kf-story-card-bg-opacity: {{ section.settings.card_background_opacity | divided_by: 100.0 }};
-    --kf-story-media-ratio: {{ section.settings.image_ratio }}%;
+    --kf-story-border-opacity: 0.14;
+    --kf-story-card-bg-opacity: 0;
+    --kf-story-media-ratio: 75%;
   }
 
   #{{ section_id }}.kf-story-scroll {
@@ -220,8 +219,8 @@
     max-width: 920px;
     font-size: {{ section.settings.section_eyebrow_size }}px;
     line-height: 1.2;
-    letter-spacing: {{ section.settings.section_eyebrow_letter_spacing | divided_by: 100.0 }}em;
-    text-transform: {% if section.settings.section_eyebrow_uppercase %}uppercase{% else %}none{% endif %};
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
     color: rgba(var(--color-foreground), 0.72);
   }
 
@@ -262,7 +261,7 @@
 
   #{{ section_id }}.kf-story-scroll--desktop-grid .kf-story-scroll__track {
     grid-auto-flow: initial;
-    grid-template-columns: repeat({{ section.settings.desktop_columns }}, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     overflow: visible;
     scroll-snap-type: none;
   }
@@ -438,12 +437,12 @@
 
     #{{ section_id }} .kf-story-scroll__section-eyebrow {
       margin-bottom: {{ section.settings.section_eyebrow_spacing_mobile }}px;
-      font-size: {{ section.settings.section_eyebrow_size_mobile }}px;
+      font-size: 11px;
     }
 
     #{{ section_id }} .kf-story-scroll__section-text {
       margin-top: 18px;
-      font-size: {{ section.settings.section_text_size_mobile }}px;
+      font-size: 14px;
     }
 
     #{{ section_id }} .kf-story-scroll__track,
@@ -502,12 +501,6 @@
   "name": "Kauffman story scroll",
   "settings": [
     {
-      "type": "color_scheme",
-      "id": "color_scheme",
-      "label": "Color scheme",
-      "default": "scheme-1"
-    },
-    {
       "type": "select",
       "id": "section_width",
       "label": "Width",
@@ -538,15 +531,6 @@
         }
       ],
       "default": "scroll"
-    },
-    {
-      "type": "range",
-      "id": "desktop_columns",
-      "label": "Desktop grid columns",
-      "min": 2,
-      "max": 4,
-      "step": 1,
-      "default": 3
     },
     {
       "type": "inline_richtext",
@@ -608,16 +592,6 @@
     },
     {
       "type": "range",
-      "id": "card_width_mobile",
-      "label": "Card width mobile",
-      "min": 70,
-      "max": 92,
-      "step": 1,
-      "unit": "vw",
-      "default": 84
-    },
-    {
-      "type": "range",
       "id": "card_min_height",
       "label": "Card min height desktop",
       "min": 260,
@@ -625,16 +599,6 @@
       "step": 10,
       "unit": "px",
       "default": 430
-    },
-    {
-      "type": "range",
-      "id": "card_min_height_mobile",
-      "label": "Card min height mobile",
-      "min": 260,
-      "max": 620,
-      "step": 10,
-      "unit": "px",
-      "default": 390
     },
     {
       "type": "range",
@@ -648,16 +612,6 @@
     },
     {
       "type": "range",
-      "id": "card_padding_mobile",
-      "label": "Card padding mobile",
-      "min": 16,
-      "max": 48,
-      "step": 2,
-      "unit": "px",
-      "default": 24
-    },
-    {
-      "type": "range",
       "id": "gap",
       "label": "Gap desktop",
       "min": 8,
@@ -665,52 +619,6 @@
       "step": 2,
       "unit": "px",
       "default": 18
-    },
-    {
-      "type": "range",
-      "id": "gap_mobile",
-      "label": "Gap mobile",
-      "min": 8,
-      "max": 32,
-      "step": 2,
-      "unit": "px",
-      "default": 12
-    },
-    {
-      "type": "range",
-      "id": "image_ratio",
-      "label": "Image ratio",
-      "min": 55,
-      "max": 140,
-      "step": 5,
-      "unit": "%",
-      "default": 75
-    },
-    {
-      "type": "range",
-      "id": "border_opacity",
-      "label": "Border opacity",
-      "min": 0,
-      "max": 40,
-      "step": 1,
-      "unit": "%",
-      "default": 14
-    },
-    {
-      "type": "range",
-      "id": "card_background_opacity",
-      "label": "Card background opacity",
-      "min": 0,
-      "max": 100,
-      "step": 5,
-      "unit": "%",
-      "default": 0
-    },
-    {
-      "type": "checkbox",
-      "id": "show_numbers",
-      "label": "Show card numbers",
-      "default": true
     },
     {
       "type": "checkbox",
@@ -740,32 +648,6 @@
     },
     {
       "type": "range",
-      "id": "section_eyebrow_size_mobile",
-      "label": "Section eyebrow size mobile",
-      "min": 10,
-      "max": 16,
-      "step": 1,
-      "unit": "px",
-      "default": 11
-    },
-    {
-      "type": "range",
-      "id": "section_eyebrow_letter_spacing",
-      "label": "Section eyebrow letter spacing",
-      "min": 0,
-      "max": 40,
-      "step": 1,
-      "unit": "%",
-      "default": 22
-    },
-    {
-      "type": "checkbox",
-      "id": "section_eyebrow_uppercase",
-      "label": "Uppercase section eyebrow",
-      "default": true
-    },
-    {
-      "type": "range",
       "id": "section_text_size",
       "label": "Section text size desktop",
       "min": 12,
@@ -773,16 +655,6 @@
       "step": 1,
       "unit": "px",
       "default": 15
-    },
-    {
-      "type": "range",
-      "id": "section_text_size_mobile",
-      "label": "Section text size mobile",
-      "min": 12,
-      "max": 20,
-      "step": 1,
-      "unit": "px",
-      "default": 14
     },
     {
       "type": "range",
@@ -796,16 +668,6 @@
     },
     {
       "type": "range",
-      "id": "ending_text_size_mobile",
-      "label": "Ending text size mobile",
-      "min": 12,
-      "max": 20,
-      "step": 1,
-      "unit": "px",
-      "default": 14
-    },
-    {
-      "type": "range",
       "id": "text_size",
       "label": "Card text size desktop",
       "min": 12,
@@ -813,26 +675,6 @@
       "step": 1,
       "unit": "px",
       "default": 14
-    },
-    {
-      "type": "range",
-      "id": "text_size_mobile",
-      "label": "Card text size mobile",
-      "min": 12,
-      "max": 18,
-      "step": 1,
-      "unit": "px",
-      "default": 14
-    },
-    {
-      "type": "range",
-      "id": "eyebrow_size",
-      "label": "Eyebrow size",
-      "min": 9,
-      "max": 14,
-      "step": 1,
-      "unit": "px",
-      "default": 11
     },
     {
       "type": "header",

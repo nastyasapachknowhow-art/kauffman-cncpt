@@ -75,8 +75,6 @@
   assign should_show_pane = true
   if block_settings.filter_style == 'vertical'
     assign should_show_pane = block_settings.enable_filtering
-  elsif block_settings.filter_style == 'drawer'
-    assign should_show_pane = false
   endif
 
   assign should_use_select_on_mobile = true
@@ -84,61 +82,6 @@
     assign should_use_select_on_mobile = false
   endif
 -%}
-
-{% if block_settings.filter_style == 'drawer' and block_settings.enable_filtering %}
-  <div
-    class="collection-results-toolbar{% if block_settings.sticky_toolbar %} collection-results-toolbar--sticky{% endif %}"
-    style="{% render 'spacing-style', settings: block_settings %}"
-  >
-    <div class="collection-results-toolbar__count">
-      <span role="status">
-        {% if products_count > 25000 %}
-          {{- 'content.item_count_cutoff' | t: count: 25000 -}}
-        {% else %}
-          {{- 'content.item_count' | t: count: products_count -}}
-        {% endif %}
-      </span>
-    </div>
-
-    <div class="collection-results-toolbar__controls">
-      <button
-        class="button-unstyled button-unstyled--with-icon collection-results-toolbar__filter"
-        on:click="#filters-drawer/showDialog"
-        type="button"
-        aria-haspopup="dialog"
-        aria-controls="filters-drawer"
-      >
-        <span class="svg-wrapper">
-          {{ 'icon-filter.svg' | inline_asset_content }}
-        </span>
-        {{ 'actions.show_filters' | t }}
-        {% if total_active_values > 0 %}
-          <span class="bubble" aria-hidden="true">{{ total_active_values }}</span>
-          <span class="visually-hidden">{{ 'accessibility.filter_count' | t: count: total_active_values }}</span>
-        {% endif %}
-      </button>
-
-      {% if block_settings.enable_grid_density %}
-        <div class="collection-results-toolbar__density collection-results-toolbar__density--desktop">
-          {% render 'grid-density-controls', viewport: 'desktop' %}
-        </div>
-        <div class="collection-results-toolbar__density collection-results-toolbar__density--mobile">
-          {% render 'grid-density-controls', viewport: 'mobile' %}
-        </div>
-      {% endif %}
-    </div>
-  </div>
-
-  <div class="collection-results-toolbar__active-filters">
-    {% render 'filter-remove-buttons',
-      filters: filters,
-      results_url: results_url,
-      show_filter_label: block_settings.show_filter_label,
-      should_show_clear_all: true,
-      form_id: 'FacetFiltersFormComponent--' | append: section.id | append: '-overflow'
-    %}
-  </div>
-{% endif %}
 
 {% if block_settings.enable_filtering or block_settings.enable_sorting or block_settings.enable_grid_density %}
   {% if block_settings.filter_style == 'vertical' %}
@@ -388,7 +331,6 @@
     </div>
   </div>
 
-  {% unless block_settings.filter_style == 'drawer' %}
   <div
     class="facets-toggle{% if block_settings.enable_filtering == false %} facets-toggle--no-filters{% endif %}{% if block_settings.filter_style == 'horizontal' and block_settings.inherit_color_scheme == false %} color-{{ block_settings.color_scheme }}{% endif %}"
     style="
@@ -469,7 +411,6 @@
       {% endif %}
     </div>
   </div>
-  {% endunless %}
 {% else %}
   <div></div>
 {% endif %}
@@ -663,73 +604,6 @@
 {% endif %}
 
 {% stylesheet %}
-  .collection-results-toolbar,
-  .collection-results-toolbar__active-filters {
-    grid-column: var(--full-width);
-  }
-
-  .collection-results-toolbar {
-    display: flex;
-    min-height: var(--minimum-touch-target);
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--gap-md);
-    padding-block: var(--padding-block-start) var(--padding-block-end);
-    padding-inline: max(var(--page-margin), var(--padding-inline-start)) max(var(--page-margin), var(--padding-inline-end));
-    border-block: var(--style-border-width) solid rgb(var(--color-border-rgb) / var(--opacity-15));
-    background: var(--color-background);
-    z-index: var(--layer-raised);
-  }
-
-  .collection-results-toolbar--sticky {
-    position: sticky;
-    top: var(--header-group-height, 0);
-    z-index: var(--layer-sticky);
-  }
-
-  .collection-results-toolbar__count,
-  .collection-results-toolbar__filter {
-    font-size: var(--font-size--sm);
-    text-transform: var(--facet-label-transform);
-  }
-
-  .collection-results-toolbar__controls,
-  .collection-results-toolbar__filter {
-    display: flex;
-    align-items: center;
-    gap: var(--gap-xs);
-  }
-
-  .collection-results-toolbar__filter {
-    min-height: var(--minimum-touch-target);
-    cursor: pointer;
-  }
-
-  .collection-results-toolbar__density--desktop {
-    display: none;
-
-    @media screen and (min-width: 821px) {
-      display: block;
-    }
-  }
-
-  .collection-results-toolbar__density--mobile {
-    display: block;
-
-    @media screen and (min-width: 821px) {
-      display: none;
-    }
-  }
-
-  .collection-results-toolbar__active-filters {
-    padding-inline: var(--page-margin);
-  }
-
-  .collection-results-toolbar__active-filters .facets-remove {
-    padding-inline: 0;
-    margin-block: var(--margin-sm);
-  }
-
   .facets-block-wrapper {
     @media screen and (min-width: 821px) {
       margin: var(--facets-margin);
@@ -1541,10 +1415,6 @@
       "label": "t:settings.direction",
       "options": [
         {
-          "value": "drawer",
-          "label": "Drawer"
-        },
-        {
           "value": "horizontal",
           "label": "t:options.horizontal"
         },
@@ -1553,7 +1423,7 @@
           "label": "t:options.vertical"
         }
       ],
-      "default": "drawer",
+      "default": "horizontal",
       "visible_if": "{{ block.settings.enable_filtering == true }}"
     },
     {
@@ -1589,13 +1459,6 @@
       ],
       "default": "default",
       "visible_if": "{{ block.settings.enable_filtering == true }}"
-    },
-    {
-      "type": "checkbox",
-      "id": "sticky_toolbar",
-      "label": "Sticky results toolbar",
-      "default": false,
-      "visible_if": "{{ block.settings.filter_style == 'drawer' }}"
     },
     {
       "type": "checkbox",
