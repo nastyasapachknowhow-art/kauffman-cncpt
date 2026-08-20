@@ -6,6 +6,12 @@
 {%- enddoc -%}
 
 {% stylesheet %}
+  /* Product pages use the sticky purchase bar. Keep this block available to
+     quick add, which is rendered outside #MainContent. */
+  #MainContent[data-template^='product'] .product-information__grid .buy-buttons-block {
+    display: none;
+  }
+
   .buy-buttons-block {
     --buy-button-preferred-width: 185px;
 
