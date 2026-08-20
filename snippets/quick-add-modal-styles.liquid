@@ -590,7 +590,7 @@
 
     .quick-add-modal__content .product-form-buttons:has(.accelerated-checkout-block) {
       display: grid;
-      grid-template-columns: minmax(8.5rem, 1fr) minmax(0, 2fr);
+      grid-template-columns: minmax(0, 3fr) minmax(0, 7fr);
       gap: 0;
     }
 
@@ -616,8 +616,8 @@
       grid-column: 1;
       grid-row: 1;
       order: -1;
-      border: var(--style-border-width) solid var(--color-foreground);
-      background: var(--color-background);
+      border: 0;
+      background: #ef6a3a;
     }
 
     .quick-add-modal__content .product-form-buttons:has(.accelerated-checkout-block) > span:not(
@@ -633,13 +633,38 @@
       color: #fff;
       background: #000;
       box-shadow: none;
-      letter-spacing: 0.2em;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
+    }
+
+    .quick-add-modal__content .add-to-cart-button :is(.add-to-cart-text, .add-to-cart-text__content),
+    .quick-add-modal__content .add-to-cart-button .add-to-cart-text__content > span {
+      white-space: nowrap;
+    }
+
+    .quick-add-modal__content .add-to-cart-button .add-to-cart-text__content > span > span {
+      font-size: 0;
+    }
+
+    .quick-add-modal__content .add-to-cart-button .add-to-cart-text__content > span > span::after {
+      content: 'ADD TO BAG';
+      font-size: var(--font-paragraph--size);
     }
 
     .quick-add-modal__content .accelerated-checkout-block shopify-accelerated-checkout {
       --shopify-accelerated-checkout-button-border-radius: 0;
       --shopify-accelerated-checkout-button-block-size: var(--height-buy-buttons);
+    }
+
+    .quick-add-modal__content .accelerated-checkout-block button.shopify-payment-button__button--unbranded {
+      --button-color: #fff;
+      --button-background-color: #ef6a3a;
+      --button-border-color: #ef6a3a;
+
+      color: #fff;
+      background: #ef6a3a;
+      border-radius: 0;
+      box-shadow: none;
     }
   }
 
