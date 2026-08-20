@@ -522,6 +522,33 @@
     display: none;
   }
 
+  /* Keep the carousel's own pagination as a quiet divider between the selected
+   * image and the visual thumbnail rail. */
+  @media screen and (min-width: 821px) {
+    .quick-add-modal__content
+      .product-information__media
+      slideshow-controls.media-gallery__bullet-controls[class~='mobile:hidden'] {
+      position: absolute;
+      inset: auto 0 calc(var(--thumbnail-width) * 0.85 + var(--padding-sm) * 2);
+      z-index: var(--layer-raised);
+      display: flex;
+      justify-content: center;
+      margin: 0;
+      pointer-events: auto;
+    }
+  }
+
+  @media screen and (max-width: 820px) {
+    .quick-add-modal__content
+      .product-information__media
+      slideshow-controls.media-gallery__bullet-controls[class~='desktop:hidden'] {
+      display: flex;
+      justify-content: center;
+      margin: var(--gap-xs) 0 0;
+      pointer-events: auto;
+    }
+  }
+
   .quick-add-modal__content .sticky-content,
   .quick-add-modal__content .sticky-content--desktop {
     top: 0;
@@ -563,8 +590,8 @@
 
     .quick-add-modal__content .product-form-buttons:has(.accelerated-checkout-block) {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: var(--gap-sm);
+      grid-template-columns: minmax(8.5rem, 1fr) minmax(0, 2fr);
+      gap: 0;
     }
 
     .quick-add-modal__content .product-form-buttons:has(.accelerated-checkout-block) > :is(
@@ -583,6 +610,36 @@
       ) {
       min-width: 0;
       width: 100%;
+    }
+
+    .quick-add-modal__content .product-form-buttons:has(.accelerated-checkout-block) > .accelerated-checkout-block {
+      grid-column: 1;
+      grid-row: 1;
+      order: -1;
+      border: var(--style-border-width) solid var(--color-foreground);
+      background: var(--color-background);
+    }
+
+    .quick-add-modal__content .product-form-buttons:has(.accelerated-checkout-block) > span:not(
+        .product-form-text__error
+      ) {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .quick-add-modal__content .product-form-buttons:has(.accelerated-checkout-block) .add-to-cart-button {
+      height: var(--height-buy-buttons);
+      border-radius: 0;
+      color: #fff;
+      background: #000;
+      box-shadow: none;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    .quick-add-modal__content .accelerated-checkout-block shopify-accelerated-checkout {
+      --shopify-accelerated-checkout-button-border-radius: 0;
+      --shopify-accelerated-checkout-button-block-size: var(--height-buy-buttons);
     }
   }
 
