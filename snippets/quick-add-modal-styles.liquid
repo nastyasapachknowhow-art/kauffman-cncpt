@@ -400,6 +400,10 @@
       product-inventory *,
       .kauffman-personalization,
       .kauffman-personalization *,
+      rte-formatter.text-block:has(strong),
+      rte-formatter.text-block:has(strong) *,
+      .shopify-block:has(.kauffman-delivery),
+      .shopify-block:has(.kauffman-delivery) *,
       .view-more-details__wrapper,
       .view-more-details__wrapper *
     ) {
@@ -612,14 +616,50 @@
     top: 0;
   }
 
-  .quick-add-modal__content .text-block.rte:not(product-price),
+  .quick-add-modal__content .text-block.rte:not(product-price):not(:has(strong)),
   .quick-add-modal__content .view-more-details__wrapper {
     display: none;
+  }
+
+  .quick-add-modal__content
+    .product-details
+    > .group-block
+    > .group-block-content
+    > rte-formatter.text-block:has(strong),
+  .quick-add-modal__content
+    .product-details
+    > .group-block
+    > .group-block-content
+    > .shopify-block:has(.kauffman-delivery) {
+    display: block !important;
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: min(100%, 32rem);
+    margin-inline: auto;
+  }
+
+  .quick-add-modal__content
+    .product-details
+    > .group-block
+    > .group-block-content
+    > rte-formatter.text-block:has(strong) {
+    order: 1;
+    margin-block: var(--gap-lg) 0;
+  }
+
+  .quick-add-modal__content
+    .product-details
+    > .group-block
+    > .group-block-content
+    > .shopify-block:has(.kauffman-delivery) {
+    order: 2;
+    margin-block: var(--gap-lg) var(--gap-xl);
   }
 
   /* Purchase controls deliberately share the PDP form hierarchy. The dynamic
    * checkout button receives the currently selected variant via that form. */
   .quick-add-modal__content .buy-buttons-block {
+    order: 3;
     width: 100%;
     max-width: var(--product-details-content-max-width, 382px);
     margin-inline: auto;

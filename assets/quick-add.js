@@ -208,6 +208,82 @@ export class QuickAddComponent extends Component {
 
     this.#syncVariantSelection(modalContent);
     this.#setupGalleryControls(modalContent);
+    this.#setupDeliveryEstimate(modalContent);
+  }
+
+  /**
+   * Initializes delivery dates because scripts from fetched product markup do
+   * not execute when that markup is inserted into the quick-add dialog.
+   * @param {Element} modalContent - The quick-add modal content container.
+   */
+  #setupDeliveryEstimate(modalContent) {
+    const euCountries = new Set([
+      'AT',
+      'BE',
+      'BG',
+      'HR',
+      'CY',
+      'CZ',
+      'DK',
+      'EE',
+      'FI',
+      'FR',
+      'DE',
+      'GR',
+      'HU',
+      'IE',
+      'IT',
+      'LV',
+      'LT',
+      'LU',
+      'MT',
+      'NL',
+      'PL',
+      'PT',
+      'RO',
+      'SK',
+      'SI',
+      'ES',
+      'SE',
+    ]);
+
+    const addBusinessDays = (date, days) => {
+      const result = new Date(date);
+      let addedDays = 0;
+
+      while (addedDays < days) {
+        result.setDate(result.getDate() + 1);
+        const day = result.getDay();
+
+        if (day !== 0 && day !== 6) addedDays += 1;
+      }
+
+      return result;
+    };
+
+    modalContent.querySelectorAll('.kauffman-delivery').forEach((delivery) => {
+      const target = delivery.querySelector('[data-delivery-date]');
+      if (!(target instanceof HTMLElement)) return;
+
+      const country = delivery.dataset.country || 'EU';
+      const [minimum, maximum] = euCountries.has(country)
+        ? [Number(delivery.dataset.euMin), Number(delivery.dataset.euMax)]
+        : country === 'GB'
+          ? [Number(delivery.dataset.ukMin), Number(delivery.dataset.ukMax)]
+          : country === 'US'
+            ? [Number(delivery.dataset.usMin), Number(delivery.dataset.usMax)]
+            : [Number(delivery.dataset.restMin), Number(delivery.dataset.restMax)];
+      const minimumDays = minimum || 1;
+      const maximumDays = maximum || minimumDays;
+      const formatDate = new Intl.DateTimeFormat(document.documentElement.lang || undefined, {
+        month: 'short',
+        day: 'numeric',
+      });
+
+      target.textContent = `${formatDate.format(addBusinessDays(new Date(), minimumDays))} – ${formatDate.format(
+        addBusinessDays(new Date(), maximumDays)
+      )}`;
+    });
   }
 
   /**
