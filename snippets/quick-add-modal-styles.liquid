@@ -435,7 +435,6 @@
     width: 100%;
     grid-column: 1 / span 1;
     grid-row: 1;
-    min-height: 0;
     position: relative;
     top: 0;
     animation: fadeIn 0.4s var(--animation-timing-fade-in) both;
@@ -443,24 +442,23 @@
     @media screen and (min-width: 821px) {
       position: sticky;
       grid-column: 1 / 4;
-      width: auto;
-      height: 100%;
-      padding: var(--padding-lg);
-      border-inline-end: var(--style-border-width) solid rgb(var(--color-foreground-rgb) / 0.08);
-      background: rgb(var(--color-foreground-rgb) / 0.025);
+      width: var(--quick-add-modal-gallery-width);
+      overflow-y: auto;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    &::-webkit-scrollbar {
+      display: none;
     }
   }
 
   .quick-add-modal__content .product-information__media media-gallery {
-    pointer-events: auto;
+    pointer-events: none;
 
     @media screen and (min-width: 821px) {
-      display: grid;
-      grid-template-columns: clamp(3.5rem, 16%, 4.5rem) minmax(0, 1fr);
-      grid-template-rows: minmax(0, 1fr);
-      gap: var(--gap-sm);
-      height: 100%;
-      min-height: 0;
+      position: absolute;
+      inset: 0;
     }
   }
 
@@ -478,16 +476,16 @@
 
   .quick-add-modal__content .product-information__media slideshow-slides {
     display: flex;
-    flex-direction: row;
-    gap: 0;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
+    flex-direction: column;
+    gap: var(--gap-2xs);
+    overflow: visible;
+    scroll-snap-type: none;
   }
 
   .quick-add-modal__content .product-information__media slideshow-slide {
     width: 100%;
     flex: none;
-    scroll-snap-align: center;
+    scroll-snap-align: unset;
     position: relative;
     transform: none;
     opacity: 1;
@@ -496,69 +494,23 @@
   }
 
   .quick-add-modal__content .product-information__media slideshow-slide[aria-hidden='true'] {
-    display: block;
-  }
-
-  @media screen and (min-width: 821px) {
-    .quick-add-modal__content .product-information__media slideshow-component {
-      grid-column: 2;
-      grid-row: 1;
-      min-width: 0;
-      height: 100%;
-    }
-
-    .quick-add-modal__content .product-information__media slideshow-container,
-    .quick-add-modal__content .product-information__media slideshow-slides,
-    .quick-add-modal__content .product-information__media slideshow-slide,
-    .quick-add-modal__content .product-information__media .product-media {
-      height: 100%;
-    }
-
-    .quick-add-modal__content .product-information__media .product-media {
-      display: grid;
-      place-items: center;
-      aspect-ratio: auto;
-      background: var(--color-background);
-      border: var(--style-border-width) solid rgb(var(--color-foreground-rgb) / 0.08);
-    }
-
-    .quick-add-modal__content .product-information__media .product-media__image {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
-
-    .quick-add-modal__content .product-information__media .media-gallery__preview-strip--desktop {
-      grid-column: 1;
-      grid-row: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      align-self: center;
-      gap: var(--gap-sm);
-      max-height: 100%;
-      padding: 0;
-      overflow-y: auto;
-      overflow-x: hidden;
-    }
-
-    .quick-add-modal__content .product-information__media .media-gallery__preview-strip--desktop .media-gallery__preview-thumb {
-      flex: 0 0 auto;
-      width: 100%;
-      height: auto;
-      aspect-ratio: 1;
-      border: var(--style-border-width) solid transparent;
-      border-radius: 0;
-      background: var(--color-background);
-    }
-
-    .quick-add-modal__content .product-information__media .media-gallery__preview-thumb::after {
+    @media screen and (max-width: 820px) {
       display: none;
     }
+  }
 
-    .quick-add-modal__content .product-information__media .media-gallery__preview-thumb.is-active {
-      border-color: var(--color-foreground);
-    }
+  .quick-add-modal__content .product-information__media slideshow-slide:nth-child(1) {
+    animation: fadeSlideIn 0.3s var(--animation-timing-fade-in) both;
+  }
+
+  .quick-add-modal__content .product-information__media slideshow-slide:nth-child(2) {
+    animation: fadeSlideIn 0.3s var(--animation-timing-fade-in) both;
+    animation-delay: 0.05s;
+  }
+
+  .quick-add-modal__content .product-information__media slideshow-slide:nth-child(3) {
+    animation: fadeSlideIn 0.3s var(--animation-timing-fade-in) both;
+    animation-delay: 0.1s;
   }
 
   .quick-add-modal__content .product-information__media :is(slideshow-controls, slideshow-controls[thumbnails]) {
