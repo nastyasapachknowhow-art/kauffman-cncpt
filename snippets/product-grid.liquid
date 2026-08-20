@@ -6,28 +6,8 @@
   @param {object} products - Array of product objects
   @param {string} [title] - Header of the collection or search results
   @param {string} children - List or grid of product cards
-  @param {string} [pagination_type] - One of `load_more`, `infinite`, or `pages`
-  @param {boolean} [enable_infinite_scroll] - Legacy infinite-scroll flag used by search
+  @param {boolean} [enable_infinite_scroll] - Whether to enable infinite scroll (default: true)
 {%- enddoc -%}
-
-{% liquid
-  if pagination_type == blank
-    if enable_infinite_scroll
-      assign pagination_type = 'infinite'
-    else
-      assign pagination_type = 'pages'
-    endif
-  endif
-
-  assign mobile_columns = section.settings.columns_mobile
-  if mobile_columns == blank
-    if section.settings.mobile_product_card_size == 'large'
-      assign mobile_columns = 1
-    else
-      assign mobile_columns = 2
-    endif
-  endif
-%}
 
 {% capture product_card_size %}
   {% render 'util-product-grid-card-size' section: section %}
@@ -39,11 +19,7 @@
     {% case section.settings.layout_type %}
       {% when 'grid' %}
         .product-grid--{{ section.id }}:is(.product-grid--grid) {
-          {% if section.settings.columns_desktop != blank %}
-            --product-grid-columns-desktop: repeat({{ section.settings.columns_desktop }}, minmax(0, 1fr));
-          {% else %}
-            --product-grid-columns-desktop: repeat(auto-fill, minmax({{ product_card_size }}, 1fr));
-          {% endif %}
+          --product-grid-columns-desktop: repeat(auto-fill, minmax({{ product_card_size }}, 1fr));
         }
 
 
@@ -70,13 +46,15 @@
         }
     {% endcase %}
 
-    {% if section.settings.columns_tablet != blank %}
-      @media screen and (max-width: 1099px) {
-        .product-grid--{{ section.id }}:is(.product-grid--grid) {
-          --product-grid-columns-desktop: repeat({{ section.settings.columns_tablet }}, minmax(0, 1fr));
+    /* This logic helps prevent displaying one column for an large or extra-large product card size on a small screen. We want it to display at least two columns. */
+    {% case section.settings.product_card_size %}
+      {% when 'extra-large' or 'large' %}
+        @container product-grid (max-width: calc({{ product_card_size }} * 3 + {{ section.settings.columns_gap_horizontal }}px * 2)) {
+          .product-grid--{{ section.id }}:is(.product-grid--grid) {
+            --product-grid-columns-desktop: repeat(2, 1fr);
+          }
         }
-      }
-    {% endif %}
+    {% endcase %}
 
     /* When zoomed out, fit as many 100px-wide columns as possible */
     .product-grid--{{ section.id }}[product-grid-view='zoom-out'] {
@@ -132,7 +110,7 @@
         </p>
       </div>
     {% else %}
-      {% if pagination_type == 'infinite' %}
+      {% if enable_infinite_scroll %}
         <span ref="viewMorePrevious"></span>
       {% endif %}
 
@@ -140,14 +118,14 @@
         <h4 class="main-collection-grid__title">{{ title }}</h4>
       {% endif %}
       <ul
-        class="product-grid product-grid--{{ section.id }} product-grid--{{ section.settings.layout_type }} {% if mobile_columns == 1 %} product-grid-mobile--large{% endif %}"
+        class="product-grid product-grid--{{ section.id }} product-grid--{{ section.settings.layout_type }} {% if section.settings.mobile_product_card_size == 'large' %} product-grid-mobile--large{% endif %}"
         data-testid="product-grid"
         product-grid-view="default"
         ref="grid"
         role="list"
         data-last-page="{{ paginate.pages }}"
         data-product-card-size="{{ section.settings.product_card_size }}"
-        style="--mobile-columns: {{ mobile_columns }};"
+        style="--mobile-columns: {% if section.settings.mobile_product_card_size == 'large' %}1{% else %}2{% endif %};"
       >
         {% comment %}
           This script is used to set the grid view on the product grid stored in sessionStorage. Keeping it here helps us prevent seeing the default state.
@@ -181,26 +159,8 @@
 
         {{ children }}
       </ul>
-      {% if pagination_type == 'infinite' %}
+      {% if enable_infinite_scroll != false %}
         <span ref="viewMoreNext"></span>
-      {% elsif pagination_type == 'load_more' and paginate.next %}
-        <div class="product-grid__load-more-wrapper">
-          <a
-            class="button button-secondary product-grid__load-more"
-            href="{{ paginate.next.url }}"
-            ref="loadMore"
-            on:click="/loadNextPage"
-          >
-            <span ref="loadMoreText">{{ 'actions.show_more' | t }}</span>
-          </a>
-          <p
-            class="visually-hidden"
-            aria-live="polite"
-            aria-atomic="true"
-            data-count-template="{{ 'content.item_count' | t: count: '__COUNT__' | escape }}"
-            ref="loadMoreStatus"
-          ></p>
-        </div>
       {% else %}
         {% render 'pagination-controls', paginate: paginate %}
       {% endif %}
@@ -218,28 +178,6 @@
     @media screen and (min-width: 821px) {
       --product-grid-gap: var(--product-grid-gap-desktop);
     }
-  }
-
-  @media screen and (max-width: 820px) {
-    .product-grid {
-      grid-template-columns: repeat(var(--mobile-columns), minmax(0, 1fr));
-    }
-  }
-
-  .product-grid__load-more-wrapper {
-    display: flex;
-    justify-content: center;
-    padding: var(--padding-2xl) var(--page-margin) var(--padding-lg);
-  }
-
-  .product-grid__load-more {
-    min-width: min(100%, 18rem);
-    justify-content: center;
-  }
-
-  .product-grid__load-more[aria-busy='true'] {
-    opacity: 0.6;
-    pointer-events: none;
   }
 
   .product-grid slideshow-arrows .slideshow-control {

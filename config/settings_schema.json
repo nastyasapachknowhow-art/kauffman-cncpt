@@ -2072,7 +2072,7 @@
         "type": "checkbox",
         "id": "quick_add",
         "label": "t:settings.quick_add",
-        "default": false
+        "default": true
       },
       {
         "type": "checkbox",

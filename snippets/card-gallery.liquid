@@ -134,11 +134,9 @@
             continue
           endif
 
-          if forloop.first
-            if section.index == null or section.index < 5
-              assign loading = 'eager'
-              assign sizes = image_sizes
-            endif
+          if forloop.first and section.index == null or section.index < 5
+            assign loading = 'eager'
+            assign sizes = image_sizes
           endif
 
           assign class = 'product-media-container media-fit product-media-container--[media_type]' | replace: '[media_type]', media.media_type
@@ -158,12 +156,6 @@
       if settings.product_card_carousel == false
         assign slideshow_attributes = slideshow_attributes | append: ' disabled="true"'
       endif
-
-      capture gallery_controls
-        if settings.product_card_carousel and visible_slide_count > 1
-          render 'slideshow-controls', style: 'bullets', item_count: visible_slide_count, controls_on_media: true, class: 'product-card-gallery__pagination'
-        endif
-      endcapture
     %}
     <a
       class="contents"
@@ -177,8 +169,6 @@
         slides: slides,
         slide_count: media_list_to_show.size,
         show_arrows: show_arrows,
-        controls: gallery_controls,
-        controls_inside_container: true,
         attributes: slideshow_attributes
       %}
     </a>
@@ -397,26 +387,6 @@
     @container (max-width: 249px) {
       padding-inline: 0 var(--padding-sm);
     }
-  }
-
-  .card-gallery .product-card-gallery__pagination {
-    --slideshow-bullets-gap: 5px;
-    --slideshow-bullet-size: 5px;
-
-    width: fit-content;
-    min-height: 28px;
-    inset-inline-start: 50%;
-    inset-inline-end: auto;
-    bottom: var(--padding-xs);
-    translate: -50% 0;
-    padding: 6px 8px;
-    border-radius: var(--style-border-radius-pills);
-    background: rgb(0 0 0 / 28%);
-    backdrop-filter: blur(8px);
-  }
-
-  .card-gallery .product-card-gallery__pagination .slideshow-controls__bullets {
-    padding: 0;
   }
 
   /*

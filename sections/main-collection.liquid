@@ -28,7 +28,7 @@
   class="section product-grid-container color-{{ section.settings.color_scheme }}"
   style="--padding-block-start: {{ section.settings.padding-block-start }}px; --padding-block-end: {{ section.settings.padding-block-end }}px;"
   section-id="{{ section.id }}"
-  pagination-type="{{ section.settings.pagination_type }}"
+  infinite-scroll="{{ section.settings.enable_infinite_scroll }}"
 >
   {% render 'skip-to-content-link', href: '#ResultsList', text: 'accessibility.skip_to_results_list' %}
 
@@ -42,7 +42,11 @@
       results_size: collection.products_count
     %}
 
-    {% assign products_per_page = section.settings.products_per_page | default: 24 %}
+    {% assign products_per_page = 24 %}
+
+    {% if section.settings.enable_infinite_scroll == false %}
+      {% assign products_per_page = section.settings.products_per_page %}
+    {% endif %}
 
     {% paginate collection.products by products_per_page %}
       {% capture children %}
@@ -66,7 +70,7 @@
         children: children,
         products: collection.products,
         paginate: paginate,
-        pagination_type: section.settings.pagination_type
+        enable_infinite_scroll: section.settings.enable_infinite_scroll
       %}
     {% endpaginate %}
   </div>
@@ -122,23 +126,25 @@
     },
     {
       "type": "select",
-      "id": "pagination_type",
-      "label": "Pagination",
+      "id": "mobile_product_card_size",
+      "label": "t:settings.mobile_card_size",
       "options": [
         {
-          "value": "load_more",
-          "label": "Load more button"
+          "value": "small",
+          "label": "t:options.small"
         },
         {
-          "value": "infinite",
-          "label": "Auto load on scroll"
-        },
-        {
-          "value": "pages",
-          "label": "Page links"
+          "value": "large",
+          "label": "t:options.large"
         }
       ],
-      "default": "load_more"
+      "default": "small"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_infinite_scroll",
+      "label": "t:settings.auto_load_products",
+      "default": true
     },
     {
       "type": "range",
@@ -148,37 +154,7 @@
       "max": 36,
       "step": 4,
       "default": 24,
-      "visible_if": "{{ section.settings.pagination_type != 'infinite' }}"
-    },
-    {
-      "type": "range",
-      "id": "columns_mobile",
-      "label": "Mobile columns",
-      "min": 1,
-      "max": 2,
-      "step": 1,
-      "default": 2,
-      "visible_if": "{{ section.settings.layout_type == 'grid' }}"
-    },
-    {
-      "type": "range",
-      "id": "columns_tablet",
-      "label": "Tablet columns",
-      "min": 2,
-      "max": 4,
-      "step": 1,
-      "default": 3,
-      "visible_if": "{{ section.settings.layout_type == 'grid' }}"
-    },
-    {
-      "type": "range",
-      "id": "columns_desktop",
-      "label": "Desktop columns",
-      "min": 2,
-      "max": 6,
-      "step": 1,
-      "default": 4,
-      "visible_if": "{{ section.settings.layout_type == 'grid' }}"
+      "visible_if": "{{ section.settings.enable_infinite_scroll == false }}"
     },
     {
       "type": "header",
