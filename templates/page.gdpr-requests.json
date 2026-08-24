@@ -1,0 +1,9 @@
+{
+  "sections": {
+    "main": {
+      "type": "kauffman-gdpr-request",
+      "settings": {}
+    }
+  },
+  "order": ["main"]
+}
