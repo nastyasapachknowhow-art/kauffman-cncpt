@@ -529,6 +529,11 @@
     margin-bottom: 0;
   }
 
+  .cart-items__product-info,
+  .cart-items__details {
+    min-width: 0;
+  }
+
   .cart-items__details {
     grid-area: details;
     color: rgb(var(--color-foreground-rgb) / var(--opacity-70));
@@ -552,6 +557,7 @@
     color: var(--color-foreground);
     text-transform: var(--product-title-case);
     display: block;
+    overflow-wrap: anywhere;
     margin-block-start: calc((var(--font-size--md) - 1lh) / 2);
   }
 
