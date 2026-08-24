@@ -90,23 +90,30 @@
         {% endif %}
 
         {% form 'customer', class: 'kauffman-footer__newsletter-form' %}
-          <input type="hidden" name="contact[tags]" value="newsletter">
-          <label class="visually-hidden" for="KauffmanFooterEmail-{{ section.id }}">{{ section.settings.email_placeholder }}</label>
-          <input
-            id="KauffmanFooterEmail-{{ section.id }}"
-            class="kauffman-footer__newsletter-input"
-            type="email"
-            name="contact[email]"
-            value="{{ form.email }}"
-            autocorrect="off"
-            autocapitalize="off"
-            autocomplete="email"
-            placeholder="{{ section.settings.email_placeholder }}"
-            required
-          >
-          <button class="kauffman-footer__newsletter-button" type="submit">
-            {{ section.settings.subscribe_label }}
-          </button>
+          {% assign privacy_policy_url = shop.privacy_policy.url | default: '/policies/privacy-policy' %}
+          <div class="kauffman-footer__newsletter-input-row">
+            <input type="hidden" name="contact[tags]" value="newsletter">
+            <label class="visually-hidden" for="KauffmanFooterEmail-{{ section.id }}">{{ section.settings.email_placeholder }}</label>
+            <input
+              id="KauffmanFooterEmail-{{ section.id }}"
+              class="kauffman-footer__newsletter-input"
+              type="email"
+              name="contact[email]"
+              value="{{ form.email }}"
+              autocorrect="off"
+              autocapitalize="off"
+              autocomplete="email"
+              placeholder="{{ section.settings.email_placeholder }}"
+              required
+            >
+            <button class="kauffman-footer__newsletter-button" type="submit">
+              {{ section.settings.subscribe_label }}
+            </button>
+          </div>
+          <label class="kauffman-footer__newsletter-consent">
+            <input type="checkbox" name="contact[accepts_marketing]" value="true" required>
+            <span>I agree to receive marketing emails and have read the <a href="{{ privacy_policy_url }}">Privacy Policy</a>.</span>
+          </label>
           {% if form.errors %}
             <div class="kauffman-footer__form-message" role="alert">{{ form.errors | default_errors }}</div>
           {% endif %}
@@ -446,10 +453,13 @@
 
   .kauffman-footer__newsletter-form {
     position: relative;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 150px;
     width: 500px;
     max-width: 100%;
+  }
+
+  .kauffman-footer__newsletter-input-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 150px;
     min-height: 56px;
     border: 1px solid var(--kk-footer-border);
     border-radius: 2px;
@@ -485,6 +495,26 @@
     text-align: center;
     text-transform: uppercase;
     cursor: pointer;
+  }
+
+  .kauffman-footer__newsletter-consent {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    margin-top: 10px;
+    color: var(--kk-footer-muted);
+    font: 300 12px/18px Inter, var(--font-body--family), sans-serif;
+  }
+
+  .kauffman-footer__newsletter-consent input {
+    width: 14px;
+    height: 14px;
+    margin: 2px 0 0;
+    flex: 0 0 auto;
+  }
+
+  .kauffman-footer__newsletter-consent a {
+    color: inherit;
   }
 
   .kauffman-footer__form-message {
@@ -762,8 +792,11 @@
     }
 
     .kauffman-footer__newsletter-form {
-      grid-template-columns: minmax(0, 1fr) 128px;
       width: 100%;
+    }
+
+    .kauffman-footer__newsletter-input-row {
+      grid-template-columns: minmax(0, 1fr) 128px;
       min-height: 52px;
     }
 

@@ -1,0 +1,270 @@
+{% liquid
+  assign form_id = 'GdprRequestForm-' | append: section.id
+  assign privacy_policy_url = shop.privacy_policy.url
+  if privacy_policy_url == blank
+    assign privacy_policy_url = '/policies/privacy-policy'
+  endif
+%}
+
+<section class="gdpr-request" aria-labelledby="GdprRequestHeading-{{ section.id }}">
+  <div class="gdpr-request__intro">
+    <p class="gdpr-request__eyebrow">Privacy</p>
+    <h1 id="GdprRequestHeading-{{ section.id }}">Make a privacy request</h1>
+    <div class="gdpr-request__copy rte">
+      <p>Use this form to request access to, correction, deletion, restriction, transfer, or to object to the processing of your personal data.</p>
+      <p>We will confirm your identity before disclosing, changing, or deleting personal data. Please do not include payment-card details, passwords, or identity-document numbers in this form.</p>
+    </div>
+  </div>
+
+  {%- form 'contact', id: form_id, class: 'gdpr-request__form' -%}
+    <input type="hidden" name="contact[tags]" value="gdpr-request, privacy-request">
+    <input type="hidden" name="contact[Request source]" value="Privacy request page">
+
+    {%- if form.errors -%}
+      <div class="gdpr-request__message gdpr-request__message--error" role="alert" tabindex="-1" autofocus>
+        {{ form.errors | default_errors }}
+      </div>
+    {%- endif -%}
+
+    {%- if form.posted_successfully? -%}
+      <div class="gdpr-request__message gdpr-request__message--success" role="status" tabindex="-1" autofocus>
+        <h2>We received your request</h2>
+        <p>We will contact you at the email address provided to verify your identity and confirm the next steps.</p>
+      </div>
+    {%- else -%}
+      <div class="gdpr-request__field">
+        <label for="GdprRequestType-{{ section.id }}">What would you like to request?</label>
+        <select id="GdprRequestType-{{ section.id }}" name="contact[Request type]" required>
+          <option value="" selected disabled>Select a request type</option>
+          <option value="Access to personal data">Access to my personal data</option>
+          <option value="Correction of personal data">Correct my personal data</option>
+          <option value="Erasure of personal data">Delete my personal data</option>
+          <option value="Restriction of processing">Restrict processing of my personal data</option>
+          <option value="Data portability">Receive a portable copy of my personal data</option>
+          <option value="Object to processing">Object to processing of my personal data</option>
+          <option value="Withdraw marketing consent">Stop marketing communications</option>
+          <option value="Other privacy request">Another privacy request</option>
+        </select>
+      </div>
+
+      <div class="gdpr-request__field">
+        <label for="GdprRequestEmail-{{ section.id }}">Email address</label>
+        <input
+          id="GdprRequestEmail-{{ section.id }}"
+          type="email"
+          name="contact[email]"
+          value="{{ form.email }}"
+          autocomplete="email"
+          autocorrect="off"
+          autocapitalize="off"
+          spellcheck="false"
+          required
+          {% if form.errors contains 'email' %}
+            aria-invalid="true"
+          {% endif %}
+        >
+        <p class="gdpr-request__hint">Use the email address associated with your order or account, if you have one.</p>
+      </div>
+
+      <div class="gdpr-request__field">
+        <label for="GdprRequestReference-{{ section.id }}">Order number or customer reference <span>(optional)</span></label>
+        <input
+          id="GdprRequestReference-{{ section.id }}"
+          type="text"
+          name="contact[Order or customer reference]"
+          autocomplete="off"
+        >
+      </div>
+
+      <div class="gdpr-request__field">
+        <label for="GdprRequestDetails-{{ section.id }}">Details <span>(optional)</span></label>
+        <textarea id="GdprRequestDetails-{{ section.id }}" name="contact[Request details]" rows="6">{{- form.body -}}</textarea>
+        <p class="gdpr-request__hint">Tell us only what we need to understand your request. Do not send sensitive information through this form.</p>
+      </div>
+
+      <div class="gdpr-request__confirmation">
+        <input id="GdprRequestConfirm-{{ section.id }}" type="checkbox" name="contact[Identity confirmation]" value="Requester confirms they are the data subject or are authorized to act for them" required>
+        <label for="GdprRequestConfirm-{{ section.id }}">
+          <span class="gdpr-request__confirmation-title">Confirm your request</span>
+          <span>I confirm that I am the person concerned by this request, or that I am authorised to act for them.</span>
+        </label>
+      </div>
+
+      <p class="gdpr-request__notice">By submitting this form, you ask us to handle your request under our <a href="{{ privacy_policy_url }}">Privacy Policy</a>.</p>
+
+      <button class="gdpr-request__submit button" type="submit">Submit privacy request</button>
+    {%- endif -%}
+  {%- endform -%}
+</section>
+
+<style>
+  .gdpr-request {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr);
+    gap: clamp(2.5rem, 7vw, 8rem);
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: clamp(3rem, 8vw, 7rem) 1.5rem;
+  }
+
+  .gdpr-request__eyebrow {
+    margin: 0 0 0.875rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .gdpr-request h1,
+  .gdpr-request h2 {
+    margin: 0;
+    color: var(--color-foreground-heading, var(--color-foreground));
+  }
+
+  .gdpr-request h1 {
+    font-size: clamp(2.25rem, 4vw, 4rem);
+    line-height: 1;
+  }
+
+  .gdpr-request__copy {
+    margin-top: 1.5rem;
+    color: var(--color-foreground);
+    line-height: 1.6;
+    opacity: 0.8;
+  }
+
+  .gdpr-request__copy p + p {
+    margin-top: 1rem;
+  }
+
+  .gdpr-request__form {
+    display: grid;
+    gap: 1.25rem;
+    align-content: start;
+    padding: clamp(1.25rem, 3vw, 2rem);
+    border: 1px solid var(--color-border, currentColor);
+  }
+
+  .gdpr-request__field {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .gdpr-request__field label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .gdpr-request__field label span {
+    font-weight: 400;
+    opacity: 0.72;
+  }
+
+  .gdpr-request__field input,
+  .gdpr-request__field select,
+  .gdpr-request__field textarea {
+    width: 100%;
+    min-height: 3rem;
+    padding: 0.75rem;
+    border: 1px solid var(--color-border, currentColor);
+    border-radius: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+  }
+
+  .gdpr-request__field textarea {
+    min-height: 9rem;
+    resize: vertical;
+  }
+
+  .gdpr-request__hint,
+  .gdpr-request__notice {
+    margin: 0;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    opacity: 0.75;
+  }
+
+  .gdpr-request__notice a {
+    color: inherit;
+  }
+
+  .gdpr-request__confirmation {
+    display: grid;
+    grid-template-columns: 1.25rem minmax(0, 1fr);
+    gap: 0.875rem;
+    align-items: flex-start;
+    padding: 1rem;
+    border: 1px solid var(--color-border, currentColor);
+    background: rgb(var(--color-foreground-rgb) / var(--opacity-5));
+  }
+
+  .gdpr-request .gdpr-request__confirmation input[type='checkbox'] {
+    --checkbox-size: 1.25rem;
+    width: 1.25rem;
+    min-width: 1.25rem;
+    height: 1.25rem;
+    margin: 0.125rem 0 0;
+    margin-inline-end: 0;
+  }
+
+  .gdpr-request .gdpr-request__confirmation label {
+    display: grid;
+    gap: 0.25rem;
+    margin: 0;
+    color: inherit;
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.5;
+    cursor: pointer;
+  }
+
+  .gdpr-request__confirmation-title {
+    font-weight: 600;
+  }
+
+  .gdpr-request__submit {
+    width: 100%;
+  }
+
+  .gdpr-request__message {
+    padding: 1.25rem;
+    border: 1px solid currentColor;
+    line-height: 1.5;
+  }
+
+  .gdpr-request__message h2 {
+    font-size: 1.5rem;
+  }
+
+  .gdpr-request__message p {
+    margin: 0.75rem 0 0;
+  }
+
+  .gdpr-request__message--error {
+    color: rgb(165, 40, 40);
+  }
+
+  .gdpr-request__message--success {
+    color: rgb(28, 104, 58);
+  }
+
+  @media screen and (max-width: 749px) {
+    .gdpr-request {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+      padding-inline: 1rem;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "GDPR request form",
+  "tag": "section",
+  "class": "section-kauffman-gdpr-request",
+  "settings": []
+}
+{% endschema %}

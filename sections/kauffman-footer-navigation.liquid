@@ -316,7 +316,7 @@
     </div>
     <div class="kfv__col"><h3 class="kfv__title">{{ section.settings.shop_title }}</h3>{% if section.settings.shop_menu != blank %}<ul class="kfv__links">{% for link in section.settings.shop_menu.links %}<li><a href="{{ link.url }}">{{ link.title }}</a></li>{% endfor %}</ul>{% endif %}</div>
     <div class="kfv__col"><h3 class="kfv__title">{{ section.settings.customer_title }}</h3>{% if section.settings.customer_service_menu != blank %}<ul class="kfv__links">{% for link in section.settings.customer_service_menu.links %}<li><a href="{{ link.url }}">{{ link.title }}</a></li>{% endfor %}</ul>{% endif %}</div>
-    <div class="kfv__col"><h3 class="kfv__title">{{ section.settings.legal_title }}</h3>{% if section.settings.legal_menu != blank %}<ul class="kfv__links">{% for link in section.settings.legal_menu.links %}<li><a href="{{ link.url }}">{{ link.title }}</a></li>{% endfor %}</ul>{% endif %}</div>
+    <div class="kfv__col"><h3 class="kfv__title">{{ section.settings.legal_title }}</h3>{% if section.settings.legal_menu != blank or section.settings.show_privacy_request_link != false %}<ul class="kfv__links">{% for link in section.settings.legal_menu.links %}<li><a href="{{ link.url }}">{{ link.title }}</a></li>{% endfor %}{% if section.settings.show_privacy_request_link != false %}<li><a href="{{ section.settings.privacy_request_url | default: '/pages/gdpr-requests' }}">{{ section.settings.privacy_request_label | default: 'Privacy requests' }}</a></li>{% endif %}</ul>{% endif %}</div>
   </div>
   <div class="kfv__mobile">
     <div class="kfv__mobile-brand">{{ brand_block }}</div>
@@ -330,7 +330,7 @@
     </details>
     <details class="kfv__accordion" open>
       <summary><span>{{ section.settings.legal_title }}</span><span class="kfv__plus">+</span></summary>
-      {% if section.settings.legal_menu != blank %}<ul class="kfv__links">{% for link in section.settings.legal_menu.links %}<li><a href="{{ link.url }}">{{ link.title }}</a></li>{% endfor %}</ul>{% endif %}
+      {% if section.settings.legal_menu != blank or section.settings.show_privacy_request_link != false %}<ul class="kfv__links">{% for link in section.settings.legal_menu.links %}<li><a href="{{ link.url }}">{{ link.title }}</a></li>{% endfor %}{% if section.settings.show_privacy_request_link != false %}<li><a href="{{ section.settings.privacy_request_url | default: '/pages/gdpr-requests' }}">{{ section.settings.privacy_request_label | default: 'Privacy requests' }}</a></li>{% endif %}</ul>{% endif %}
     </details>
     {% if has_localization %}
       <div class="kfv__localization">
@@ -443,6 +443,9 @@
     { "type": "text", "id": "customer_title", "label": "Customer service title", "default": "Customer Service" },
     { "type": "link_list", "id": "legal_menu", "label": "Legal menu" },
     { "type": "text", "id": "legal_title", "label": "Legal title", "default": "Legal" },
+    { "type": "checkbox", "id": "show_privacy_request_link", "label": "Show privacy request link", "default": true },
+    { "type": "text", "id": "privacy_request_label", "label": "Privacy request link label", "default": "Privacy requests" },
+    { "type": "url", "id": "privacy_request_url", "label": "Privacy request page" },
     { "type": "range", "id": "padding_y_desktop", "label": "Padding vertical desktop", "min": 16, "max": 100, "step": 4, "unit": "px", "default": 52 },
     { "type": "range", "id": "padding_x_desktop", "label": "Padding horizontal desktop", "min": 16, "max": 100, "step": 4, "unit": "px", "default": 40 },
     { "type": "range", "id": "padding_y_mobile", "label": "Padding vertical mobile", "min": 16, "max": 80, "step": 4, "unit": "px", "default": 36 },
