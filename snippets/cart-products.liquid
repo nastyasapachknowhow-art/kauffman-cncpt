@@ -736,6 +736,28 @@
     }
   }
 
+  /* Keep the cart drawer price with the quantity controls, leaving the title a full row to wrap. */
+  .cart-drawer .cart-items__table-row {
+    grid-template-columns: clamp(2.5rem, 15cqi, 7.5rem) minmax(0, 1fr) max-content;
+    grid-template-areas:
+      'media details details'
+      'media quantity price'
+      'media error error';
+  }
+
+  .cart-drawer .cart-items__table-row--full-width-variants {
+    grid-template-areas:
+      'media details details'
+      'media variants variants'
+      'media unit_price unit_price'
+      'media quantity price'
+      'media error error';
+  }
+
+  .cart-drawer .cart-items__price {
+    align-self: center;
+  }
+
   .cart__subtotal-container,
   .cart__total-container {
     display: flex;
