@@ -82,10 +82,13 @@
         <p class="gdpr-request__hint">Tell us only what we need to understand your request. Do not send sensitive information through this form.</p>
       </div>
 
-      <label class="gdpr-request__confirmation" for="GdprRequestConfirm-{{ section.id }}">
+      <div class="gdpr-request__confirmation">
         <input id="GdprRequestConfirm-{{ section.id }}" type="checkbox" name="contact[Identity confirmation]" value="Requester confirms they are the data subject or are authorized to act for them" required>
-        <span>I confirm that I am the person concerned by this request, or that I am authorised to act for them.</span>
-      </label>
+        <label for="GdprRequestConfirm-{{ section.id }}">
+          <span class="gdpr-request__confirmation-title">Confirm your request</span>
+          <span>I confirm that I am the person concerned by this request, or that I am authorised to act for them.</span>
+        </label>
+      </div>
 
       <p class="gdpr-request__notice">By submitting this form, you ask us to handle your request under our <a href="{{ privacy_policy_url }}">Privacy Policy</a>.</p>
 
@@ -147,8 +150,7 @@
     gap: 0.5rem;
   }
 
-  .gdpr-request__field label,
-  .gdpr-request__confirmation {
+  .gdpr-request__field label {
     font-size: 0.875rem;
     font-weight: 600;
     line-height: 1.4;
@@ -190,17 +192,37 @@
   }
 
   .gdpr-request__confirmation {
-    display: flex;
-    gap: 0.75rem;
+    display: grid;
+    grid-template-columns: 1.25rem minmax(0, 1fr);
+    gap: 0.875rem;
     align-items: flex-start;
+    padding: 1rem;
+    border: 1px solid var(--color-border, currentColor);
+    background: rgb(var(--color-foreground-rgb) / var(--opacity-5));
+  }
+
+  .gdpr-request .gdpr-request__confirmation input[type='checkbox'] {
+    --checkbox-size: 1.25rem;
+    width: 1.25rem;
+    min-width: 1.25rem;
+    height: 1.25rem;
+    margin: 0.125rem 0 0;
+    margin-inline-end: 0;
+  }
+
+  .gdpr-request .gdpr-request__confirmation label {
+    display: grid;
+    gap: 0.25rem;
+    margin: 0;
+    color: inherit;
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.5;
     cursor: pointer;
   }
 
-  .gdpr-request__confirmation input {
-    width: 1rem;
-    height: 1rem;
-    margin-top: 0.15rem;
-    flex: 0 0 auto;
+  .gdpr-request__confirmation-title {
+    font-weight: 600;
   }
 
   .gdpr-request__submit {
