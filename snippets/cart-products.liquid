@@ -264,35 +264,6 @@
                     {%- endif -%}
                   </div>
 
-                  <div class="cart-items__unit-price-wrapper">
-                    <div>
-                      {% if item.original_price != item.final_price %}
-                        <span class="visually-hidden">{{ 'content.price_sale' | t }}</span>
-                        <span>{{ item.final_price | money }}</span>
-                        <span class="visually-hidden">{{ 'content.price_regular' | t }}</span>
-                        <s class="compare-at-price">
-                          {% if item.variant.compare_at_price > item.original_price %}
-                            {{ item.variant.compare_at_price | money }}
-                          {% else %}
-                            {{ item.original_price | money }}
-                          {% endif %}
-                        </s>
-                      {% else %}
-                        {% if item.variant.compare_at_price > item.original_price %}
-                          <span class="visually-hidden">{{ 'content.price_sale' | t }}</span>
-                        {% else %}
-                          <span class="visually-hidden">{{ 'content.price' | t }}</span>
-                        {% endif %}
-
-                        <span>{{ item.original_price | money }}</span>
-
-                        {% if item.variant.compare_at_price > item.original_price %}
-                          <span class="visually-hidden">{{ 'content.price_regular' | t }}</span>
-                          <s class="compare-at-price">{{ item.variant.compare_at_price | money }}</s>
-                        {% endif %}
-                      {% endif %}
-                    </div>
-                  </div>
                 </td>
                 <td
                   class="cart-items__quantity"
@@ -437,14 +408,13 @@
     margin-bottom: var(--margin-lg);
   }
 
-  /* Cart drawer: separate grid areas for variants and unit price */
+  /* Cart drawer: place variants on their own row. */
   .cart-drawer .cart-items__table-row--full-width-variants {
     grid-template-columns: clamp(2.5rem, 15cqi, 7.5rem) minmax(0, 1fr) auto;
-    grid-template-rows: repeat(4, min-content) 1fr;
+    grid-template-rows: repeat(3, min-content) 1fr;
     grid-template-areas:
       'media details price'
       'media variants variants'
-      'media unit_price unit_price'
       'media quantity quantity'
       'media error error';
 
@@ -466,11 +436,6 @@
       p {
         margin: 0;
       }
-    }
-
-    .cart-items__unit-price-wrapper {
-      grid-area: unit_price;
-      font-size: var(--font-size--sm);
     }
 
     .cart-items__price {
@@ -720,13 +685,12 @@
       align-items: flex-end;
     }
 
-    /* Cart drawer: separate areas for variants and unit price */
+    /* Cart drawer: keep variants on their own row. */
     .cart-drawer .cart-items__table-row--full-width-variants {
-      grid-template-rows: min-content min-content min-content 1fr;
+      grid-template-rows: min-content min-content 1fr;
       grid-template-areas:
         'media details quantity price'
         'media variants variants variants'
-        'media unit_price unit_price unit_price'
         'media error error error';
 
       .cart-items__quantity,
@@ -749,7 +713,6 @@
     grid-template-areas:
       'media details details'
       'media variants variants'
-      'media unit_price unit_price'
       'media quantity price'
       'media error error';
   }
