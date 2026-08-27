@@ -30,8 +30,11 @@
     # Get the initial quantity based on quantity rules
     assign initial_quantity = current_variant.quantity_rule.min | default: 1
     assign sticky_bottom_mode = false
+    assign sticky_bottom_reserve = 0
     if section.settings.sticky_add_to_cart_style == 'bottom'
       assign sticky_bottom_mode = true
+      assign sticky_bottom_reserve = section.settings.sticky_bottom_padding_y | times: 2
+      assign sticky_bottom_reserve = sticky_bottom_reserve | plus: section.settings.sticky_bottom_height | plus: 20
     endif
     assign sticky_product_form_id = 'StickyAddToCart-ProductForm-' | append: section.id
   %}
@@ -563,10 +566,6 @@
     color: var(--color-foreground);
   }
 
-  body:has(.sticky-add-to-cart__bar--bottom) {
-    padding-bottom: calc(var(--sticky-bottom-height, var(--height-buy-buttons, 64px)) + (2 * var(--sticky-bottom-padding-y, 12px)) + 20px);
-  }
-
   /* Mobile adjustments */
   @media screen and (max-width: 820px) {
     .sticky-add-to-cart__bar {
@@ -664,6 +663,15 @@
     }
   }
 {% endstylesheet %}
+
+{% if sticky_bottom_mode %}
+  <style>
+    body:has(.sticky-add-to-cart__bar--bottom) > footer {
+      background: #0e0e0e;
+      padding-bottom: calc({{ sticky_bottom_reserve }}px + env(safe-area-inset-bottom));
+    }
+  </style>
+{% endif %}
 
 {% schema %}
 {
