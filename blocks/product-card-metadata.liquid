@@ -1,0 +1,24 @@
+{%- liquid
+  assign product_family = closest.product.metafields.custom.product_family.value
+  assign product_collection = closest.product.metafields.custom.collection.value
+-%}
+
+{%- if product_family != blank or product_collection != blank -%}
+  <p class="product-card__metadata" {{ block.shopify_attributes }}>
+    {%- if product_family != blank -%}
+      {{- product_family | escape -}}
+    {%- endif -%}
+    {%- if product_collection != blank -%}
+      {%- if product_family != blank -%}{{ ' ' }}{%- endif -%}
+      {{- product_collection | escape -}}
+    {%- endif -%}
+  </p>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Product card metadata",
+  "tag": null,
+  "settings": []
+}
+{% endschema %}

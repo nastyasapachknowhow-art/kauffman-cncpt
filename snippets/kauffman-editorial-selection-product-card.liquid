@@ -59,24 +59,26 @@
       </h3>
     </a>
 
-    {% if product_family != blank %}
-      <p class="kauffman-editorial-selection-v2-product-card__family">
-        {{ product_family }}
+    {% if product_family != blank or primary_collection != blank %}
+      <p class="kauffman-editorial-selection-v2-product-card__metadata">
+        {%- if product_family != blank -%}
+          {{- product_family -}}
+        {%- endif -%}
+        {%- if primary_collection != blank -%}
+          {%- if product_family != blank -%}{{ ' ' }}{%- endif -%}
+          {%- if primary_collection_resource != blank -%}
+            <a
+              class="kauffman-editorial-selection-v2-product-card__metadata-link"
+              href="{{ primary_collection_resource.url }}"
+              title="{{ primary_collection | escape }}"
+            >
+              {{- primary_collection -}}
+            </a>
+          {%- else -%}
+            {{- primary_collection -}}
+          {%- endif -%}
+        {%- endif -%}
       </p>
-    {% endif %}
-
-    {% if primary_collection != blank and primary_collection_resource != blank %}
-      <a
-        class="kauffman-editorial-selection-v2-product-card__collection"
-        href="{{ primary_collection_resource.url }}"
-        title="{{ primary_collection | escape }}"
-      >
-        {{ primary_collection }}
-      </a>
-    {% elsif primary_collection != blank %}
-      <span class="kauffman-editorial-selection-v2-product-card__collection">
-        {{ primary_collection }}
-      </span>
     {% endif %}
 
     {% if display_settings.show_vendor and card_product.vendor != blank %}

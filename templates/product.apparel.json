@@ -1443,8 +1443,8 @@
                 "width": "100%",
                 "max_width": "normal",
                 "alignment": "left",
-                "type_preset": "rte",
-                "font": "var(--font-body--family)",
+                "type_preset": "custom",
+                "font": "var(--font-heading--family)",
                 "font_size": "1rem",
                 "line_height": "normal",
                 "letter_spacing": "normal",
@@ -1461,19 +1461,25 @@
               },
               "blocks": {}
             },
+            "product_card_metadata": {
+              "type": "product-card-metadata",
+              "name": "Product card metadata",
+              "settings": {},
+              "blocks": {}
+            },
             "price_gLWgA6": {
               "type": "price",
               "settings": {
                 "show_sale_price_first": true,
                 "show_installments": false,
                 "show_tax_info": false,
-                "type_preset": "h6",
+                "type_preset": "custom",
                 "width": "100%",
                 "alignment": "left",
-                "font": "var(--font-body--family)",
+                "font": "var(--font-accent--family)",
                 "font_size": "1rem",
                 "line_height": "normal",
-                "letter_spacing": "normal",
+                "letter_spacing": "loose",
                 "case": "none",
                 "color": "var(--color-foreground)",
                 "padding-block-start": 0,
@@ -1487,6 +1493,7 @@
           "block_order": [
             "product_card_gallery_DNizbJ",
             "product_title_M7MJkb",
+            "product_card_metadata",
             "price_gLWgA6"
           ]
         }
