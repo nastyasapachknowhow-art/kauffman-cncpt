@@ -37,7 +37,7 @@
   %}
 
   <sticky-add-to-cart
-    class="sticky-add-to-cart"
+    class="sticky-add-to-cart{% if sticky_bottom_mode %} sticky-add-to-cart--bottom{% endif %}"
     data-variant-available="{{ current_variant.available }}"
     data-product-id="{{ product.id }}"
     data-current-variant-id="{{ current_variant.id }}"
@@ -353,6 +353,19 @@
     z-index: var(--layer-sticky);
   }
 
+  /* Keep the persistent bottom CTA on its own dark dock instead of exposing the page background after the footer. */
+  sticky-add-to-cart.sticky-add-to-cart--bottom::after {
+    content: '';
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: calc(var(--sticky-bottom-height) + (2 * var(--sticky-bottom-padding-y)) + 20px);
+    background: #0e0e0e;
+    pointer-events: none;
+    z-index: calc(var(--layer-sticky) - 1);
+  }
+
   .sticky-add-to-cart__bar--bottom[data-stuck='false'],
   .sticky-add-to-cart__bar--bottom[data-stuck='true'] {
     opacity: 1;
@@ -456,6 +469,7 @@
     border-radius: var(--sticky-bottom-button-radius);
     text-transform: uppercase;
     letter-spacing: clamp(0.04em, 1.5vw, 0.18em);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 45%);
   }
 
   .sticky-add-to-cart__notify-button {
