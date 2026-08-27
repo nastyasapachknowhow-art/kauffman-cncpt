@@ -36,14 +36,8 @@ html[scroll-lock] {
   overflow: hidden;
 }
 
-/* Extend the dark footer into the iOS safe area on touch devices. */
+/* Let the footer, rather than the document background, extend beneath iOS Safari controls. */
 @media (any-pointer: coarse) {
-  html.footer-chrome-dark,
-  html.footer-chrome-dark body {
-    background-color: #0e0e0e;
-    color-scheme: dark;
-  }
-
   body > footer {
     background-color: #0e0e0e;
     padding-bottom: env(safe-area-inset-bottom);
