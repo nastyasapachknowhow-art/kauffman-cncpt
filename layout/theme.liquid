@@ -144,7 +144,6 @@
         const updateChrome = () => {
           const color = footerIsVisible ? footerColor : headerColor;
 
-          document.documentElement.classList.toggle('footer-chrome-dark', footerIsVisible);
           if (themeColor && themeColor.content !== color) themeColor.setAttribute('content', color);
         };
 
