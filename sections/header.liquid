@@ -190,7 +190,7 @@
 
 {% capture localization_markup %}
   {% if show_country or show_language %}
-    <button type="button" class="kauffman-localization-trigger header-actions__action mobile:hidden" data-kauffman-localization-trigger aria-haspopup="dialog" aria-controls="KauffmanLocalizationPopup">
+    <button type="button" class="header-localization-trigger kauffman-localization-trigger header-actions__action mobile:hidden" data-kauffman-localization-trigger aria-haspopup="dialog" aria-controls="KauffmanLocalizationPopup">
       {% if show_country %}
         <span
           class="kauffman-localization-trigger__flag"
@@ -919,6 +919,11 @@
     display: inline-flex;
     align-items: center;
     gap: 7px;
+  }
+
+  /* The drawer header is also used for touch/tablet layouts above the mobile breakpoint. */
+  #header-component[data-menu-style='drawer'] .header-localization-trigger {
+    display: none;
   }
 
   .kauffman-localization-trigger__flag {
