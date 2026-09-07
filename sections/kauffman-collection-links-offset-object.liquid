@@ -78,6 +78,26 @@
   #{{ section_id }} .kcl-image.is-active {
     opacity: var(--kcl-image-opacity);
     transform: rotate(-4deg) scale(1.06);
+    animation: kcl-image-jitter 220ms ease-out;
+  }
+
+  @keyframes kcl-image-jitter {
+    0%,
+    100% {
+      transform: rotate(-4deg) scale(1.06) translateX(0);
+    }
+
+    28% {
+      transform: rotate(-3.6deg) scale(1.06) translateX(-3px);
+    }
+
+    56% {
+      transform: rotate(-4.4deg) scale(1.06) translateX(3px);
+    }
+
+    78% {
+      transform: rotate(-3.8deg) scale(1.06) translateX(-1px);
+    }
   }
 
   #{{ section_id }} .kcl-image img,
@@ -217,6 +237,26 @@
 
     #{{ section_id }} .kcl-image.is-active {
       transform: scale(1.02);
+      animation-name: kcl-image-jitter-mobile;
+    }
+
+    @keyframes kcl-image-jitter-mobile {
+      0%,
+      100% {
+        transform: scale(1.02) translateX(0);
+      }
+
+      28% {
+        transform: scale(1.02) translateX(-3px);
+      }
+
+      56% {
+        transform: scale(1.02) translateX(3px);
+      }
+
+      78% {
+        transform: scale(1.02) translateX(-1px);
+      }
     }
 
     #{{ section_id }} .kcl-image img {
@@ -249,6 +289,10 @@
     #{{ section_id }} .kcl-link,
     #{{ section_id }} .kcl-text-layer {
       transition: none;
+    }
+
+    #{{ section_id }} .kcl-image.is-active {
+      animation: none;
     }
   }
 {% endstyle %}
