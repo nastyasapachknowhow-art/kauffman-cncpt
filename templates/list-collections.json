@@ -278,7 +278,7 @@
         "padding_top_desktop": 0,
         "padding_bottom_desktop": 0,
         "padding_top_mobile": 0,
-        "padding_bottom_mobile": 40,
+        "padding_bottom_mobile": 0,
         "side_padding_desktop": 0,
         "side_padding_mobile": 0,
         "text_font": "cormorant_n4",

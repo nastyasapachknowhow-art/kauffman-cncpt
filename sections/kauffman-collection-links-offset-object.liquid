@@ -192,8 +192,7 @@
 
   @media screen and (max-width: 749px) {
     #{{ section_id }}.kcl-section {
-      padding-top: var(--kcl-padding-top-mobile);
-      padding-bottom: var(--kcl-padding-bottom-mobile);
+      padding-block: 0;
     }
 
     #{{ section_id }} .kcl-section__inner {
@@ -201,8 +200,10 @@
     }
 
     #{{ section_id }} .kcl-stage {
-      min-height: 84vh;
-      min-height: 84svh;
+      min-height: calc(100vh - var(--header-height, 60px));
+      min-height: calc(100svh - var(--header-height, 60px));
+      block-size: calc(100vh - var(--header-height, 60px));
+      block-size: calc(100svh - var(--header-height, 60px));
     }
 
     #{{ section_id }} .kcl-image {
@@ -228,7 +229,7 @@
       align-self: end;
       max-width: none;
       margin: 0;
-      padding: 0 5vw 7vh;
+      padding: 0 5vw max(24px, calc(16px + env(safe-area-inset-bottom)));
       column-gap: {{ section.settings.column_gap_mobile }}px;
       row-gap: {{ section.settings.row_gap_mobile }}px;
     }
