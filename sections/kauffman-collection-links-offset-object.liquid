@@ -221,8 +221,25 @@
 
     #{{ section_id }} .kcl-image img {
       object-position: 50% 6%;
-      -webkit-mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, 0.92) 30%, transparent 56%);
-      mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, 0.92) 30%, transparent 56%);
+      -webkit-mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, 0.94) 42%, rgba(0, 0, 0, 0.58) 62%, transparent 78%);
+      mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, 0.94) 42%, rgba(0, 0, 0, 0.58) 62%, transparent 78%);
+    }
+
+    #{{ section_id }} .kcl-images::after {
+      position: absolute;
+      inset: 44% 0 0;
+      z-index: 1;
+      content: '';
+      pointer-events: none;
+      background: linear-gradient(
+        to bottom,
+        rgb(255 255 255 / 0) 0%,
+        rgb(255 255 255 / 0.22) 28%,
+        rgb(255 255 255 / 0.78) 68%,
+        #fff 100%
+      );
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
     }
 
     #{{ section_id }} .kcl-list {
