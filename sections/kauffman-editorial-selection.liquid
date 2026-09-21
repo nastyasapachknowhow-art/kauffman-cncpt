@@ -442,8 +442,9 @@
     }
 
     #{{ section_id }} .kauffman-editorial-selection-v2__media {
-      height: clamp(320px, var(--kesv2-editorial-height-mobile), 760px);
-      min-height: clamp(320px, var(--kesv2-editorial-height-mobile), 760px);
+      /* Preserve the editorial image as a stop in the journey, not a second homepage. */
+      height: clamp(320px, min(var(--kesv2-editorial-height-mobile), 72svh), 640px);
+      min-height: clamp(320px, min(var(--kesv2-editorial-height-mobile), 72svh), 640px);
     }
 
     #{{ section_id }} .kauffman-editorial-selection-v2__video--desktop {
@@ -468,6 +469,13 @@
 
     #{{ section_id }} .kauffman-editorial-selection-v2__heading {
       font-size: var(--kesv2-heading-size-mobile);
+    }
+
+    #{{ section_id }} .kauffman-editorial-selection-v2__cta {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      padding-block: 10px;
     }
 
     #{{ section_id }} .kauffman-editorial-selection-v2__spacer {

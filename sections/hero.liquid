@@ -648,6 +648,11 @@
   }
 
   @media screen and (max-width: 820px) {
+    .hero {
+      /* Keep the mobile hero cinematic without letting browser chrome turn it into a full-page wall. */
+      min-height: min(calc(var(--hero-min-height) - var(--hero-height-offset)), 88svh);
+    }
+
     .hero__media-wrapper--desktop {
       display: none;
     }
@@ -658,6 +663,11 @@
 
     .hero__media-grid {
       grid-template-columns: repeat(var(--hero-media-count-mobile, 1), 1fr);
+    }
+
+    .hero__content-wrapper {
+      padding-inline: max(16px, env(safe-area-inset-left)) max(16px, env(safe-area-inset-right));
+      padding-block-end: max(24px, env(safe-area-inset-bottom));
     }
 
     /* Mobile stacking */

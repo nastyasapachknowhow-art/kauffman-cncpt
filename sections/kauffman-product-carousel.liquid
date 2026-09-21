@@ -237,7 +237,14 @@
     }
 
     #{{ section_id }} .resource-list__carousel .resource-list__slide {
-      --slide-width: clamp(150px, var(--mobile-card-size, 60cqw), var(--slide-width-max));
+      --slide-width: clamp(180px, max(var(--mobile-card-size, 60cqw), 72cqw), var(--slide-width-max));
+      scroll-snap-stop: always;
+    }
+
+    #{{ section_id }} .resource-list__carousel {
+      --resource-list-column-gap: max(var(--kpc-gap-mobile), 12px);
+      scroll-padding-inline: 12px;
+      touch-action: pan-x;
     }
   }
 </style>
