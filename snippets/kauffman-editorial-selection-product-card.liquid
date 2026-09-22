@@ -34,7 +34,11 @@
 %}
 
 <div class="kauffman-editorial-selection-v2-product-card">
-  <a class="kauffman-editorial-selection-v2-product-card__media-link" href="{{ product_url }}">
+  <a
+    class="kauffman-editorial-selection-v2-product-card__media-link"
+    href="{{ product_url }}"
+    aria-label="{{ card_product.title | default: 'View product' | escape }}"
+  >
     <div class="kauffman-editorial-selection-v2-product-card__media">
       {% if card_product.featured_media != blank %}
         {{
@@ -43,6 +47,7 @@
           | image_tag:
             class: 'kauffman-editorial-selection-v2-product-card__image',
             loading: 'lazy',
+            alt: card_product.title | default: 'Kauffman Concept product',
             sizes: image_sizes,
             widths: '300, 450, 600, 800, 1000, 1200'
         }}

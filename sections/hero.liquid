@@ -108,6 +108,7 @@
   assign mobile_widths_array = mobile_widths | split: ', '
 
   assign fetch_priority = 'auto'
+  assign hero_alt_fallback = shop.name | default: 'Kauffman Concept'
 
   if section.index == 1
     assign fetch_priority = 'high'
@@ -139,7 +140,7 @@
           width: section.settings.image_1.width,
           widths: widths,
           height: section.settings.image_1.height,
-          alt: section.settings.image_1.alt,
+          alt: section.settings.image_1.alt | default: hero_alt_fallback,
           class: 'hero__media',
           sizes: sizes,
           fetchpriority: fetch_priority,
@@ -155,7 +156,7 @@
           width: section.settings.image_1.width,
           widths: widths,
           height: section.settings.image_1.height,
-          alt: section.settings.image_1.alt,
+          alt: section.settings.image_1.alt | default: hero_alt_fallback,
           class: 'hero__media',
           sizes: sizes,
           fetchpriority: fetch_priority,
@@ -191,7 +192,7 @@
             width: section.settings.image_1_mobile.width,
             widths: mobile_widths,
             height: section.settings.image_1_mobile.height,
-            alt: section.settings.image_1_mobile.alt,
+            alt: section.settings.image_1_mobile.alt | default: hero_alt_fallback,
             class: 'hero__media',
             sizes: sizes_mobile,
             fetchpriority: fetch_priority,
@@ -243,7 +244,7 @@
           width: section.settings.image_2.width,
           widths: widths,
           height: section.settings.image_2.height,
-          alt: section.settings.image_2.alt,
+          alt: section.settings.image_2.alt | default: hero_alt_fallback,
           class: 'hero__media',
           sizes: sizes,
           fetchpriority: fetch_priority,
@@ -259,7 +260,7 @@
           width: section.settings.image_2.width,
           widths: widths,
           height: section.settings.image_2.height,
-          alt: section.settings.image_2.alt,
+          alt: section.settings.image_2.alt | default: hero_alt_fallback,
           class: 'hero__media',
           sizes: sizes,
           fetchpriority: fetch_priority,
@@ -295,7 +296,7 @@
             width: section.settings.image_2_mobile.width,
             widths: mobile_widths,
             height: section.settings.image_2_mobile.height,
-            alt: section.settings.image_2_mobile.alt,
+            alt: section.settings.image_2_mobile.alt | default: hero_alt_fallback,
             class: 'hero__media',
             sizes: sizes_mobile,
             fetchpriority: fetch_priority,

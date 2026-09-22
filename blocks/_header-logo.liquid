@@ -20,7 +20,11 @@
     endif
   endif
 
-  assign alt_text_fallback = shop.name | escape | append: ' ' | append: 'accessibility.home' | t
+  assign home_label = 'accessibility.home' | t
+  if home_label contains 'Translation missing'
+    assign home_label = 'Home'
+  endif
+  assign alt_text_fallback = shop.name | default: 'Kauffman Concept' | append: ' ' | append: home_label
 %}
 
 {% comment %}
